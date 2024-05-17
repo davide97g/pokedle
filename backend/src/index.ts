@@ -5,9 +5,10 @@ import {
   guessPokemon,
   guessedFeatures,
   guessedNegativeFeatures,
+  updateInfo,
 } from "./solver";
 import cors from "cors";
-import { PokemonGuess, PokemonNegativeGuess } from "../../types/pokemon.model";
+import { PokemonValidationGuess } from "../../types/pokemon.model";
 
 dotenv.config();
 
@@ -28,8 +29,6 @@ app.get("/status", (_: any, res: any) => {
 });
 
 app.post("/reset", express.json(), (req: any, res: any) => {
-  console.info(req.body);
-
   guessHistoryPokemon.splice(0, guessHistoryPokemon.length);
   Object.assign(guessedFeatures, {});
   Object.assign(guessedNegativeFeatures, {});
@@ -37,14 +36,9 @@ app.post("/reset", express.json(), (req: any, res: any) => {
 });
 
 app.post("/guess", express.json(), (req: any, res: any) => {
-  console.info(req.body);
-  const { guess, negativeGuess } = req.body as {
-    guess: Partial<PokemonGuess>;
-    negativeGuess: Partial<PokemonNegativeGuess>;
-  };
-  Object.assign(guessedFeatures, guess);
-  Object.assign(guessedNegativeFeatures, negativeGuess);
-  res.send({ success: true, guess });
+  const validationGuess = req.body as Partial<PokemonValidationGuess>;
+  updateInfo(validationGuess);
+  res.send({ success: true });
 });
 
 app.get("/suggest", async (_: any, res: any) => {

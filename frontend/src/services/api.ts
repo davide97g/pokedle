@@ -1,8 +1,8 @@
 import { Pokemon } from "../../../types/pokemon.types";
 import {
-  PokemonGuess,
+  PokemonFeatures,
   PokemonModel,
-  PokemonNegativeGuess,
+  PokemonFeaturesNegative,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
 
@@ -35,8 +35,8 @@ export const getStatus = async () => {
       (res) =>
         res as {
           history: PokemonModel[];
-          guessedFeatures: Partial<PokemonGuess>;
-          guessedNegativeFeatures: Partial<PokemonNegativeGuess>;
+          guessedFeatures: Partial<PokemonFeatures>;
+          guessedNegativeFeatures: Partial<PokemonFeaturesNegative>;
         }
     )
     .catch((err) => {

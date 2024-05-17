@@ -59,36 +59,36 @@ function App() {
     input: string
   ): PokemonValidationGuess => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, type1, type2, color, habitat, evolutionStage, height, weight] =
+    const [_, type1, type2, habitat, color, evolutionStage, height, weight] =
       input.split("\n");
     return {
       type1: {
-        value: type1,
+        value: type1.toLocaleLowerCase(),
         valid: undefined,
       },
       type2: {
-        value: type2,
+        value: type2.toLocaleLowerCase(),
         valid: undefined,
       },
       color: {
-        value: color,
+        value: color.toLocaleLowerCase(),
         valid: undefined,
       },
       habitat: {
-        value: habitat,
+        value: habitat.toLocaleLowerCase(),
         valid: undefined,
       },
       evolutionStage: {
         value: parseInt(evolutionStage),
-        comparison: "equal",
+        comparison: undefined,
       },
       height: {
-        value: parseInt(height),
-        comparison: "equal",
+        value: parseInt(height.replace("m", "")),
+        comparison: undefined,
       },
       weight: {
-        value: parseInt(weight),
-        comparison: "equal",
+        value: parseInt(weight.replace("kg", "")) * 10,
+        comparison: undefined,
       },
     };
   };
@@ -98,12 +98,14 @@ function App() {
     document.addEventListener("paste", (event) => {
       const clipboardData = event.clipboardData;
       const pastedData = clipboardData?.getData("Text");
-      console.log(pastedData);
       if (pastedData) {
         const parsedData = parseInputToGuessValidation(pastedData);
         setValidationGuess(parsedData);
       }
     });
+    return () => {
+      document.removeEventListener("paste", () => {});
+    };
   }, []);
 
   return (
@@ -167,6 +169,7 @@ function App() {
         >
           {/* for each validation guess key create a checkbox to set validity */}
           <label htmlFor="type1">Type 1</label>
+          <input readOnly type="text" value={validationGuess?.type1.value} />
           <input
             id="type1"
             type="checkbox"
@@ -182,6 +185,7 @@ function App() {
             }
           />
           <label htmlFor="type2">Type 2</label>
+          <input readOnly type="text" value={validationGuess?.type2.value} />
           <input
             id="type2"
             type="checkbox"
@@ -196,22 +200,8 @@ function App() {
               })
             }
           />
-          <label htmlFor="color">Color</label>
-          <input
-            id="color"
-            type="checkbox"
-            checked={validationGuess?.color.valid}
-            onChange={(e) =>
-              setValidationGuess({
-                ...validationGuess!,
-                color: {
-                  ...validationGuess!.color,
-                  valid: e.target.checked,
-                },
-              })
-            }
-          />
           <label htmlFor="habitat">Habitat</label>
+          <input readOnly type="text" value={validationGuess?.habitat.value} />
           <input
             id="habitat"
             type="checkbox"
@@ -226,9 +216,64 @@ function App() {
               })
             }
           />
+          <label htmlFor="color">Color</label>
+          <input readOnly type="text" value={validationGuess?.color.value} />
+          <input
+            id="color"
+            type="checkbox"
+            checked={validationGuess?.color.valid}
+            onChange={(e) =>
+              setValidationGuess({
+                ...validationGuess!,
+                color: {
+                  ...validationGuess!.color,
+                  valid: e.target.checked,
+                },
+              })
+            }
+          />
+          <label htmlFor="evolutionStage">Evolution Stage</label>
+          <input
+            readOnly
+            type="text"
+            value={validationGuess?.evolutionStage.value}
+          />
+          <select
+            id="evolutionStage"
+            value={validationGuess?.evolutionStage.comparison}
+            onChange={(e) =>
+              setValidationGuess({
+                ...validationGuess!,
+                evolutionStage: {
+                  ...validationGuess!.evolutionStage,
+                  comparison: e.target.value as ValidationComparison,
+                },
+              })
+            }
+          >
+            <option
+              selected={validationGuess?.evolutionStage.comparison === "less"}
+              value="less"
+            >
+              Lower
+            </option>
+            <option
+              selected={validationGuess?.evolutionStage.comparison === "equal"}
+              value="equal"
+            >
+              Equal
+            </option>
+            <option
+              selected={
+                validationGuess?.evolutionStage.comparison === "greater"
+              }
+              value="greater"
+            >
+              Greater
+            </option>
+          </select>
           <label htmlFor="height">Height</label>
-          {/* radio with 3 options: less greater and equal */}
-
+          <input readOnly type="text" value={validationGuess?.height.value} />
           <select
             id="height"
             value={validationGuess?.height.comparison}
@@ -261,8 +306,8 @@ function App() {
               Greater
             </option>
           </select>
-
           <label htmlFor="weight">Weight</label>
+          <input readOnly type="text" value={validationGuess?.weight.value} />
           <select
             id="weight"
             value={validationGuess?.weight.comparison}
@@ -290,41 +335,6 @@ function App() {
             </option>
             <option
               selected={validationGuess?.weight.comparison === "greater"}
-              value="greater"
-            >
-              Greater
-            </option>
-          </select>
-          <label htmlFor="evolutionStage">Evolution Stage</label>
-          <select
-            id="evolutionStage"
-            value={validationGuess?.evolutionStage.comparison}
-            onChange={(e) =>
-              setValidationGuess({
-                ...validationGuess!,
-                evolutionStage: {
-                  ...validationGuess!.evolutionStage,
-                  comparison: e.target.value as ValidationComparison,
-                },
-              })
-            }
-          >
-            <option
-              selected={validationGuess?.evolutionStage.comparison === "less"}
-              value="less"
-            >
-              Lower
-            </option>
-            <option
-              selected={validationGuess?.evolutionStage.comparison === "equal"}
-              value="equal"
-            >
-              Equal
-            </option>
-            <option
-              selected={
-                validationGuess?.evolutionStage.comparison === "greater"
-              }
               value="greater"
             >
               Greater

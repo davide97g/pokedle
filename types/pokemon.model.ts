@@ -11,6 +11,15 @@ export interface PokemonModel {
   habitat: string;
 }
 
+export type FEATURE =
+  | "type1"
+  | "type2"
+  | "color"
+  | "habitat"
+  | "height"
+  | "weight"
+  | "evolutionStage";
+
 export type ValidationComparison = "greater" | "less" | "equal";
 export interface PokemonValidationGuess {
   type1: {
@@ -31,31 +40,33 @@ export interface PokemonValidationGuess {
   };
   height: {
     value: number;
-    comparison: ValidationComparison;
+    comparison: ValidationComparison | undefined;
   };
   weight: {
     value: number;
-    comparison: ValidationComparison;
+    comparison: ValidationComparison | undefined;
   };
   evolutionStage: {
     value: number;
-    comparison: ValidationComparison;
+    comparison: ValidationComparison | undefined;
   };
 }
 
-export interface PokemonGuess {
+export interface PokemonFeatures {
   type1?: string;
   type2?: string;
+  color?: string;
+  habitat?: string;
+  evolutionStage?: number;
   height?: number;
   weight?: number;
-  color?: string;
-  evolutionStage?: number;
-  habitat?: string;
 }
 
-export interface PokemonNegativeGuess {
-  type1List: string[];
-  type2List: string[];
+export interface PokemonFeaturesNegative {
+  type1: string[];
+  type2: string[];
+  color: string[];
+  habitat: string[];
   height: {
     min: number;
     max: number;
@@ -64,10 +75,8 @@ export interface PokemonNegativeGuess {
     min: number;
     max: number;
   };
-  colorList: string[];
   evolutionStage: {
     min: number;
     max: number;
   };
-  habitatList: string[];
 }
