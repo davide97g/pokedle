@@ -43,7 +43,7 @@ app.post("/guess", express.json(), (req: any, res: any) => {
 
 app.get("/suggest", async (_: any, res: any) => {
   const pokemon = guessPokemon();
-  res.send({ pokemon });
+  res.status(pokemon ? 200 : 500).send({ pokemon });
 });
 
 app.listen(port, () => {

@@ -6,6 +6,7 @@ import {
 } from "../../types/pokemon.model";
 
 import database from "../../database/data/pokemon-model.json";
+import { generateCombinations } from "./combinations";
 
 export const guessHistoryPokemon: PokemonModel[] = [];
 
@@ -132,34 +133,64 @@ export const updateInfo = (
   }
 };
 
+const countRemainingPokemonWithGuess = (
+  validationGuess: Partial<PokemonValidationGuess>,
+  pokemonList: PokemonModel[]
+) => {
+  const features = Object.keys(validationGuess) as FEATURE[];
+
+  const pokemonFiltered = pokemonList.filter((p) =>
+    features.every((feature) => {
+      const guess = validationGuess[feature] as {
+        value: string | number;
+        valid: boolean | undefined;
+        comparison: "greater" | "less" | "equal" | undefined;
+      };
+      const isValid = guess?.valid || guess?.comparison === "equal";
+      if (isValid) return p[feature] === guess.value;
+      else return p[feature] !== guess.value;
+    })
+  );
+
+  return pokemonFiltered.length;
+};
+
+const createGuessList = (
+  pokemon: PokemonModel,
+  remainingFeatures: FEATURE[]
+): Partial<PokemonValidationGuess>[] => {
+  const templateGuess: Partial<PokemonValidationGuess> = {};
+  // template guess
+  remainingFeatures.forEach((feature) => {
+    templateGuess[feature] = {
+      value: pokemon[feature],
+      valid: undefined,
+      comparison: undefined,
+    } as any;
+  });
+
+  const combs = generateCombinations(templateGuess);
+  return combs;
+};
+
 // for a give pokemon simulate all the possibile scenarios with every features potentially guessed or not
 const computeAvgScore = (
   pokemon: PokemonModel,
   remainingFeatures: FEATURE[],
   pokemonList: PokemonModel[]
 ): number => {
-  const totalPossibilities = 2 ** remainingFeatures.length;
   let totalScore = 0;
-  remainingFeatures.forEach((feature) => {
-    let score = 0;
-    const pokemonFeatureValue = pokemon[feature];
-    const pokemonFeatureCount = pokemonList.filter(
-      (p) => p[feature] === pokemonFeatureValue
-    ).length;
-    const pokemonFeatureCountInverse = pokemonList.filter(
-      (p) => p[feature] !== pokemonFeatureValue
-    ).length;
+  let count = 0;
 
-    // if the feature is present
-    score += pokemonFeatureCount;
+  const guessList = createGuessList(pokemon, remainingFeatures);
 
-    // if the feature is not present
-    score += pokemonFeatureCountInverse;
-
+  guessList.forEach((guess) => {
+    const score = countRemainingPokemonWithGuess(guess, pokemonList);
     totalScore += score;
+    if (score > 0) count++;
   });
 
-  return totalScore / totalPossibilities;
+  return totalScore / (count || 1);
 };
 
 // 7 features, 2 possibilities for each feature, 2^7 = 128 possibilities
@@ -167,34 +198,37 @@ const computeAvgScore = (
 const findOptimalPokemon = (
   pokemonList: PokemonModel[],
   remainingFeatures: FEATURE[]
-): PokemonModel => {
-  const pokemonScores: { pokemonId: number; avg: number }[] = [];
+) => {
+  const pokemonScores: { pokemonId: number; avg: number; name: string }[] = [];
 
   pokemonList.forEach((pokemon) => {
     const avg = computeAvgScore(pokemon, remainingFeatures, pokemonList);
-    pokemonScores.push({ pokemonId: pokemon.id, avg });
+    pokemonScores.push({ pokemonId: pokemon.id, avg, name: pokemon.name });
   });
 
-  console.info(pokemonScores);
+  pokemonScores.sort((a, b) => a.avg - b.avg);
+  if (pokemonScores.length === 0) return null;
 
-  const bestPokemonId = pokemonScores.sort((a, b) => a.avg - b.avg)?.[0]
-    .pokemonId;
-  return pokemonList.find((p) => p.id === bestPokemonId) as PokemonModel;
+  console.log(structuredClone(pokemonScores).splice(0, 10));
+  const bestPokemonId = pokemonScores[0].pokemonId;
+
+  return pokemonList.find((p) => p.id === bestPokemonId);
 };
 
-export const guessPokemon = (): PokemonModel => {
+export const guessPokemon = () => {
   const guessedPokemonIds = guessHistoryPokemon.map((p) => p.id);
   // Filter out the pokemons that have been guessed
-  PokemonList = PokemonList.filter((p) => !guessedPokemonIds.includes(p.id));
+  const pokemonStillToGuess = PokemonList.filter(
+    (p) => !guessedPokemonIds.includes(p.id)
+  );
 
   //  Filter out the pokemons that have the guessed features
   const guessedFeaturesKeys = Object.keys(guessedFeatures) as FEATURE[];
-  PokemonList = PokemonList.filter((p) =>
+  const pokemonWithCorrectFeatures = pokemonStillToGuess.filter((p) =>
     guessedFeaturesKeys.every((key) => p[key] === guessedFeatures[key])
   );
-  console.info(PokemonList);
 
-  PokemonList = PokemonList.filter((p) =>
+  const pokemonFiltered = pokemonWithCorrectFeatures.filter((p) =>
     Object.entries(guessedNegativeFeatures).every(([key, value]) => {
       if (Array.isArray(value)) {
         return !value.includes((p as any)[key]);
@@ -211,6 +245,10 @@ export const guessPokemon = (): PokemonModel => {
     (k) => !guessedFeaturesKeys.includes(k as FEATURE)
   ) as FEATURE[];
 
-  const bestPokemonToGuess = findOptimalPokemon(PokemonList, remainingFeatures);
+  const bestPokemonToGuess = findOptimalPokemon(
+    pokemonFiltered,
+    remainingFeatures
+  );
+  if (bestPokemonToGuess) guessHistoryPokemon.push(bestPokemonToGuess);
   return bestPokemonToGuess;
 };
