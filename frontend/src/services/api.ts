@@ -19,7 +19,7 @@ export const getRandomPokemon = async () => {
 };
 
 export const sendGuess = async (validationGuess: PokemonValidationGuess) => {
-  return fetch(`http://localhost:3000/guess`, {
+  return fetch(`http://localhost:3000/validation`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -37,6 +37,7 @@ export const getStatus = async () => {
           history: PokemonModel[];
           guessedFeatures: Partial<PokemonFeatures>;
           guessedNegativeFeatures: Partial<PokemonFeaturesNegative>;
+          pokemonToGuess: PokemonModel;
         }
     )
     .catch((err) => {
@@ -59,4 +60,26 @@ export const reset = async () => {
   return fetch(`http://localhost:3000/reset`, {
     method: "POST",
   });
+};
+
+export const sendGuessPokemon = async (pokemon: PokemonModel) => {
+  return fetch(`http://localhost:3000/guess-pokemon`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(pokemon),
+  })
+    .then((res) => res.json())
+    .then((res) => res.validation as PokemonValidationGuess);
+};
+
+export const getPokemons = async () => {
+  return fetch(`http://localhost:3000/pokemon/all`)
+    .then((res) => res.json())
+    .then((res) => res as PokemonModel[])
+    .catch((err) => {
+      console.info(err);
+      return null;
+    });
 };

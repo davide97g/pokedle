@@ -21,7 +21,7 @@ export const guessedNegativeFeatures: Partial<PokemonFeaturesNegative> = {
   weight: { min: 0, max: Infinity },
 };
 
-let PokemonList = database as PokemonModel[];
+export const PokemonList = database as PokemonModel[];
 
 export const updateInfo = (
   validationGuess: Partial<PokemonValidationGuess>

@@ -5,7 +5,14 @@ import {
   ValidationComparison,
 } from "../../types/pokemon.model";
 import "./App.css";
-import { getStatus, getSuggestion, reset, sendGuess } from "./services/api";
+import {
+  getPokemons,
+  getStatus,
+  getSuggestion,
+  reset,
+  sendGuess,
+  sendGuessPokemon,
+} from "./services/api";
 
 function App() {
   const [status, setStatus] = useState<{
@@ -13,6 +20,8 @@ function App() {
   }>({
     history: [],
   });
+
+  const [pokemonList, setPokemonList] = useState<PokemonModel[]>([]);
 
   const [validationGuess, setValidationGuess] =
     useState<PokemonValidationGuess>();
@@ -115,6 +124,14 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    getPokemons().then((res) => {
+      if (res) {
+        setPokemonList(res);
+      }
+    });
+  }, []);
+
   return (
     <>
       <h1>Solvedle</h1>
@@ -123,6 +140,25 @@ function App() {
         Restart
       </button>
       <br />
+      <br />
+      {/* create a select with option img+pokemon name */}
+      <label htmlFor="pokemon">Pokemon</label>
+      <select
+        id="pokemon"
+        onChange={(e) => {
+          const pokemonSelected = pokemonList.find(
+            (p) => p.name === e.target.value
+          );
+          if (pokemonSelected)
+            sendGuessPokemon(pokemonSelected).then((res) =>
+              setValidationGuess(res)
+            );
+        }}
+      >
+        {pokemonList.map((pokemon) => (
+          <option key={pokemon.name}>{pokemon.name}</option>
+        ))}
+      </select>
       <br />
       <div
         style={{
@@ -179,8 +215,8 @@ function App() {
                 <p>{pokemon.name}</p>
                 <img
                   src={pokemon.sprite}
-                  height={40}
-                  width={40}
+                  height={120}
+                  width={120}
                   alt={pokemon.name}
                 />
               </div>

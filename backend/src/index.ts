@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import {
+  PokemonList,
   guessHistoryPokemon,
   guessPokemon,
   guessedFeatures,
@@ -9,6 +10,7 @@ import {
 } from "./solver";
 import cors from "cors";
 import { PokemonValidationGuess } from "../../types/pokemon.model";
+import { POKEMON_TO_GUESS, testGuess } from "./player";
 
 dotenv.config();
 
@@ -25,7 +27,12 @@ app.get("/status", (_: any, res: any) => {
     history: guessHistoryPokemon,
     guessedFeatures,
     guessedNegativeFeatures,
+    pokemonToGuess: POKEMON_TO_GUESS,
   });
+});
+
+app.get("/pokemon/all", (_: any, res: any) => {
+  res.send(PokemonList);
 });
 
 app.post("/reset", express.json(), (req: any, res: any) => {
@@ -35,7 +42,13 @@ app.post("/reset", express.json(), (req: any, res: any) => {
   res.send({ success: true });
 });
 
-app.post("/guess", express.json(), (req: any, res: any) => {
+app.post("/guess-pokemon", express.json(), (req: any, res: any) => {
+  const pokemon = req.body;
+  const validation = testGuess(pokemon);
+  res.send({ validation });
+});
+
+app.post("/validation", express.json(), (req: any, res: any) => {
   const validationGuess = req.body as Partial<PokemonValidationGuess>;
   updateInfo(validationGuess);
   res.send({ success: true });
