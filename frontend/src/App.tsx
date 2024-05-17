@@ -1,37 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
-import "./App.css";
+import { useEffect, useState } from "react";
 import {
-  PokemonGuess,
   PokemonModel,
-  PokemonNegativeGuess,
+  PokemonValidationGuess,
+  ValidationComparison,
 } from "../../types/pokemon.model";
+import "./App.css";
 import { getStatus, getSuggestion, reset, sendGuess } from "./services/api";
 
 function App() {
   const [status, setStatus] = useState<{
     history: PokemonModel[];
-    guessedFeatures: Partial<PokemonGuess>;
-    guessedNegativeFeatures: Partial<PokemonNegativeGuess>;
   }>({
     history: [],
-    guessedFeatures: {},
-    guessedNegativeFeatures: {},
   });
 
-  const [guess, setGuess] = useState<Partial<PokemonGuess>>({});
+  const [validationGuess, setValidationGuess] =
+    useState<PokemonValidationGuess>();
+
   const [suggestion, setSuggestion] = useState<PokemonModel | null>(null);
-  const [negativeGuess, setNegativeGuess] = useState<
-    Partial<PokemonNegativeGuess>
-  >({});
-
-  useEffect(() => {
-    setGuess(status.guessedFeatures);
-    setNegativeGuess(status.guessedNegativeFeatures);
-  }, [status]);
-
-  const cleanGuess = useMemo(() => {
-    return Object.fromEntries(Object.entries(guess).filter((value) => value));
-  }, [guess]);
 
   const updateStatus = async () =>
     getStatus().then((res) => {
@@ -42,7 +28,8 @@ function App() {
     });
 
   const onSend = async () => {
-    await sendGuess({ guess: cleanGuess, negativeGuess })
+    if (!validationGuess) return;
+    await sendGuess(validationGuess)
       .then((res) => {
         console.log(res);
         updateStatus();
@@ -66,6 +53,57 @@ function App() {
 
   useEffect(() => {
     updateStatus();
+  }, []);
+
+  const parseInputToGuessValidation = (
+    input: string
+  ): PokemonValidationGuess => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_, type1, type2, color, habitat, evolutionStage, height, weight] =
+      input.split("\n");
+    return {
+      type1: {
+        value: type1,
+        valid: undefined,
+      },
+      type2: {
+        value: type2,
+        valid: undefined,
+      },
+      color: {
+        value: color,
+        valid: undefined,
+      },
+      habitat: {
+        value: habitat,
+        valid: undefined,
+      },
+      evolutionStage: {
+        value: parseInt(evolutionStage),
+        comparison: "equal",
+      },
+      height: {
+        value: parseInt(height),
+        comparison: "equal",
+      },
+      weight: {
+        value: parseInt(weight),
+        comparison: "equal",
+      },
+    };
+  };
+
+  // listen for paste event
+  useEffect(() => {
+    document.addEventListener("paste", (event) => {
+      const clipboardData = event.clipboardData;
+      const pastedData = clipboardData?.getData("Text");
+      console.log(pastedData);
+      if (pastedData) {
+        const parsedData = parseInputToGuessValidation(pastedData);
+        setValidationGuess(parsedData);
+      }
+    });
   }, []);
 
   return (
@@ -117,308 +155,181 @@ function App() {
           margin: "auto",
         }}
       >
+        <h3>Guess Validation</h3>
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             gap: "10px",
-            width: "200px",
+            width: "1200px",
             margin: "auto",
           }}
         >
-          <h3>Positive Guess</h3>
-          {/* create a dropdown with different types of type1 to choose from */}
-          <select
-            onChange={(e) => setGuess({ ...guess, type1: e.target.value })}
-          >
-            <option value=""></option>
-            <option value="normal">Normal</option>
-            <option value="fire">Fire</option>
-            <option value="water">Water</option>
-            <option value="electric">Electric</option>
-            <option value="grass">Grass</option>
-            <option value="ice">Ice</option>
-            <option value="fighting">Fighting</option>
-            <option value="poison">Poison</option>
-            <option value="ground">Ground</option>
-            <option value="flying">Flying</option>
-            <option value="psychic">Psychic</option>
-            <option value="bug">Bug</option>
-            <option value="rock">Rock</option>
-            <option value="ghost">Ghost</option>
-            <option value="dragon">Dragon</option>
-            <option value="dark">Dark</option>
-            <option value="steel">Steel</option>
-            <option value="fairy">Fairy</option>
-          </select>
-          {/* create a dropdown with different types of type2 to choose from */}
-
-          <select
-            onChange={(e) => setGuess({ ...guess, type2: e.target.value })}
-          >
-            <option value=""></option>
-            <option value="none">None</option>
-            <option value="normal">Normal</option>
-            <option value="fire">Fire</option>
-            <option value="water">Water</option>
-            <option value="electric">Electric</option>
-            <option value="grass">Grass</option>
-            <option value="ice">Ice</option>
-            <option value="fighting">Fighting</option>
-            <option value="poison">Poison</option>
-            <option value="ground">Ground</option>
-            <option value="flying">Flying</option>
-            <option value="psychic">Psychic</option>
-            <option value="bug">Bug</option>
-            <option value="rock">Rock</option>
-            <option value="ghost">Ghost</option>
-            <option value="dragon">Dragon</option>
-            <option value="dark">Dark</option>
-            <option value="steel">Steel</option>
-            <option value="fairy">Fairy</option>
-          </select>
-          {/* create a dropdown with different colors to choose from */}
-
-          <select
-            onChange={(e) => setGuess({ ...guess, color: e.target.value })}
-          >
-            <option value=""></option>
-            <option value="black">Black</option>
-            <option value="blue">Blue</option>
-            <option value="brown">Brown</option>
-            <option value="gray">Gray</option>
-            <option value="green">Green</option>
-            <option value="pink">Pink</option>
-            <option value="purple">Purple</option>
-            <option value="red">Red</option>
-            <option value="white">White</option>
-            <option value="yellow">Yellow</option>
-          </select>
-          {/* create a dropdown with different habitats to choose from */}
-          <select
-            onChange={(e) => setGuess({ ...guess, habitat: e.target.value })}
-          >
-            <option value=""></option>
-            <option value="cave">Cave</option>
-            <option value="forest">Forest</option>
-            <option value="grassland">Grassland</option>
-            <option value="mountain">Mountain</option>
-            <option value="rare">Rare</option>
-            <option value="rough-terrain">Rough Terrain</option>
-            <option value="sea">Sea</option>
-            <option value="urban">Urban</option>
-            <option value="waters-edge">Water's Edge</option>
-          </select>
-          {/* create a dropdown with different evolution stages to choose from */}
-          <select
-            onChange={(e) =>
-              setGuess({ ...guess, evolutionStage: parseInt(e.target.value) })
-            }
-          >
-            <option value=""></option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-          </select>
-          {/* input that takes a number for height */}
-          <input
-            type="number"
-            onChange={(e) =>
-              setGuess({ ...guess, height: parseInt(e.target.value) })
-            }
-          />
-          {/* input that takes a number for weight */}
-          <input
-            type="number"
-            onChange={(e) =>
-              setGuess({ ...guess, weight: parseInt(e.target.value) })
-            }
-          />
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            width: "200px",
-            margin: "auto",
-          }}
-        >
-          <h3>Negative Guess</h3>
-          {/* create a dropdown with different types of type1 to choose from */}
+          {/* for each validation guess key create a checkbox to set validity */}
           <label htmlFor="type1">Type 1</label>
-          <select
+          <input
             id="type1"
-            multiple
-            onChange={(e) => {
-              const values = Array.from(e.target.selectedOptions).map(
-                (option) => option.value
-              );
-              setNegativeGuess({ ...negativeGuess, type1List: values });
-            }}
-          >
-            <option value=""></option>
-            <option value="normal">Normal</option>
-            <option value="fire">Fire</option>
-            <option value="water">Water</option>
-            <option value="electric">Electric</option>
-            <option value="grass">Grass</option>
-            <option value="ice">Ice</option>
-            <option value="fighting">Fighting</option>
-            <option value="poison">Poison</option>
-            <option value="ground">Ground</option>
-            <option value="flying">Flying</option>
-            <option value="psychic">Psychic</option>
-            <option value="bug">Bug</option>
-            <option value="rock">Rock</option>
-            <option value="ghost">Ghost</option>
-            <option value="dragon">Dragon</option>
-            <option value="dark">Dark</option>
-            <option value="steel">Steel</option>
-            <option value="fairy">Fairy</option>
-          </select>
-          {/* create a dropdown with different types of type2 to choose from */}
+            type="checkbox"
+            checked={validationGuess?.type1.valid}
+            onChange={(e) =>
+              setValidationGuess({
+                ...validationGuess!,
+                type1: {
+                  ...validationGuess!.type1,
+                  valid: e.target.checked,
+                },
+              })
+            }
+          />
           <label htmlFor="type2">Type 2</label>
-          <select
+          <input
             id="type2"
-            multiple
-            onChange={(e) => {
-              const values = Array.from(e.target.selectedOptions).map(
-                (option) => option.value
-              );
-              setNegativeGuess({ ...negativeGuess, type2List: values });
-            }}
-          >
-            <option value=""></option>
-            <option value="none">None</option>
-            <option value="normal">Normal</option>
-            <option value="fire">Fire</option>
-            <option value="water">Water</option>
-            <option value="electric">Electric</option>
-            <option value="grass">Grass</option>
-            <option value="ice">Ice</option>
-            <option value="fighting">Fighting</option>
-            <option value="poison">Poison</option>
-            <option value="ground">Ground</option>
-            <option value="flying">Flying</option>
-            <option value="psychic">Psychic</option>
-            <option value="bug">Bug</option>
-            <option value="rock">Rock</option>
-            <option value="ghost">Ghost</option>
-            <option value="dragon">Dragon</option>
-            <option value="dark">Dark</option>
-            <option value="steel">Steel</option>
-            <option value="fairy">Fairy</option>
-          </select>
-          {/* create a dropdown with different colors to choose from */}
+            type="checkbox"
+            checked={validationGuess?.type2.valid}
+            onChange={(e) =>
+              setValidationGuess({
+                ...validationGuess!,
+                type2: {
+                  ...validationGuess!.type2,
+                  valid: e.target.checked,
+                },
+              })
+            }
+          />
           <label htmlFor="color">Color</label>
-          <select
+          <input
             id="color"
-            multiple
-            onChange={(e) => {
-              const values = Array.from(e.target.selectedOptions).map(
-                (option) => option.value
-              );
-              setNegativeGuess({ ...negativeGuess, colorList: values });
-            }}
-          >
-            <option value=""></option>
-            <option value="black">Black</option>
-            <option value="blue">Blue</option>
-            <option value="brown">Brown</option>
-            <option value="gray">Gray</option>
-            <option value="green">Green</option>
-            <option value="pink">Pink</option>
-            <option value="purple">Purple</option>
-            <option value="red">Red</option>
-            <option value="white">White</option>
-            <option value="yellow">Yellow</option>
-          </select>
-          {/* create a dropdown with different habitats to choose from */}
+            type="checkbox"
+            checked={validationGuess?.color.valid}
+            onChange={(e) =>
+              setValidationGuess({
+                ...validationGuess!,
+                color: {
+                  ...validationGuess!.color,
+                  valid: e.target.checked,
+                },
+              })
+            }
+          />
           <label htmlFor="habitat">Habitat</label>
-          <select
+          <input
             id="habitat"
-            multiple
-            onChange={(e) => {
-              const values = Array.from(e.target.selectedOptions).map(
-                (option) => option.value
-              );
-              setNegativeGuess({ ...negativeGuess, habitatList: values });
-            }}
-          >
-            <option value=""></option>
-            <option
-              value="cave"
-              selected={negativeGuess.habitatList?.includes("cave")}
-            >
-              Cave
-            </option>
-            <option
-              value="forest"
-              selected={negativeGuess.habitatList?.includes("forest")}
-            >
-              Forest
-            </option>
-            <option
-              value="grassland"
-              selected={negativeGuess.habitatList?.includes("grassland")}
-            >
-              Grassland
-            </option>
-            <option value="mountain">Mountain</option>
-            <option value="rare">Rare</option>
-            <option value="rough-terrain">Rough Terrain</option>
-            <option value="sea">Sea</option>
-            <option value="urban">Urban</option>
-            <option value="waters-edge">Water's Edge</option>
-          </select>
-          {/* create a dropdown with different evolution stages to choose from */}
-          {/* add label */}
-          <label htmlFor="evolutionStage">Evolution Stage</label>
-          <input
-            id="evolutionStage"
-            type="number"
+            type="checkbox"
+            checked={validationGuess?.habitat.valid}
             onChange={(e) =>
-              setNegativeGuess({
-                ...negativeGuess,
-                evolutionStage: {
-                  min: parseInt(e.target.value),
-                  max: parseInt(e.target.value) + 1,
+              setValidationGuess({
+                ...validationGuess!,
+                habitat: {
+                  ...validationGuess!.habitat,
+                  valid: e.target.checked,
                 },
               })
             }
           />
-          {/* input that takes a number for height */}
           <label htmlFor="height">Height</label>
-          <input
+          {/* radio with 3 options: less greater and equal */}
+
+          <select
             id="height"
-            type="number"
+            value={validationGuess?.height.comparison}
             onChange={(e) =>
-              setNegativeGuess({
-                ...negativeGuess,
+              setValidationGuess({
+                ...validationGuess!,
                 height: {
-                  min: parseInt(e.target.value),
-                  max: parseInt(e.target.value) + 1,
+                  ...validationGuess!.height,
+                  comparison: e.target.value as ValidationComparison,
                 },
               })
             }
-          />
-          {/* input that takes a number for weight */}
+          >
+            <option
+              selected={validationGuess?.height.comparison === "less"}
+              value="less"
+            >
+              Lower
+            </option>
+            <option
+              selected={validationGuess?.height.comparison === "equal"}
+              value="equal"
+            >
+              Equal
+            </option>
+            <option
+              selected={validationGuess?.height.comparison === "greater"}
+              value="greater"
+            >
+              Greater
+            </option>
+          </select>
+
           <label htmlFor="weight">Weight</label>
-          <input
+          <select
             id="weight"
-            type="number"
+            value={validationGuess?.weight.comparison}
             onChange={(e) =>
-              setNegativeGuess({
-                ...negativeGuess,
+              setValidationGuess({
+                ...validationGuess!,
                 weight: {
-                  min: parseInt(e.target.value),
-                  max: parseInt(e.target.value) + 1,
+                  ...validationGuess!.weight,
+                  comparison: e.target.value as ValidationComparison,
                 },
               })
             }
-          />
+          >
+            <option
+              selected={validationGuess?.weight.comparison === "less"}
+              value="less"
+            >
+              Lower
+            </option>
+            <option
+              selected={validationGuess?.weight.comparison === "equal"}
+              value="equal"
+            >
+              Equal
+            </option>
+            <option
+              selected={validationGuess?.weight.comparison === "greater"}
+              value="greater"
+            >
+              Greater
+            </option>
+          </select>
+          <label htmlFor="evolutionStage">Evolution Stage</label>
+          <select
+            id="evolutionStage"
+            value={validationGuess?.evolutionStage.comparison}
+            onChange={(e) =>
+              setValidationGuess({
+                ...validationGuess!,
+                evolutionStage: {
+                  ...validationGuess!.evolutionStage,
+                  comparison: e.target.value as ValidationComparison,
+                },
+              })
+            }
+          >
+            <option
+              selected={validationGuess?.evolutionStage.comparison === "less"}
+              value="less"
+            >
+              Lower
+            </option>
+            <option
+              selected={validationGuess?.evolutionStage.comparison === "equal"}
+              value="equal"
+            >
+              Equal
+            </option>
+            <option
+              selected={
+                validationGuess?.evolutionStage.comparison === "greater"
+              }
+              value="greater"
+            >
+              Greater
+            </option>
+          </select>
         </div>
       </div>
       {/* button that sends the guess */}

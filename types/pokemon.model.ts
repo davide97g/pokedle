@@ -11,6 +11,38 @@ export interface PokemonModel {
   habitat: string;
 }
 
+export type ValidationComparison = "greater" | "less" | "equal";
+export interface PokemonValidationGuess {
+  type1: {
+    value: string;
+    valid: boolean | undefined;
+  };
+  type2: {
+    value: string;
+    valid: boolean | undefined;
+  };
+  color: {
+    value: string;
+    valid: boolean | undefined;
+  };
+  habitat: {
+    value: string;
+    valid: boolean | undefined;
+  };
+  height: {
+    value: number;
+    comparison: ValidationComparison;
+  };
+  weight: {
+    value: number;
+    comparison: ValidationComparison;
+  };
+  evolutionStage: {
+    value: number;
+    comparison: ValidationComparison;
+  };
+}
+
 export interface PokemonGuess {
   type1?: string;
   type2?: string;

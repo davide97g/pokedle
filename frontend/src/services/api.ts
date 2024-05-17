@@ -3,6 +3,7 @@ import {
   PokemonGuess,
   PokemonModel,
   PokemonNegativeGuess,
+  PokemonValidationGuess,
 } from "../../../types/pokemon.model";
 
 // https://pokeapi.co/
@@ -17,16 +18,13 @@ export const getRandomPokemon = async () => {
     });
 };
 
-export const sendGuess = async (guesses: {
-  guess: Partial<PokemonGuess>;
-  negativeGuess: Partial<PokemonNegativeGuess>;
-}) => {
+export const sendGuess = async (validationGuess: PokemonValidationGuess) => {
   return fetch(`http://localhost:3000/guess`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(guesses),
+    body: JSON.stringify(validationGuess),
   });
 };
 
