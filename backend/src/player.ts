@@ -4,7 +4,7 @@ import {
 } from "../../types/pokemon.model";
 import database from "../../database/data/pokemon-model.json";
 
-const PokemonList = database as PokemonModel[];
+export const PokemonList = database as PokemonModel[];
 
 const getRandomPokemon = (previousId?: number): PokemonModel => {
   const randomId = Math.floor(Math.random() * PokemonList.length) + 1;
@@ -16,7 +16,7 @@ const getRandomPokemon = (previousId?: number): PokemonModel => {
 
 export let POKEMON_TO_GUESS = getRandomPokemon();
 
-const getNewPokemonToSolve = () => {
+export const getNewPokemonToSolve = () => {
   POKEMON_TO_GUESS = getRandomPokemon();
   return POKEMON_TO_GUESS;
 };
@@ -38,10 +38,13 @@ const computeComparison = (
   }
 };
 
-export const testGuess = (
-  pokemonGuess: PokemonModel
-): PokemonValidationGuess => {
+export const testGuess = (pokemonGuessId: string): PokemonValidationGuess => {
+  const pokemonGuess = PokemonList.find((p) => p.id === Number(pokemonGuessId));
+  if (!pokemonGuess) {
+    throw new Error("Pokemon not found");
+  }
   return {
+    id: pokemonGuess.id,
     type1: {
       value: pokemonGuess.type1,
       valid: pokemonGuess.type1 === POKEMON_TO_GUESS?.type1,
