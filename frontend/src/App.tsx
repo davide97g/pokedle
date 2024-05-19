@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import {
   PokemonModel,
@@ -67,39 +68,90 @@ function App() {
   const parseInputToGuessValidation = (
     input: string
   ): PokemonValidationGuess => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, type1, type2, habitat, color, evolutionStage, height, weight] =
-      input.split("\n");
-    return {
-      type1: {
-        value: type1.toLocaleLowerCase(),
-        valid: undefined,
-      },
-      type2: {
-        value: type2.toLocaleLowerCase(),
-        valid: undefined,
-      },
-      color: {
-        value: color.toLocaleLowerCase(),
-        valid: undefined,
-      },
-      habitat: {
-        value: habitat.toLocaleLowerCase(),
-        valid: undefined,
-      },
-      evolutionStage: {
-        value: parseInt(evolutionStage),
-        comparison: undefined,
-      },
-      height: {
-        value: parseInt(height.replace("m", "")),
-        comparison: undefined,
-      },
-      weight: {
-        value: parseInt(weight.replace("kg", "")) * 10,
-        comparison: undefined,
-      },
-    };
+    if (input.split("\n").length < 8)
+      throw new Error("Invalid input: not enough values to unpack");
+    if (input.split("\n").length === 8) {
+      const [_, type1, type2, habitat, color, evolutionStage, height, weight] =
+        input.split("\n");
+      return {
+        type1: {
+          value: type1.toLocaleLowerCase(),
+          valid: undefined,
+        },
+        type2: {
+          value: type2.toLocaleLowerCase(),
+          valid: undefined,
+        },
+        color: {
+          value: color.toLocaleLowerCase(),
+          valid: undefined,
+        },
+        habitat: {
+          value: habitat.toLocaleLowerCase(),
+          valid: undefined,
+        },
+        evolutionStage: {
+          value: Number(evolutionStage),
+          comparison: undefined,
+        },
+        height: {
+          value:
+            height.indexOf("m") !== height.length - 1
+              ? Number(height.replace("m", "")) / 10
+              : Number(height.replace("m", "")),
+          comparison: undefined,
+        },
+        weight: {
+          value: Number(weight.replace("kg", "")) * 10,
+          comparison: undefined,
+        },
+      };
+    } else if (input.split("\n").length === 9) {
+      const [
+        _,
+        type1,
+        type2,
+        habitat,
+        color1,
+        color2,
+        evolutionStage,
+        height,
+        weight,
+      ] = input.split("\n");
+      return {
+        type1: {
+          value: type1.toLocaleLowerCase(),
+          valid: undefined,
+        },
+        type2: {
+          value: type2.toLocaleLowerCase(),
+          valid: undefined,
+        },
+        color: {
+          value: "partial",
+          valid: undefined,
+        },
+        habitat: {
+          value: habitat.toLocaleLowerCase(),
+          valid: undefined,
+        },
+        evolutionStage: {
+          value: Number(evolutionStage),
+          comparison: undefined,
+        },
+        height: {
+          value:
+            height.indexOf("m") !== height.length - 1
+              ? Number(height.replace("m", "")) / 10
+              : Number(height.replace("m", "")),
+          comparison: undefined,
+        },
+        weight: {
+          value: Number(weight.replace("kg", "")) * 10,
+          comparison: undefined,
+        },
+      };
+    } else throw new Error("Invalid input: too many values to unpack");
   };
 
   const onPaste = () => {

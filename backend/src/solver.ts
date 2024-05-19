@@ -20,6 +20,16 @@ export const guessedNegativeFeatures: Partial<PokemonFeaturesNegative> = {
   height: { min: 0, max: Infinity },
   weight: { min: 0, max: Infinity },
 };
+// PONYTA START
+// export const guessedNegativeFeatures: Partial<PokemonFeaturesNegative> = {
+//   type1: ["fire"],
+//   type2: ["none"],
+//   habitat: ["grassland"],
+//   color: ["orange"],
+//   evolutionStage: { min: 1, max: Infinity },
+//   height: { min: 1, max: Infinity },
+//   weight: { min: 300, max: Infinity },
+// };
 
 export const PokemonList = database as PokemonModel[];
 
@@ -215,6 +225,60 @@ const findOptimalPokemon = (
   return pokemonList.find((p) => p.id === bestPokemonId);
 };
 
+const filterOutPokemonByNegativeFeatures = (
+  pokemonList: PokemonModel[]
+): PokemonModel[] => {
+  console.log(guessedNegativeFeatures);
+  console.log(pokemonList.length);
+  return pokemonList.filter((p) => {
+    if (
+      guessedNegativeFeatures.type1 &&
+      guessedNegativeFeatures.type1.includes(p.type1)
+    )
+      return false;
+    if (
+      guessedNegativeFeatures.type2 &&
+      guessedNegativeFeatures.type2.includes(p.type2)
+    )
+      return false;
+
+    if (
+      guessedNegativeFeatures.habitat &&
+      guessedNegativeFeatures.habitat.includes(p.habitat)
+    )
+      return false;
+
+    if (
+      guessedNegativeFeatures.color &&
+      guessedNegativeFeatures.color.includes(p.color)
+    )
+      return false;
+
+    if (
+      guessedNegativeFeatures.evolutionStage &&
+      (p.evolutionStage < guessedNegativeFeatures.evolutionStage.min ||
+        p.evolutionStage > guessedNegativeFeatures.evolutionStage.max)
+    )
+      return false;
+
+    if (
+      guessedNegativeFeatures.height &&
+      (p.height < guessedNegativeFeatures.height.min ||
+        p.height > guessedNegativeFeatures.height.max)
+    )
+      return false;
+
+    if (
+      guessedNegativeFeatures.weight &&
+      (p.weight < guessedNegativeFeatures.weight.min ||
+        p.weight > guessedNegativeFeatures.weight.max)
+    )
+      return false;
+
+    return true;
+  });
+};
+
 export const guessPokemon = () => {
   const guessedPokemonIds = guessHistoryPokemon.map((p) => p.id);
   // Filter out the pokemons that have been guessed
@@ -228,23 +292,18 @@ export const guessPokemon = () => {
     guessedFeaturesKeys.every((key) => p[key] === guessedFeatures[key])
   );
 
-  const pokemonFiltered = pokemonWithCorrectFeatures.filter((p) =>
-    Object.entries(guessedNegativeFeatures).every(([key, value]) => {
-      if (Array.isArray(value)) {
-        return !value.includes((p as any)[key]);
-      } else {
-        return (
-          (!value.min || (p as any)[key] > value.min) &&
-          (!value.max || (p as any)[key] < value.max)
-        );
-      }
-    })
-  );
+  // ? filter out the pokemons that have the guessed negative features
 
   const remainingFeatures = Object.keys(guessedNegativeFeatures).filter(
     (k) => !guessedFeaturesKeys.includes(k as FEATURE)
   ) as FEATURE[];
 
+  const pokemonFiltered = filterOutPokemonByNegativeFeatures(
+    pokemonWithCorrectFeatures
+  );
+
+  console.info(pokemonFiltered);
+  console.log(pokemonFiltered.length);
   const bestPokemonToGuess = findOptimalPokemon(
     pokemonFiltered,
     remainingFeatures
