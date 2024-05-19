@@ -1,3 +1,6 @@
+// @ts-expect-error - import direct from link
+import confetti from "https://cdn.skypack.dev/canvas-confetti";
+
 import {
   Autocomplete,
   AutocompleteItem,
@@ -35,12 +38,29 @@ export const Player = () => {
       : []
   );
 
+  const hasWon = (feedbackGuess: PokemonValidationGuess) => {
+    return (
+      feedbackGuess.type1.valid &&
+      feedbackGuess.type2.valid &&
+      feedbackGuess.color.valid &&
+      feedbackGuess.habitat.valid &&
+      feedbackGuess.height.comparison === "equal" &&
+      feedbackGuess.weight.comparison === "equal" &&
+      feedbackGuess.evolutionStage.comparison === "equal"
+    );
+  };
+
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
       sendGuessPokemonId(pokemonId).then((response) => {
         {
           const updatedHistory = [...guessFeedbackHistory, response];
           setGuessFeedbackHistory(updatedHistory);
+          if (hasWon(response)) {
+            setTimeout(() => {
+              confetti();
+            }, 1000);
+          }
           localStorage.setItem(
             "guessFeedbackHistory",
             JSON.stringify(updatedHistory)
