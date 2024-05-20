@@ -7,7 +7,7 @@
 // - type2
 // - height
 // - weight
-// - sprite
+// - image
 // - color
 // - evolutionStage
 // - habitat
@@ -15,14 +15,22 @@
 
 // write the file as a unique json array of objects
 
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
+
+const NUMBER_OF_POKEMON = 1025;
 
 const modeling = () => {
   const pokemonData = [];
-  for (let i = 1; i <= 151; i++) {
-    const filePath = join("./data/", `pokemon-${i}.json`);
-    const filePathEnhanced = join("./data/", `pokemon-enhanced-${i}.json`);
+  for (let i = 1; i <= NUMBER_OF_POKEMON; i++) {
+    const filePath = join("./data/basic/", `pokemon-${i}.json`);
+    const filePathEnhanced = join(
+      "./data/enhanced/",
+      `pokemon-enhanced-${i}.json`
+    );
+
+    // if the file does not exist, skip it
+    if (!existsSync(filePath) || !existsSync(filePathEnhanced)) continue;
 
     const data = readFileSync(filePath, "utf8");
     const pokemon = JSON.parse(data);
@@ -37,7 +45,7 @@ const modeling = () => {
       type2: pokemon.types[1] ? pokemon.types[1].type.name : "none",
       height: pokemon.height,
       weight: pokemon.weight,
-      sprite: pokemon.sprites.front_default,
+      image: pokemon.image,
     });
   }
   const filePath = join("./data/", "pokemon-model.json");
