@@ -27,9 +27,11 @@ import {
   newPokemon,
   GENERATION,
 } from "../services/api";
+import { Loader } from "../components/Loader";
 
 export const Player = () => {
   const [initialLoading, setInitialLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [showGoal, setShowGoal] = useState(false);
   const [pokemonList, setPokemonList] = useState<PokemonSummary[]>([]);
   const [pokemonToGuess, setPokemonToGuess] = useState<PokemonModel>();
@@ -93,37 +95,46 @@ export const Player = () => {
 
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
-      sendGuessPokemonId(pokemonId, generation).then((response) => {
-        {
-          const updatedHistory = [...guessFeedbackHistory, response];
-          setGuessFeedbackHistory(updatedHistory);
-          localStorage.setItem(
-            "guessFeedbackHistory",
-            JSON.stringify(updatedHistory)
-          );
-        }
-      });
+      setIsLoading(true);
+      sendGuessPokemonId(pokemonId, generation)
+        .then((response) => {
+          {
+            const updatedHistory = [...guessFeedbackHistory, response];
+            setGuessFeedbackHistory(updatedHistory);
+            localStorage.setItem(
+              "guessFeedbackHistory",
+              JSON.stringify(updatedHistory)
+            );
+          }
+        })
+        .finally(() => setIsLoading(false));
     }
   };
 
   useEffect(() => {
+    setIsLoading(true);
     getPokemons(generation)
       .then((res) => {
         if (res) {
           setPokemonList(res);
         }
       })
-      .finally(() => setInitialLoading(false));
+      .finally(() => {
+        setInitialLoading(false);
+        setIsLoading(false);
+      });
   }, [generation]);
 
   useEffect(() => {
-    getStatus().then((res) => setPokemonToGuess(res?.pokemonToGuess));
+    setIsLoading(true);
+    getStatus()
+      .then((res) => setPokemonToGuess(res?.pokemonToGuess))
+      .finally(() => setIsLoading(false));
   }, []);
-
-  if (initialLoading) return <div>Loading...</div>;
 
   return (
     <>
+      {(isLoading || initialLoading) && <Loader />}
       <h1 className="text-3xl">Pokedle</h1>
       <Switch isSelected={showGoal} onValueChange={setShowGoal}>
         Show Goal
@@ -181,13 +192,16 @@ export const Player = () => {
             src={pokemonToGuess?.image}
           />
           <Button
-            onClick={() =>
-              newPokemon(generation).then(() => {
-                window.location.reload();
-                localStorage.removeItem("guessFeedbackHistory");
-                setGuessFeedbackHistory([]);
-              })
-            }
+            onClick={() => {
+              setIsLoading(true);
+              newPokemon(generation)
+                .then(() => {
+                  window.location.reload();
+                  localStorage.removeItem("guessFeedbackHistory");
+                  setGuessFeedbackHistory([]);
+                })
+                .finally(() => setIsLoading(false));
+            }}
             color="danger"
           >
             New Pokemon
@@ -240,11 +254,14 @@ export const Player = () => {
           className="px-2"
           isDisabled={gameStatus === "WON"}
           onClick={() => {
-            getBestSuggestion(guessFeedbackHistory, generation).then((res) => {
-              if (res) {
-                guessPokemonById(res.id);
-              }
-            });
+            setIsLoading(true);
+            getBestSuggestion(guessFeedbackHistory, generation)
+              .then((res) => {
+                if (res) {
+                  guessPokemonById(res.id);
+                }
+              })
+              .finally(() => setIsLoading(false));
           }}
         >
           <p>Best Guess</p>

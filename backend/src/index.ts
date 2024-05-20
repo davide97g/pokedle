@@ -12,7 +12,11 @@ import { getPokemonList } from "./data";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:8080", "https://solvedle.vercel.app"],
+  })
+);
 const port = process.env.PORT;
 
 app.get("/", (_: any, res: any) => {
