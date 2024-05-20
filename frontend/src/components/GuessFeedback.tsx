@@ -1,8 +1,9 @@
-import { Card, CardBody, Image } from "@nextui-org/react";
+import { Card, CardBody, Image, Tooltip } from "@nextui-org/react";
 import {
   PokemonSummary,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
+import { ComparisonIcon } from "./ComparisonIcon";
 
 export const GuessFeedback = ({
   guess,
@@ -23,13 +24,18 @@ export const GuessFeedback = ({
           }}
         />
         <CardBody className={`overflow-visible w-24`}>
-          <Image
-            alt="Card background"
-            className="object-cover rounded-xl"
-            src={pokemon?.image}
-            width={150}
-            height={150}
-          />
+          <Tooltip
+            showArrow
+            content={pokemon.name}
+            className="text-gray-600 capitalize"
+          >
+            <Image
+              alt="Card background"
+              className="object-cover rounded-xl"
+              src={pokemon?.image}
+              width={150}
+            />
+          </Tooltip>
         </CardBody>
       </Card>
       <Card>
@@ -77,13 +83,8 @@ export const GuessFeedback = ({
           }  text-center flex justify-center`}
         >
           <p className="text-small capitalize">{guess.evolutionStage.value}</p>
-          {/* very small text with "higher or lower" */}
-          {guess.evolutionStage.comparison !== "equal" && (
-            <p className="text-xs text-white/50">
-              {guess.evolutionStage.comparison}
-            </p>
-          )}
         </CardBody>
+        <ComparisonIcon comparison={guess.evolutionStage.comparison} />
       </Card>
       <Card>
         <CardBody
@@ -94,9 +95,7 @@ export const GuessFeedback = ({
           }  text-center flex justify-center`}
         >
           <p className="text-small">{Number(guess.height.value) / 10}m</p>
-          {guess.height.comparison !== "equal" && (
-            <p className="text-xs text-white/50">{guess.height.comparison}</p>
-          )}
+          <ComparisonIcon comparison={guess.height.comparison} />
         </CardBody>
       </Card>
       <Card>
@@ -110,9 +109,7 @@ export const GuessFeedback = ({
           <p className="text-small capitalize">
             {Number(guess.weight.value) / 10}kg
           </p>
-          {guess.weight.comparison !== "equal" && (
-            <p className="text-xs text-white/50">{guess.weight.comparison}</p>
-          )}
+          <ComparisonIcon comparison={guess.weight.comparison} />
         </CardBody>
       </Card>
     </div>
