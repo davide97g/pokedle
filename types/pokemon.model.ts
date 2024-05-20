@@ -5,10 +5,16 @@ export interface PokemonModel {
   type2: string;
   height: number;
   weight: number;
-  sprite: string;
+  image: string;
   color: string;
   evolutionStage: number;
   habitat: string;
+}
+
+export interface PokemonSummary {
+  id: number;
+  name: string;
+  image: string;
 }
 
 export type FEATURE =

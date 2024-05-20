@@ -3,9 +3,12 @@ import {
   PokemonModel,
   PokemonFeaturesNegative,
   PokemonValidationGuess,
+  PokemonSummary,
 } from "../../../types/pokemon.model";
 
 const BACKEND_URL = "http://localhost:3000";
+
+export type GENERATION = "1" | "2" | "3";
 
 // https://pokeapi.co/
 
@@ -49,9 +52,10 @@ export const getSuggestion = async () => {
 };
 
 export const getBestSuggestion = async (
-  guessValidationHistory: PokemonValidationGuess[]
+  guessValidationHistory: PokemonValidationGuess[],
+  gen: GENERATION
 ) => {
-  return fetch(`${BACKEND_URL}/best-guess`, {
+  return fetch(`${BACKEND_URL}/best-guess/${gen}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -66,8 +70,8 @@ export const getBestSuggestion = async (
     });
 };
 
-export const newPokemon = async () => {
-  return fetch(`${BACKEND_URL}/new-pokemon`, {
+export const newPokemon = async (gen: GENERATION) => {
+  return fetch(`${BACKEND_URL}/new-pokemon/${gen}`, {
     method: "POST",
   });
 };
@@ -84,18 +88,21 @@ export const sendGuessPokemon = async (pokemon: PokemonModel) => {
     .then((res) => res.validation as PokemonValidationGuess);
 };
 
-export const getPokemons = async () => {
-  return fetch(`${BACKEND_URL}/pokemon/all`)
+export const getPokemons = async (gen: GENERATION) => {
+  return fetch(`${BACKEND_URL}/pokemon/all/${gen}`)
     .then((res) => res.json())
-    .then((res) => res as PokemonModel[])
+    .then((res) => res as PokemonSummary[])
     .catch((err) => {
       console.info(err);
       return null;
     });
 };
 
-export const sendGuessPokemonId = async (pokemonId: number) => {
-  return fetch(`${BACKEND_URL}/guess-pokemon/${pokemonId}`, {
+export const sendGuessPokemonId = async (
+  pokemonId: number,
+  gen: GENERATION
+) => {
+  return fetch(`${BACKEND_URL}/guess-pokemon/${pokemonId}/${gen}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

@@ -8,10 +8,14 @@ import {
   Button,
   Card,
   Image,
+  Select,
+  SelectItem,
+  Switch,
 } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   PokemonModel,
+  PokemonSummary,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
 import { GuessFeedback } from "../components/GuessFeedback";
@@ -21,12 +25,23 @@ import {
   getBestSuggestion,
   sendGuessPokemonId,
   newPokemon,
+  GENERATION,
 } from "../services/api";
 
 export const Player = () => {
   const [initialLoading, setInitialLoading] = useState(true);
-  const [pokemonList, setPokemonList] = useState<PokemonModel[]>([]);
+  const [showGoal, setShowGoal] = useState(false);
+  const [pokemonList, setPokemonList] = useState<PokemonSummary[]>([]);
   const [pokemonToGuess, setPokemonToGuess] = useState<PokemonModel>();
+
+  const [generation, setGeneration] = useState<GENERATION>("1");
+  const generations = [
+    { value: "1", label: "Generation 1" },
+    { value: "2", label: "Generation 2" },
+    { value: "3", label: "Generation 3" },
+  ];
+
+  const [gameStatus, setGameStatus] = useState<"PLAYING" | "WON">("PLAYING");
 
   const [guessFeedbackHistory, setGuessFeedbackHistory] = useState<
     PokemonValidationGuess[]
@@ -37,6 +52,32 @@ export const Player = () => {
         ) as PokemonValidationGuess[])
       : []
   );
+
+  useEffect(() => {
+    if (gameStatus === "WON") {
+      const particleCount = Math.max(
+        Math.floor(1000 - guessFeedbackHistory.length * 100),
+        100
+      );
+      confetti({
+        particleCount,
+        spread: 100000,
+      });
+    }
+  }, [gameStatus, guessFeedbackHistory.length]);
+
+  useEffect(() => {
+    console.log(guessFeedbackHistory);
+    if (guessFeedbackHistory.length > 0) {
+      if (guessFeedbackHistory.some((feedback) => hasWon(feedback))) {
+        setTimeout(() => setGameStatus("WON"), 1000);
+      }
+    }
+  }, [guessFeedbackHistory]);
+
+  const reversedGuessFeedbackHistory = useMemo(() => {
+    return structuredClone(guessFeedbackHistory).reverse();
+  }, [guessFeedbackHistory]);
 
   const hasWon = (feedbackGuess: PokemonValidationGuess) => {
     return (
@@ -52,15 +93,10 @@ export const Player = () => {
 
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
-      sendGuessPokemonId(pokemonId).then((response) => {
+      sendGuessPokemonId(pokemonId, generation).then((response) => {
         {
           const updatedHistory = [...guessFeedbackHistory, response];
           setGuessFeedbackHistory(updatedHistory);
-          if (hasWon(response)) {
-            setTimeout(() => {
-              confetti();
-            }, 1000);
-          }
           localStorage.setItem(
             "guessFeedbackHistory",
             JSON.stringify(updatedHistory)
@@ -71,14 +107,14 @@ export const Player = () => {
   };
 
   useEffect(() => {
-    getPokemons()
+    getPokemons(generation)
       .then((res) => {
         if (res) {
           setPokemonList(res);
         }
       })
       .finally(() => setInitialLoading(false));
-  }, []);
+  }, [generation]);
 
   useEffect(() => {
     getStatus().then((res) => setPokemonToGuess(res?.pokemonToGuess));
@@ -89,6 +125,31 @@ export const Player = () => {
   return (
     <>
       <h1 className="text-3xl">Pokedle</h1>
+      <Switch isSelected={showGoal} onValueChange={setShowGoal}>
+        Show Goal
+      </Switch>
+      <Select
+        label="Generation"
+        variant="bordered"
+        placeholder="Select an generation"
+        selectedKeys={generation}
+        className="max-w-xs w-48"
+        multiple={false}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onSelectionChange={(keys: any) => {
+          if (keys) setGeneration(keys.currentKey as GENERATION);
+        }}
+      >
+        {generations.map((gen) => (
+          <SelectItem
+            className="text-gray-600"
+            key={gen.value}
+            value={gen.value}
+          >
+            {gen.label}
+          </SelectItem>
+        ))}
+      </Select>
       {guessFeedbackHistory.length > 0 && (
         <Button
           style={{
@@ -99,13 +160,14 @@ export const Player = () => {
           onClick={() => {
             localStorage.removeItem("guessFeedbackHistory");
             setGuessFeedbackHistory([]);
+            setGameStatus("PLAYING");
           }}
         >
           Restart
         </Button>
       )}
 
-      {pokemonToGuess && (
+      {showGoal && pokemonToGuess && (
         <Card
           style={{
             position: "absolute",
@@ -116,11 +178,11 @@ export const Player = () => {
           <Image
             alt="Card background"
             className="object-cover rounded-xl"
-            src={pokemonToGuess?.sprite}
+            src={pokemonToGuess?.image}
           />
           <Button
             onClick={() =>
-              newPokemon().then(() => {
+              newPokemon(generation).then(() => {
                 window.location.reload();
                 localStorage.removeItem("guessFeedbackHistory");
                 setGuessFeedbackHistory([]);
@@ -137,6 +199,7 @@ export const Player = () => {
       <div className="flex justify-center items-center flex-row gap-12 w-full">
         {pokemonList.length > 0 && (
           <Autocomplete
+            isDisabled={gameStatus === "WON"}
             defaultItems={pokemonList}
             variant="bordered"
             label="Choose a pokemon"
@@ -159,7 +222,7 @@ export const Player = () => {
                     alt={pokemon.name}
                     className="flex-shrink-0"
                     size="sm"
-                    src={pokemon.sprite}
+                    src={pokemon.image}
                   />
                   <div className="flex flex-col">
                     <span className="text-small text-gray-600 capitalize">
@@ -175,8 +238,9 @@ export const Player = () => {
           color="primary"
           variant="ghost"
           className="px-2"
+          isDisabled={gameStatus === "WON"}
           onClick={() => {
-            getBestSuggestion(guessFeedbackHistory).then((res) => {
+            getBestSuggestion(guessFeedbackHistory, generation).then((res) => {
               if (res) {
                 guessPokemonById(res.id);
               }
@@ -188,10 +252,10 @@ export const Player = () => {
       </div>
 
       {/* VALIDATION LINES */}
-      <div className="flex flex-col gap-2">
-        {guessFeedbackHistory.map((guess) => (
+      <div className="flex flex-col gap-2 overflow-y-auto max-h-[39rem]">
+        {reversedGuessFeedbackHistory.reverse().map((guess) => (
           <GuessFeedback
-            key={crypto.randomUUID()}
+            key={guess.id}
             guess={guess}
             pokemon={pokemonList.find((p) => p.id === guess.id)}
           />

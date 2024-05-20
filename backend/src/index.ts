@@ -2,13 +2,12 @@ import dotenv from "dotenv";
 import express from "express";
 import { guessPokemon } from "./solver";
 import cors from "cors";
-import { PokemonValidationGuess } from "../../types/pokemon.model";
 import {
-  POKEMON_TO_GUESS,
-  testGuess,
-  getNewPokemonToSolve,
-  PokemonList,
-} from "./player";
+  PokemonSummary,
+  PokemonValidationGuess,
+} from "../../types/pokemon.model";
+import { POKEMON_TO_GUESS, testGuess, getNewPokemonToSolve } from "./player";
+import { getPokemonList } from "./data";
 
 dotenv.config();
 
@@ -26,12 +25,23 @@ app.get("/status", (_: any, res: any) => {
   });
 });
 
-app.get("/pokemon/all", (_: any, res: any) => {
-  res.send(PokemonList);
+app.get("/pokemon/all/:gen", (req: any, res: any) => {
+  const gen = req.params.gen;
+  const summary: PokemonSummary[] = getPokemonList(gen || "1").map(
+    (pokemon) => {
+      return {
+        id: pokemon.id,
+        name: pokemon.name,
+        image: pokemon.image,
+      };
+    }
+  );
+  res.send(summary);
 });
 
-app.post("/new-pokemon", express.json(), (req: any, res: any) => {
-  const pokemon = getNewPokemonToSolve();
+app.post("/new-pokemon/:gen", express.json(), (req: any, res: any) => {
+  const gen = req.params.gen;
+  const pokemon = getNewPokemonToSolve(gen);
   res.send({ pokemon });
 });
 
@@ -41,16 +51,21 @@ app.post("/yesterday-pokemon", express.json(), (req: any, res: any) => {
   res.send({ validation });
 });
 
-app.post("/guess-pokemon/:pokemonId", express.json(), (req: any, res: any) => {
-  const pokemonId = req.params.pokemonId;
+app.post(
+  "/guess-pokemon/:pokemonId/:gen",
+  express.json(),
+  (req: any, res: any) => {
+    const pokemonId = req.params.pokemonId;
+    const gen = req.params.gen;
+    const validation = testGuess(pokemonId, gen);
+    res.send({ validation });
+  }
+);
 
-  const validation = testGuess(pokemonId);
-  res.send({ validation });
-});
-
-app.post("/best-guess", express.json(), (req: any, res: any) => {
+app.post("/best-guess/:gen", express.json(), (req: any, res: any) => {
   const validationGuessHistory = req.body as PokemonValidationGuess[];
-  const pokemon = guessPokemon(validationGuessHistory);
+  const gen = req.params.gen;
+  const pokemon = guessPokemon(validationGuessHistory, gen);
   res.send({ pokemon });
 });
 

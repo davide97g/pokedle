@@ -202,7 +202,7 @@ export const Solver = () => {
           <>
             <h2>{suggestion.name}</h2>
             <img
-              src={suggestion.sprite}
+              src={suggestion.image}
               height={100}
               width={100}
               alt={suggestion.name}
@@ -239,7 +239,7 @@ export const Solver = () => {
                 <p>{index + 1}</p>
                 <p>{pokemon.name}</p>
                 <img
-                  src={pokemon.sprite}
+                  src={pokemon.image}
                   height={120}
                   width={120}
                   alt={pokemon.name}

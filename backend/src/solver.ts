@@ -5,12 +5,10 @@ import {
   FEATURE,
 } from "../../types/pokemon.model";
 
-import database from "../../database/data/pokemon-model.json";
 import { generateCombinations } from "./combinations";
+import { GENERATION, getPokemonList } from "./data";
 
 let yesterdayGuessedPokemon: PokemonModel | undefined = undefined;
-
-const PokemonList = database as PokemonModel[];
 
 const countRemainingPokemonWithGuess = (
   validationGuess: Partial<PokemonValidationGuess>,
@@ -268,13 +266,14 @@ const filterOutPokemonByNegativeFeatures = (
 };
 
 export const guessPokemon = (
-  validationGuessHistory: PokemonValidationGuess[]
+  validationGuessHistory: PokemonValidationGuess[],
+  gen?: GENERATION
 ) => {
   const guessedPokemonIds = validationGuessHistory.map((v) => v.id);
   if (yesterdayGuessedPokemon)
     guessedPokemonIds.push((yesterdayGuessedPokemon as PokemonModel).id);
   // Filter out the pokemons that have been guessed
-  const pokemonStillToGuess = PokemonList.filter(
+  const pokemonStillToGuess = getPokemonList(gen).filter(
     (p) => !guessedPokemonIds.includes(p.id)
   );
 

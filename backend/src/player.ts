@@ -2,22 +2,18 @@ import {
   PokemonModel,
   PokemonValidationGuess,
 } from "../../types/pokemon.model";
-import database from "../../database/data/pokemon-model.json";
+import { GENERATION, getPokemonList } from "./data";
 
-export const PokemonList = database as PokemonModel[];
-
-const getRandomPokemon = (previousId?: number): PokemonModel => {
-  const randomId = Math.floor(Math.random() * PokemonList.length) + 1;
-  if (randomId === previousId) {
-    return getRandomPokemon(previousId);
-  }
-  return PokemonList.find((p) => p.id === randomId)!;
+const getRandomPokemon = (gen?: GENERATION): PokemonModel => {
+  const pokemonList = getPokemonList(gen ?? "1");
+  const randomId = Math.floor(Math.random() * pokemonList.length) + 1;
+  return pokemonList.find((p) => p.id === randomId)!;
 };
 
 export let POKEMON_TO_GUESS = getRandomPokemon();
 
-export const getNewPokemonToSolve = () => {
-  POKEMON_TO_GUESS = getRandomPokemon();
+export const getNewPokemonToSolve = (gen?: GENERATION) => {
+  POKEMON_TO_GUESS = getRandomPokemon(gen ?? "1");
   return POKEMON_TO_GUESS;
 };
 
@@ -38,8 +34,13 @@ const computeComparison = (
   }
 };
 
-export const testGuess = (pokemonGuessId: string): PokemonValidationGuess => {
-  const pokemonGuess = PokemonList.find((p) => p.id === Number(pokemonGuessId));
+export const testGuess = (
+  pokemonGuessId: string,
+  gen?: GENERATION
+): PokemonValidationGuess => {
+  const pokemonGuess = getPokemonList(gen ?? "1").find(
+    (p) => p.id === Number(pokemonGuessId)
+  );
   if (!pokemonGuess) {
     throw new Error("Pokemon not found");
   }
