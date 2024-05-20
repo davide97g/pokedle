@@ -22,12 +22,10 @@ import {
 } from "../../../types/pokemon.model";
 import { GuessFeedback } from "../components/GuessFeedback";
 import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
-import { Loader } from "../components/Loader";
 import { API } from "../services/api";
 import { GENERATION } from "../types";
 
 export const Player = () => {
-  const [initialLoading, setInitialLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showGoal, setShowGoal] = useState(
     localStorage.getItem("showGoal") === "true"
@@ -80,7 +78,6 @@ export const Player = () => {
   }, [gameStatus, guessFeedbackHistory.length]);
 
   useEffect(() => {
-    console.log(guessFeedbackHistory);
     if (guessFeedbackHistory.length > 0) {
       if (guessFeedbackHistory.some((feedback) => hasWon(feedback))) {
         setTimeout(() => setGameStatus("WON"), 1000);
@@ -141,10 +138,7 @@ export const Player = () => {
           setPokemonList(res);
         }
       })
-      .finally(() => {
-        setInitialLoading(false);
-        setIsLoading(false);
-      });
+      .finally(() => setIsLoading(false));
   }, [generation]);
 
   useEffect(() => {
@@ -159,7 +153,14 @@ export const Player = () => {
 
   return (
     <>
-      {(isLoading || initialLoading) && <Loader />}
+      {isLoading && (
+        <Progress
+          size="sm"
+          isIndeterminate
+          aria-label="Loading..."
+          className="absolute w-screen z-50 top-0"
+        />
+      )}
       <div className="flex flex-row items-center">
         <img src="./logo.png" alt="logo" height={45} width={45} />
         <h1 className="text-2xl">Pokedle</h1>
