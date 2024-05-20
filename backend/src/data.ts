@@ -1,5 +1,5 @@
 import { PokemonModel } from "../../types/pokemon.model";
-import database from "../../database/data/pokemon-model.json";
+import database from "../data/pokemon-model.json";
 
 const FIRST_GEN = 151;
 const SECOND_GEN = 251;
