@@ -14,7 +14,11 @@ dotenv.config();
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:8080", "https://solvedle.vercel.app"],
+    origin: [
+      "http://localhost:8080",
+      "https://pokedle97.vercel.app",
+      "https://pokedle.online",
+    ],
   })
 );
 const port = process.env.PORT;
