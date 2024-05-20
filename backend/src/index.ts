@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
-import { guessPokemon } from "./solver";
+import { countRemainingPokemonFromHistory, guessPokemon } from "./solver";
 import cors from "cors";
 import {
   PokemonSummary,
@@ -27,9 +27,17 @@ app.get("/", (_: any, res: any) => {
   res.send("Solvedle Server");
 });
 
-app.get("/status", (_: any, res: any) => {
+app.post("/status/:gen", express.json(), (req: any, res: any) => {
+  const gen = req.params.gen;
+  const validationGuessHistory = req.body as PokemonValidationGuess[];
+  const remainingPokemon = countRemainingPokemonFromHistory(
+    validationGuessHistory,
+    gen
+  );
+
   res.send({
     pokemonToGuess: POKEMON_TO_GUESS,
+    remainingPokemon,
   });
 });
 
@@ -53,20 +61,19 @@ app.post("/new-pokemon/:gen", express.json(), (req: any, res: any) => {
   res.send({ pokemon });
 });
 
-app.post("/yesterday-pokemon", express.json(), (req: any, res: any) => {
-  const pokemon = req.body;
-  const validation = testGuess(pokemon);
-  res.send({ validation });
-});
-
 app.post(
   "/guess-pokemon/:pokemonId/:gen",
   express.json(),
   (req: any, res: any) => {
     const pokemonId = req.params.pokemonId;
     const gen = req.params.gen;
+    const validationGuessHistory = req.body as PokemonValidationGuess[];
     const validation = testGuess(pokemonId, gen);
-    res.send({ validation });
+    const remainingPokemon = countRemainingPokemonFromHistory(
+      validationGuessHistory,
+      gen
+    );
+    res.send({ validation, remainingPokemon });
   }
 );
 

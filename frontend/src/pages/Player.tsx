@@ -9,6 +9,7 @@ import {
   Button,
   Card,
   Image,
+  Progress,
   Select,
   SelectItem,
   Switch,
@@ -33,6 +34,8 @@ export const Player = () => {
   );
   const [pokemonList, setPokemonList] = useState<PokemonSummary[]>([]);
   const [pokemonToGuess, setPokemonToGuess] = useState<PokemonModel>();
+
+  const [remainingPokemon, setRemainingPokemon] = useState<number>();
 
   const [generation, setGeneration] = useState<GENERATION>(
     (localStorage.getItem("generation") as GENERATION) || "1"
@@ -104,10 +107,11 @@ export const Player = () => {
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
       setIsLoading(true);
-      API.sendGuessPokemonId(pokemonId, generation)
+      API.sendGuessPokemonId(pokemonId, generation, guessFeedbackHistory)
         .then((response) => {
-          const updatedHistory = [...guessFeedbackHistory, response];
+          const updatedHistory = [...guessFeedbackHistory, response.validation];
           setGuessFeedbackHistory(updatedHistory);
+          setRemainingPokemon(response.remainingPokemon);
           localStorage.setItem(
             "guessFeedbackHistory",
             JSON.stringify(updatedHistory)
@@ -145,10 +149,13 @@ export const Player = () => {
 
   useEffect(() => {
     setIsLoading(true);
-    API.getStatus()
-      .then((res) => setPokemonToGuess(res?.pokemonToGuess))
+    API.getStatus(generation, guessFeedbackHistory)
+      .then((res) => {
+        setPokemonToGuess(res?.pokemonToGuess);
+        setRemainingPokemon(res?.remainingPokemon);
+      })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [generation, guessFeedbackHistory]);
 
   return (
     <>
@@ -287,10 +294,24 @@ export const Player = () => {
           Best Guess
         </Button>
       </div>
-
       {/* VALIDATION LINES */}
       {Boolean(reversedGuessFeedbackHistory.length) && (
         <div className="flex flex-col gap-2 overflow-y-auto max-h-[39rem]">
+          {Boolean(remainingPokemon) && (
+            <p className="text-xs text-white/50">
+              {remainingPokemon}/{pokemonList.length} left
+            </p>
+          )}
+          <Progress
+            aria-label="Loading..."
+            value={Math.max(
+              Math.round(
+                (100 * (pokemonList.length - (remainingPokemon ?? 0))) /
+                  pokemonList.length
+              ),
+              1
+            )}
+          />
           <GuessFeedbackHeader />
           {reversedGuessFeedbackHistory.reverse().map((guess) => (
             <GuessFeedback

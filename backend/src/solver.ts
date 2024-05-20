@@ -7,6 +7,7 @@ import {
 
 import { generateCombinations } from "./combinations";
 import { GENERATION, getPokemonList } from "./data";
+import { getFirstGuess } from "./player";
 
 let yesterdayGuessedPokemon: PokemonModel | undefined = undefined;
 
@@ -269,6 +270,9 @@ export const guessPokemon = (
   validationGuessHistory: PokemonValidationGuess[],
   gen?: GENERATION
 ) => {
+  // ? when it's the first guess => we already kwow the first optimal pokemon to guess based on the generation
+  if (!validationGuessHistory.length) return getFirstGuess(gen ?? "1");
+
   const guessedPokemonIds = validationGuessHistory.map((v) => v.id);
   if (yesterdayGuessedPokemon)
     guessedPokemonIds.push((yesterdayGuessedPokemon as PokemonModel).id);
@@ -304,4 +308,34 @@ export const guessPokemon = (
   );
 
   return bestPokemonToGuess;
+};
+
+export const countRemainingPokemonFromHistory = (
+  validationGuessHistory: PokemonValidationGuess[],
+  gen?: GENERATION
+) => {
+  const guessedPokemonIds = validationGuessHistory.map((v) => v.id);
+  if (yesterdayGuessedPokemon)
+    guessedPokemonIds.push((yesterdayGuessedPokemon as PokemonModel).id);
+  // Filter out the pokemons that have been guessed
+  const pokemonStillToGuess = getPokemonList(gen).filter(
+    (p) => !guessedPokemonIds.includes(p.id)
+  );
+
+  const { guessedFeatures, guessedNegativeFeatures } = updateInfo(
+    validationGuessHistory
+  );
+
+  //  Filter out the pokemons that have the guessed features
+  const guessedFeaturesKeys = Object.keys(guessedFeatures) as FEATURE[];
+  const pokemonWithCorrectFeatures = pokemonStillToGuess.filter((p) =>
+    guessedFeaturesKeys.every((key) => p[key] === guessedFeatures[key])
+  );
+
+  const pokemonFiltered = filterOutPokemonByNegativeFeatures(
+    pokemonWithCorrectFeatures,
+    guessedNegativeFeatures
+  );
+
+  return pokemonFiltered.length;
 };
