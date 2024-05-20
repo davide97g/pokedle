@@ -62,7 +62,7 @@ export const Solver = () => {
     if (input.split("\n").length === 8) {
       const [
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        name,
+        _,
         type1,
         type2,
         habitat,
@@ -108,19 +108,28 @@ export const Solver = () => {
       };
     } else if (input.split("\n").length === 9) {
       const [
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        _,
+        name,
         type1,
         type2,
         habitat,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         color1,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         color2,
         evolutionStage,
         height,
         weight,
       ] = input.split("\n");
+
+      console.log(
+        name,
+        type1,
+        type2,
+        habitat,
+        color1,
+        color2,
+        evolutionStage,
+        height,
+        weight
+      );
       return {
         id: 0,
         type1: {
