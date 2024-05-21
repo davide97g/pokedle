@@ -1,5 +1,4 @@
-// @ts-expect-error - import direct from link
-import confetti from "https://cdn.skypack.dev/canvas-confetti";
+import confetti from "canvas-confetti";
 
 import { Add, Restart, StarFilled } from "@carbon/icons-react";
 import {
@@ -27,6 +26,7 @@ import { GENERATION } from "../types";
 
 export const Player = () => {
   const [isLoading, setIsLoading] = useState(false);
+
   const [showGoal, setShowGoal] = useState(
     localStorage.getItem("showGoal") === "true"
   );
@@ -42,6 +42,12 @@ export const Player = () => {
     { value: "1", label: "Generation 1" },
     { value: "2", label: "Generation 2" },
     { value: "3", label: "Generation 3" },
+    { value: "4", label: "Generation 4" },
+    { value: "5", label: "Generation 5" },
+    { value: "6", label: "Generation 6" },
+    { value: "7", label: "Generation 7" },
+    { value: "8", label: "Generation 8" },
+    { value: "9", label: "Generation 9" },
   ];
 
   const [gameStatus, setGameStatus] = useState<"PLAYING" | "WON">("PLAYING");
@@ -256,11 +262,9 @@ export const Player = () => {
             variant="bordered"
             label="Choose a pokemon"
             labelPlacement="inside"
-            className="max-w-xs"
+            className="max-w-xs autocomplete"
             onSelectionChange={(pokemonId) => {
-              if (pokemonId) {
-                guessPokemonById(Number(pokemonId));
-              }
+              if (pokemonId) guessPokemonById(Number(pokemonId));
             }}
           >
             {(pokemon) => (

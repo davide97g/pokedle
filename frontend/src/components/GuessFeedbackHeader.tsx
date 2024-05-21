@@ -43,6 +43,11 @@ export const GuessFeedbackHeader = () => {
           <p className="text-xs text-white/90">Weight</p>
         </CardBody>
       </Card>
+      <Card>
+        <CardBody className="w-24 text-center flex flex-row justify-center items-center h-12">
+          <p className="text-xs text-white/90">Generation</p>
+        </CardBody>
+      </Card>
     </div>
   );
 };

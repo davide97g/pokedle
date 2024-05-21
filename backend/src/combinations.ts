@@ -3,7 +3,14 @@ import { PokemonValidationGuess } from "../../types/pokemon.model";
 const validationOptions = [true, false];
 const comparisonOptions = ["equal", undefined];
 
-export const COMPARISON_KEYS = ["evolutionStage", "height", "weight"];
+export const COMPARISON_KEYS = [
+  "generation",
+  "evolutionStage",
+  "height",
+  "weight",
+];
+
+// TODO: implement comparion options "greater" and "less"
 
 export function generateCombinations(
   defaultObject: Partial<PokemonValidationGuess>

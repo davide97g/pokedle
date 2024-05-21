@@ -3,6 +3,7 @@ export interface PokemonModel {
   name: string;
   type1: string;
   type2: string;
+  generation: number;
   height: number;
   weight: number;
   image: string;
@@ -22,6 +23,7 @@ export type FEATURE =
   | "type2"
   | "color"
   | "habitat"
+  | "generation"
   | "height"
   | "weight"
   | "evolutionStage";
@@ -45,6 +47,10 @@ export interface PokemonValidationGuess {
     value: string;
     valid: boolean | undefined;
   };
+  generation: {
+    value: number;
+    comparison: ValidationComparison | undefined;
+  };
   height: {
     value: number;
     comparison: ValidationComparison | undefined;
@@ -65,6 +71,7 @@ export interface PokemonFeatures {
   color?: string;
   habitat?: string;
   evolutionStage?: number;
+  generation?: number;
   height?: number;
   weight?: number;
 }
@@ -74,6 +81,10 @@ export interface PokemonFeaturesNegative {
   type2: string[];
   color: string[];
   habitat: string[];
+  generation: {
+    min: number;
+    max: number;
+  };
   height: {
     min: number;
     max: number;

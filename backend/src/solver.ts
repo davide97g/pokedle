@@ -1,13 +1,12 @@
 import {
-  PokemonModel,
-  PokemonFeaturesNegative,
-  PokemonValidationGuess,
   FEATURE,
+  PokemonFeaturesNegative,
+  PokemonModel,
+  PokemonValidationGuess,
 } from "../../types/pokemon.model";
 
 import { generateCombinations } from "./combinations";
-import { GENERATION, getPokemonList } from "./data";
-import { getFirstGuess } from "./player";
+import { BEST_FIRST_GUESS, GENERATION, getPokemonList } from "./data";
 
 let yesterdayGuessedPokemon: PokemonModel | undefined = undefined;
 
@@ -99,6 +98,7 @@ const updateInfo = (
     type2: [],
     habitat: [],
     color: [],
+    generation: { min: 0, max: Infinity },
     evolutionStage: { min: 0, max: Infinity },
     height: { min: 0, max: Infinity },
     weight: { min: 0, max: Infinity },
@@ -113,6 +113,8 @@ const updateInfo = (
       guessedFeatures.habitat = validationGuess.habitat?.value;
     if (validationGuess.color?.valid)
       guessedFeatures.color = validationGuess.color?.value;
+    if (validationGuess.generation?.comparison === "equal")
+      guessedFeatures.generation = validationGuess.generation?.value;
     if (validationGuess.evolutionStage?.comparison === "equal")
       guessedFeatures.evolutionStage = validationGuess.evolutionStage?.value;
     if (validationGuess.height?.comparison === "equal")
@@ -125,6 +127,10 @@ const updateInfo = (
     guessedNegativeFeatures.type2 = guessedNegativeFeatures.type2 || [];
     guessedNegativeFeatures.habitat = guessedNegativeFeatures.habitat || [];
     guessedNegativeFeatures.color = guessedNegativeFeatures.color || [];
+    guessedNegativeFeatures.generation = guessedNegativeFeatures.generation || {
+      min: 0,
+      max: Infinity,
+    };
     guessedNegativeFeatures.evolutionStage =
       guessedNegativeFeatures.evolutionStage || { min: 0, max: Infinity };
     guessedNegativeFeatures.height = guessedNegativeFeatures.height || {
@@ -167,6 +173,20 @@ const updateInfo = (
           validationGuess.color?.value as string,
         ]),
       ];
+
+    if (validationGuess.generation?.comparison !== "equal") {
+      const value = validationGuess.generation?.value as number;
+      if (validationGuess.generation?.comparison === "greater")
+        guessedNegativeFeatures.generation.min = Math.max(
+          guessedNegativeFeatures.generation.min,
+          value
+        );
+      else
+        guessedNegativeFeatures.generation.max = Math.min(
+          guessedNegativeFeatures.generation.max,
+          value
+        );
+    }
 
     if (validationGuess.evolutionStage?.comparison !== "equal") {
       const value = validationGuess.evolutionStage?.value as number;
@@ -242,6 +262,13 @@ const filterOutPokemonByNegativeFeatures = (
       return false;
 
     if (
+      guessedNegativeFeatures.generation &&
+      (p.generation < guessedNegativeFeatures.generation.min ||
+        p.generation > guessedNegativeFeatures.generation.max)
+    )
+      return false;
+
+    if (
       guessedNegativeFeatures.evolutionStage &&
       (p.evolutionStage < guessedNegativeFeatures.evolutionStage.min ||
         p.evolutionStage > guessedNegativeFeatures.evolutionStage.max)
@@ -271,7 +298,7 @@ export const guessPokemon = (
   gen?: GENERATION
 ) => {
   // ? when it's the first guess => we already kwow the first optimal pokemon to guess based on the generation
-  if (!validationGuessHistory.length) return getFirstGuess(gen ?? "1");
+  if (!validationGuessHistory.length) return BEST_FIRST_GUESS[gen ?? "1"];
 
   const guessedPokemonIds = validationGuessHistory.map((v) => v.id);
   if (yesterdayGuessedPokemon)

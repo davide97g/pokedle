@@ -17,18 +17,6 @@ export const getNewPokemonToSolve = (gen?: GENERATION) => {
   return POKEMON_TO_GUESS;
 };
 
-export const getFirstGuess = (gen?: GENERATION): PokemonModel => {
-  switch (gen) {
-    case "1":
-      return getPokemonList("1").find((p) => p.id === 61)!;
-    case "2":
-      return getPokemonList("2").find((p) => p.id === 77)!;
-    case "3":
-    default:
-      return getPokemonList("3").find((p) => p.id === 287)!;
-  }
-}
-
 const computeComparison = (
   value?: number,
   guess?: number
@@ -73,6 +61,13 @@ export const testGuess = (
     habitat: {
       value: pokemonGuess.habitat,
       valid: pokemonGuess.habitat === POKEMON_TO_GUESS?.habitat,
+    },
+    generation: {
+      value: pokemonGuess.generation,
+      comparison: computeComparison(
+        POKEMON_TO_GUESS?.generation,
+        pokemonGuess?.generation
+      ),
     },
     height: {
       value: pokemonGuess.height,

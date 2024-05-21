@@ -112,6 +112,18 @@ export const GuessFeedback = ({
           <ComparisonIcon comparison={guess.weight.comparison} />
         </CardBody>
       </Card>
+      <Card>
+        <CardBody
+          className={`overflow-visible w-24 ${
+            guess.generation.comparison === "equal"
+              ? "bg-emerald-500"
+              : "bg-rose-800"
+          }  text-center flex justify-center`}
+        >
+          <p className="text-small capitalize">{guess.generation.value}</p>
+        </CardBody>
+        <ComparisonIcon comparison={guess.generation.comparison} />
+      </Card>
     </div>
   );
 };
