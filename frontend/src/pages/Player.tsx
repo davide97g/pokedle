@@ -24,6 +24,7 @@ const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
 
 export const Player = () => {
+  const isMobile = window.innerWidth < 640;
   const [isLoading, setIsLoading] = useState(false);
 
   const [showGoal, setShowGoal] = useState(
@@ -171,7 +172,7 @@ export const Player = () => {
           className="absolute w-screen z-50 top-0"
         />
       )}
-      <div className="flex flex-row items-center">
+      <div className="pt-28 md:pt-20 flex flex-row items-center">
         <img src="./logo.png" alt="logo" height={45} width={45} />
         <h1 className="text-2xl">Pokedle</h1>
       </div>
@@ -207,6 +208,7 @@ export const Player = () => {
         }}
       >
         <Button
+          size={isMobile ? "sm" : "md"}
           isDisabled={!guessFeedbackHistory.length}
           onClick={() => {
             localStorage.removeItem("guessFeedbackHistory");
@@ -218,6 +220,7 @@ export const Player = () => {
           Restart
         </Button>
         <Button
+          size={isMobile ? "sm" : "md"}
           onClick={() => {
             setIsLoading(true);
             API.newPokemon(generation)
@@ -267,7 +270,7 @@ export const Player = () => {
 
       {/* VALIDATION LINES */}
       {Boolean(reversedGuessFeedbackHistory.length) && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 max-w-full px-2">
           {Boolean(remainingPokemon) && (
             <p className="text-xs text-white/50 flex justify-end mr-2">
               {remainingPokemon}/{pokemonList.length} left
@@ -283,15 +286,17 @@ export const Player = () => {
               1
             )}
           />
-          <div className="flex flex-col gap-2 overflow-y-auto max-h-[36rem]">
+          <div className="flex flex-row sm:flex-col gap-2 overflow-auto">
             <GuessFeedbackHeader />
-            {reversedGuessFeedbackHistory.map((guess) => (
-              <GuessFeedback
-                key={guess.id}
-                guess={guess}
-                pokemon={pokemonList.find((p) => p.id === guess.id)}
-              />
-            ))}
+            <div className="flex flex-row sm:flex-col gap-2 overflow-auto sm:max-h-[36rem]">
+              {reversedGuessFeedbackHistory.map((guess) => (
+                <GuessFeedback
+                  key={guess.id}
+                  guess={guess}
+                  pokemon={pokemonList.find((p) => p.id === guess.id)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}

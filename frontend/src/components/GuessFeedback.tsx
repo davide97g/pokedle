@@ -14,7 +14,7 @@ export const GuessFeedback = ({
 }) => {
   if (!pokemon) return null;
   return (
-    <div className="flex flex-row gap-2">
+    <div className="flex flex-col sm:flex-row gap-2">
       <Card>
         <CardBody
           className={`overflow-visible w-full h-full absolute bg-black/50 rounded-xl`}
@@ -40,73 +40,85 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-visible w-24 ${
+          className={`overflow-hidden truncate w-24 ${
             guess.type1.valid ? "bg-emerald-500" : "bg-rose-800"
           }  text-center flex justify-center`}
         >
-          <p className="text-small capitalize">{guess.type1.value}</p>
+          <p className="sm:text-small text-xs text-xs capitalize">
+            {guess.type1.value}
+          </p>
         </CardBody>
       </Card>
       <Card>
         <CardBody
-          className={`overflow-visible w-24 ${
+          className={`overflow-hidden truncate  w-24 ${
             guess.type2.valid ? "bg-emerald-500" : "bg-rose-800"
           }  text-center flex justify-center`}
         >
-          <p className="text-small capitalize">{guess.type2.value}</p>
+          <p className="sm:text-small text-xs capitalize">
+            {guess.type2.value}
+          </p>
         </CardBody>
       </Card>
       <Card>
         <CardBody
-          className={`overflow-visible w-24 ${
+          className={`overflow-hidden truncate w-24 ${
             guess.habitat.valid ? "bg-emerald-500" : "bg-rose-800"
           }  text-center flex justify-center`}
         >
-          <p className="text-small capitalize">{guess.habitat.value}</p>
+          <p className="sm:text-small text-xs capitalize">
+            {guess.habitat.value}
+          </p>
         </CardBody>
       </Card>
       <Card>
         <CardBody
-          className={`overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
             guess.color.valid ? "bg-emerald-500" : "bg-rose-800"
           }  text-center flex justify-center`}
         >
-          <p className="text-small capitalize">{guess.color.value}</p>
+          <p className="sm:text-small text-xs capitalize">
+            {guess.color.value}
+          </p>
         </CardBody>
       </Card>
       <Card>
         <CardBody
-          className={`overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
             guess.evolutionStage.comparison === "equal"
               ? "bg-emerald-500"
               : "bg-rose-800"
           }  text-center flex justify-center`}
         >
-          <p className="text-small capitalize">{guess.evolutionStage.value}</p>
+          <p className="sm:text-small text-xs capitalize">
+            {guess.evolutionStage.value}
+          </p>
         </CardBody>
         <ComparisonIcon comparison={guess.evolutionStage.comparison} />
       </Card>
       <Card>
         <CardBody
-          className={`overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
             guess.height.comparison === "equal"
               ? "bg-emerald-500"
               : "bg-rose-800"
           }  text-center flex justify-center`}
         >
-          <p className="text-small">{Number(guess.height.value) / 10}m</p>
+          <p className="sm:text-small text-xs">
+            {Number(guess.height.value) / 10}m
+          </p>
           <ComparisonIcon comparison={guess.height.comparison} />
         </CardBody>
       </Card>
       <Card>
         <CardBody
-          className={`overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
             guess.weight.comparison === "equal"
               ? "bg-emerald-500"
               : "bg-rose-800"
           }  text-center flex justify-center`}
         >
-          <p className="text-small capitalize">
+          <p className="sm:text-small text-xs capitalize">
             {Number(guess.weight.value) / 10}kg
           </p>
           <ComparisonIcon comparison={guess.weight.comparison} />
@@ -114,13 +126,15 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
             guess.generation.comparison === "equal"
               ? "bg-emerald-500"
               : "bg-rose-800"
           }  text-center flex justify-center`}
         >
-          <p className="text-small capitalize">{guess.generation.value}</p>
+          <p className="sm:text-small text-xs capitalize">
+            {guess.generation.value}
+          </p>
         </CardBody>
         <ComparisonIcon comparison={guess.generation.comparison} />
       </Card>

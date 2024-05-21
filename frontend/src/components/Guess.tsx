@@ -10,6 +10,7 @@ export default function Guess({
   setShowGoal: (value: boolean) => void;
   pokemonToGuess: PokemonSummary | undefined;
 }>) {
+  const isMobile = window.innerWidth < 640;
   return (
     <div
       style={{
@@ -20,11 +21,12 @@ export default function Guess({
       className="flex flex-col gap-4 items-end"
     >
       <Switch size="sm" isSelected={showGoal} onValueChange={setShowGoal}>
-        Show Goal
+        Guess
       </Switch>
       {showGoal && pokemonToGuess && (
         <Card>
           <Image
+            width={isMobile ? 50 : 100}
             alt="Card background"
             className="object-cover rounded-xl"
             src={pokemonToGuess?.image}

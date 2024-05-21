@@ -19,15 +19,16 @@ export default function PokemonSearchBar({
   applyBestGuess: () => void;
 }>) {
   return (
-    <div className="flex justify-center items-center flex-row gap-12 w-full">
+    <div className="flex justify-center items-center flex-row gap-4  sm:gap-12 w-full">
       {pokemonList.length > 0 && (
         <Autocomplete
+          size="sm"
           isDisabled={gameStatus === "WON"}
           defaultItems={pokemonList}
           variant="bordered"
           label="Choose a pokemon"
           labelPlacement="inside"
-          className="max-w-xs autocomplete"
+          className="max-w-[250px] autocomplete"
           onSelectionChange={(pokemonId) => {
             if (pokemonId) guessPokemonById(Number(pokemonId));
           }}
@@ -56,6 +57,8 @@ export default function PokemonSearchBar({
         </Autocomplete>
       )}
       <Button
+        size="sm"
+        className="w-24"
         color="primary"
         isDisabled={gameStatus === "WON"}
         onClick={applyBestGuess}
