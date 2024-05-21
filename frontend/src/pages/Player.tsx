@@ -1,19 +1,14 @@
 import confetti from "canvas-confetti";
 
-import { Add, Restart, StarFilled } from "@carbon/icons-react";
+import { Add, Restart } from "@carbon/icons-react";
 import {
-  Autocomplete,
-  AutocompleteItem,
-  Avatar,
   Button,
-  Card,
-  Image,
+  CircularProgress,
   Progress,
   Select,
   SelectItem,
-  Switch,
 } from "@nextui-org/react";
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import {
   PokemonModel,
   PokemonSummary,
@@ -21,8 +16,12 @@ import {
 } from "../../../types/pokemon.model";
 import { GuessFeedback } from "../components/GuessFeedback";
 import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
+
 import { API } from "../services/api";
 import { GENERATION } from "../types";
+
+const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
+const Guess = lazy(() => import("../components/Guess"));
 
 export const Player = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -86,13 +85,15 @@ export const Player = () => {
   useEffect(() => {
     if (guessFeedbackHistory.length > 0) {
       if (guessFeedbackHistory.some((feedback) => hasWon(feedback))) {
-        setTimeout(() => setGameStatus("WON"), 1000);
+        setTimeout(() => setGameStatus("WON"), 250);
       }
     }
   }, [guessFeedbackHistory]);
 
   const reversedGuessFeedbackHistory = useMemo(() => {
-    return structuredClone(guessFeedbackHistory).reverse();
+    return structuredClone(
+      guessFeedbackHistory.sort((a, b) => (b.order ?? 0) - (a.order ?? 0))
+    );
   }, [guessFeedbackHistory]);
 
   const hasWon = (feedbackGuess: PokemonValidationGuess) => {
@@ -112,7 +113,10 @@ export const Player = () => {
       setIsLoading(true);
       API.sendGuessPokemonId(pokemonId, generation, guessFeedbackHistory)
         .then((response) => {
-          const updatedHistory = [...guessFeedbackHistory, response.validation];
+          const updatedHistory = [
+            ...guessFeedbackHistory,
+            { ...response.validation, order: guessFeedbackHistory.length },
+          ];
           setGuessFeedbackHistory(updatedHistory);
           setRemainingPokemon(response.remainingPokemon);
           localStorage.setItem(
@@ -231,79 +235,41 @@ export const Player = () => {
         </Button>
       </div>
 
-      <div
-        style={{
-          position: "absolute",
-          top: "1rem",
-          right: "1rem",
-        }}
-        className="flex flex-col gap-4 items-end"
+      {/* GUESS */}
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center">
+            <CircularProgress color="default" aria-label="Loading..." />
+          </div>
+        }
       >
-        <Switch size="sm" isSelected={showGoal} onValueChange={setShowGoal}>
-          Show Goal
-        </Switch>
-        {showGoal && pokemonToGuess && (
-          <Card>
-            <Image
-              alt="Card background"
-              className="object-cover rounded-xl"
-              src={pokemonToGuess?.image}
-            />
-          </Card>
-        )}
-      </div>
-
+        <Guess
+          showGoal={showGoal}
+          setShowGoal={setShowGoal}
+          pokemonToGuess={pokemonToGuess}
+        />
+      </Suspense>
       {/* SEARCH BAR */}
-      <div className="flex justify-center items-center flex-row gap-12 w-full">
-        {pokemonList.length > 0 && (
-          <Autocomplete
-            isDisabled={gameStatus === "WON"}
-            defaultItems={pokemonList}
-            variant="bordered"
-            label="Choose a pokemon"
-            labelPlacement="inside"
-            className="max-w-xs autocomplete"
-            onSelectionChange={(pokemonId) => {
-              if (pokemonId) guessPokemonById(Number(pokemonId));
-            }}
-          >
-            {(pokemon) => (
-              <AutocompleteItem
-                key={pokemon.id}
-                textValue={pokemon.name}
-                className="bg-background"
-              >
-                <div className="flex gap-2 items-center">
-                  <Avatar
-                    alt={pokemon.name}
-                    className="flex-shrink-0"
-                    size="sm"
-                    src={pokemon.image}
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-small text-gray-600 capitalize">
-                      {pokemon.name}
-                    </span>
-                  </div>
-                </div>
-              </AutocompleteItem>
-            )}
-          </Autocomplete>
-        )}
-        <Button
-          color="primary"
-          isDisabled={gameStatus === "WON"}
-          onClick={applyBestGuess}
-          startContent={<StarFilled />}
-        >
-          Best Guess
-        </Button>
-      </div>
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center">
+            <CircularProgress color="default" aria-label="Loading..." />
+          </div>
+        }
+      >
+        <PokemonSearchBar
+          pokemonList={pokemonList}
+          gameStatus={gameStatus}
+          guessPokemonById={guessPokemonById}
+          applyBestGuess={applyBestGuess}
+        />
+      </Suspense>
+
       {/* VALIDATION LINES */}
       {Boolean(reversedGuessFeedbackHistory.length) && (
-        <div className="flex flex-col gap-2 overflow-y-auto max-h-[39rem]">
+        <div className="flex flex-col gap-2">
           {Boolean(remainingPokemon) && (
-            <p className="text-xs text-white/50">
+            <p className="text-xs text-white/50 flex justify-end mr-2">
               {remainingPokemon}/{pokemonList.length} left
             </p>
           )}
@@ -317,14 +283,16 @@ export const Player = () => {
               1
             )}
           />
-          <GuessFeedbackHeader />
-          {reversedGuessFeedbackHistory.reverse().map((guess) => (
-            <GuessFeedback
-              key={guess.id}
-              guess={guess}
-              pokemon={pokemonList.find((p) => p.id === guess.id)}
-            />
-          ))}
+          <div className="flex flex-col gap-2 overflow-y-auto max-h-[36rem]">
+            <GuessFeedbackHeader />
+            {reversedGuessFeedbackHistory.map((guess) => (
+              <GuessFeedback
+                key={guess.id}
+                guess={guess}
+                pokemon={pokemonList.find((p) => p.id === guess.id)}
+              />
+            ))}
+          </div>
         </div>
       )}
     </>

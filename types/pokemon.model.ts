@@ -31,6 +31,7 @@ export type FEATURE =
 export type ValidationComparison = "greater" | "less" | "equal";
 export interface PokemonValidationGuess {
   id: number;
+  order?: number;
   type1: {
     value: string;
     valid: boolean | undefined;
