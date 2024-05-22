@@ -42,13 +42,13 @@ export const getPokemonList = (gen?: GENERATION): PokemonModel[] => {
 export const BEST_FIRST_GUESS: {
   [key: string]: PokemonModel | undefined;
 } = {
-  "1": POKEMON_LIST.find((p) => p.id === 61), // Poliwhirl
-  "2": POKEMON_LIST.find((p) => p.id === 161), // Sentret
-  "3": POKEMON_LIST.find((p) => p.id === 8), // Wartortle
-  "4": POKEMON_LIST.find((p) => p.id === 61), // Poliwhirl
-  "5": POKEMON_LIST.find((p) => p.id === 61), // Poliwhirl
-  "6": POKEMON_LIST.find((p) => p.id === 61), // Poliwhirl
-  "7": POKEMON_LIST.find((p) => p.id === 117), // Seadra
-  "8": POKEMON_LIST.find((p) => p.id === 61), // Poliwhirl
-  "9": POKEMON_LIST.find((p) => p.id === 117), // Seadra
+  "1": POKEMON_LIST.find((p) => p.id === 53), // Persian 2.3968253968253967
+  "2": POKEMON_LIST.find((p) => p.id === 30), // Nidorina 2.3679245283018866
+  "3": POKEMON_LIST.find((p) => p.id === 159), // Croconaw 2.4585987261146496
+  "4": POKEMON_LIST.find((p) => p.id === 159), // Croconaw 2.8497109826589595
+  "5": POKEMON_LIST.find((p) => p.id === 159), // Croconaw 3.489247311827957
+  "6": POKEMON_LIST.find((p) => p.id === 516), // Simipour 3.6598984771573604
+  "7": POKEMON_LIST.find((p) => p.id === 516), // Simipour 3.8523809523809525
+  "8": POKEMON_LIST.find((p) => p.id === 516), // Simipour 4.113636363636363
+  "9": POKEMON_LIST.find((p) => p.id === 516), // Simipour 4.535398230088496
 };

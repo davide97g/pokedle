@@ -208,6 +208,7 @@ export const Player = () => {
         }}
       >
         <Button
+          isIconOnly={isMobile}
           size={isMobile ? "sm" : "md"}
           isDisabled={!guessFeedbackHistory.length}
           onClick={() => {
@@ -217,10 +218,11 @@ export const Player = () => {
           }}
           startContent={<Restart />}
         >
-          Restart
+          {isMobile ? "" : "Restart"}
         </Button>
         <Button
           size={isMobile ? "sm" : "md"}
+          isIconOnly={isMobile}
           onClick={() => {
             setIsLoading(true);
             API.newPokemon(generation)
@@ -234,7 +236,7 @@ export const Player = () => {
           color="danger"
           startContent={<Add />}
         >
-          New Pokemon
+          {isMobile ? "" : "New Pokemon"}
         </Button>
       </div>
 

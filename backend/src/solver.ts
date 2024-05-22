@@ -23,9 +23,16 @@ const countRemainingPokemonWithGuess = (
         valid: boolean | undefined;
         comparison: "greater" | "less" | "equal" | undefined;
       };
-      const isValid = guess?.valid || guess?.comparison === "equal";
-      if (isValid) return p[feature] === guess.value;
-      else return p[feature] !== guess.value;
+      if (!guess) return true;
+      if (guess.valid !== undefined) {
+        if (guess.valid) return p[feature] === guess.value;
+        return p[feature] !== guess.value;
+      } else if (guess.comparison !== undefined) {
+        if (guess.comparison === "equal") return p[feature] === guess.value;
+        if (guess.comparison === "greater") return p[feature] > guess.value;
+        if (guess.comparison === "less") return p[feature] < guess.value;
+      }
+      return true;
     })
   );
 
@@ -81,10 +88,13 @@ const findOptimalPokemon = (
     pokemonScores.push({ pokemonId: pokemon.id, avg, name: pokemon.name });
   });
 
-  pokemonScores.sort((a, b) => a.avg - b.avg);
-  if (pokemonScores.length === 0) return null;
+  if (!pokemonScores.length) return null;
 
-  const bestPokemonId = pokemonScores[0].pokemonId;
+  const minScore = Math.min(...pokemonScores.map((p) => p.avg));
+  const pokemonWithMinScore = pokemonScores.filter((p) => p.avg === minScore);
+
+  const randomIndex = Math.floor(Math.random() * pokemonWithMinScore.length);
+  const bestPokemonId = pokemonWithMinScore[randomIndex].pokemonId;
 
   return pokemonList.find((p) => p.id === bestPokemonId);
 };
@@ -301,8 +311,6 @@ export const guessPokemon = (
   if (!validationGuessHistory.length) return BEST_FIRST_GUESS[gen ?? "1"];
 
   const guessedPokemonIds = validationGuessHistory.map((v) => v.id);
-  if (yesterdayGuessedPokemon)
-    guessedPokemonIds.push((yesterdayGuessedPokemon as PokemonModel).id);
   // Filter out the pokemons that have been guessed
   const pokemonStillToGuess = getPokemonList(gen).filter(
     (p) => !guessedPokemonIds.includes(p.id)
