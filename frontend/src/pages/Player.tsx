@@ -109,6 +109,14 @@ export const Player = () => {
     );
   };
 
+  const guessedPokemon = useMemo(() => {
+    if (gameStatus === "WON")
+      return pokemonList.find(
+        (p) => p.id === reversedGuessFeedbackHistory[0].id
+      );
+    return undefined;
+  }, [gameStatus, reversedGuessFeedbackHistory, pokemonList]);
+
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
       setIsLoading(true);
@@ -273,9 +281,15 @@ export const Player = () => {
       {/* VALIDATION LINES */}
       {Boolean(reversedGuessFeedbackHistory.length) && (
         <div className="flex flex-col gap-2 max-w-full px-2">
-          {Boolean(remainingPokemon) && (
+          {remainingPokemon ? (
             <p className="text-xs text-white/50 flex justify-end mr-2">
               {remainingPokemon}/{pokemonList.length} left
+            </p>
+          ) : (
+            <p className="text-xs text-white/50 flex justify-end mr-2">
+              🎉 Congratulations! You found{" "}
+              <span className="font-bold px-1">{guessedPokemon?.name}</span> in{" "}
+              {guessFeedbackHistory.length} guesses!
             </p>
           )}
           <Progress

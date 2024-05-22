@@ -40,7 +40,7 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-hidden truncate w-24 ${
+          className={`overflow-hidden truncate sm:text-wrap w-24 ${
             guess.type1.valid ? "bg-emerald-500" : "bg-rose-800"
           }  text-center flex justify-center`}
         >
@@ -51,7 +51,7 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-hidden truncate  w-24 ${
+          className={`overflow-hidden truncate sm:text-wrap  w-24 ${
             guess.type2.valid ? "bg-emerald-500" : "bg-rose-800"
           }  text-center flex justify-center`}
         >
@@ -62,7 +62,7 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-hidden truncate w-24 ${
+          className={`overflow-hidden truncate sm:text-wrap w-24 ${
             guess.habitat.valid ? "bg-emerald-500" : "bg-rose-800"
           }  text-center flex justify-center`}
         >
@@ -73,7 +73,7 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:text-wrap sm:overflow-visible w-24 ${
             guess.color.valid ? "bg-emerald-500" : "bg-rose-800"
           }  text-center flex justify-center`}
         >
@@ -84,7 +84,7 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:text-wrap sm:overflow-visible w-24 ${
             guess.evolutionStage.comparison === "equal"
               ? "bg-emerald-500"
               : "bg-rose-800"
@@ -98,7 +98,7 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:text-wrap sm:overflow-visible w-24 ${
             guess.height.comparison === "equal"
               ? "bg-emerald-500"
               : "bg-rose-800"
@@ -112,7 +112,7 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:text-wrap sm:overflow-visible w-24 ${
             guess.weight.comparison === "equal"
               ? "bg-emerald-500"
               : "bg-rose-800"
@@ -126,7 +126,7 @@ export const GuessFeedback = ({
       </Card>
       <Card>
         <CardBody
-          className={`overflow-hidden truncate sm:overflow-visible w-24 ${
+          className={`overflow-hidden truncate sm:text-wrap sm:overflow-visible w-24 ${
             guess.generation.comparison === "equal"
               ? "bg-emerald-500"
               : "bg-rose-800"
