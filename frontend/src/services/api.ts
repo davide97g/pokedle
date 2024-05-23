@@ -9,6 +9,30 @@ const BACKEND_URL =
   import.meta.env.VITE_APP_BACKEND_URL ?? "http://localhost:3000";
 
 export const API = {
+  getStatusAdmin: async (
+    gen: GENERATION,
+    guessFeedbackHistory: PokemonValidationGuess[]
+  ) => {
+    return fetch(`${BACKEND_URL}/status/${gen}/admin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(guessFeedbackHistory),
+    })
+      .then((res) => res.json())
+      .then(
+        (res) =>
+          res as {
+            remainingPokemon: number;
+            pokemonToGuess: PokemonModel;
+          }
+      )
+      .catch((err) => {
+        console.info(err);
+        return null;
+      });
+  },
   getStatus: async (
     gen: GENERATION,
     guessFeedbackHistory: PokemonValidationGuess[]
@@ -25,7 +49,6 @@ export const API = {
         (res) =>
           res as {
             remainingPokemon: number;
-            pokemonToGuess: PokemonModel;
           }
       )
       .catch((err) => {

@@ -6,6 +6,7 @@ import {
   Button,
 } from "@nextui-org/react";
 import { PokemonSummary } from "../../../types/pokemon.model";
+import { useUser } from "../hooks/useUser";
 
 export default function PokemonSearchBar({
   pokemonList,
@@ -18,6 +19,7 @@ export default function PokemonSearchBar({
   guessPokemonById: (pokemonId: number) => void;
   applyBestGuess: () => void;
 }>) {
+  const { isPro } = useUser();
   return (
     <div className="flex justify-center items-center flex-row gap-4  sm:gap-12 w-full">
       {pokemonList.length > 0 && (
@@ -56,16 +58,18 @@ export default function PokemonSearchBar({
           )}
         </Autocomplete>
       )}
-      <Button
-        size="sm"
-        className="w-24"
-        color="primary"
-        isDisabled={gameStatus === "WON"}
-        onClick={applyBestGuess}
-        startContent={<StarFilled />}
-      >
-        Best Guess
-      </Button>
+      {isPro && (
+        <Button
+          size="sm"
+          className="w-24"
+          color="primary"
+          isDisabled={gameStatus === "WON"}
+          onClick={applyBestGuess}
+          startContent={<StarFilled />}
+        >
+          Best Guess
+        </Button>
+      )}
     </div>
   );
 }

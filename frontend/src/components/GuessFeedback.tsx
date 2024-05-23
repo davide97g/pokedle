@@ -31,9 +31,12 @@ export const GuessFeedback = ({
           >
             <Image
               alt="Card background"
-              className="object-cover rounded-xl"
+              className="object-cover rounded-xl cursor-pointer"
               src={pokemon?.image}
               width={150}
+              onClick={() =>
+                window.open(`https://www.pokemon.com/us/pokedex/${pokemon.id}`)
+              }
             />
           </Tooltip>
         </CardBody>
