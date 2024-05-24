@@ -140,7 +140,7 @@ export const Player = () => {
   };
 
   const applyBestGuess = () => {
-    if (isPro) {
+    if (isPro || isAdmin) {
       setIsLoading(true);
       API.getBestSuggestion(guessFeedbackHistory, generation)
         .then((res) => {
@@ -217,28 +217,28 @@ export const Player = () => {
         ))}
       </Select>
 
-      {isAdmin && (
-        <div
-          className="flex flex-col gap-4"
-          style={{
-            position: "absolute",
-            top: "1rem",
-            left: "1rem",
+      <div
+        className="flex flex-col gap-4"
+        style={{
+          position: "absolute",
+          top: "1rem",
+          left: "1rem",
+        }}
+      >
+        <Button
+          isIconOnly={isMobile}
+          size={isMobile ? "sm" : "md"}
+          isDisabled={!guessFeedbackHistory.length}
+          onClick={() => {
+            localStorage.removeItem("guessFeedbackHistory");
+            setGuessFeedbackHistory([]);
+            setGameStatus("PLAYING");
           }}
+          startContent={<Restart />}
         >
-          <Button
-            isIconOnly={isMobile}
-            size={isMobile ? "sm" : "md"}
-            isDisabled={!guessFeedbackHistory.length}
-            onClick={() => {
-              localStorage.removeItem("guessFeedbackHistory");
-              setGuessFeedbackHistory([]);
-              setGameStatus("PLAYING");
-            }}
-            startContent={<Restart />}
-          >
-            {isMobile ? "" : "Restart"}
-          </Button>
+          {isMobile ? "" : "Restart"}
+        </Button>
+        {isAdmin && (
           <Button
             size={isMobile ? "sm" : "md"}
             isIconOnly={isMobile}
@@ -258,8 +258,8 @@ export const Player = () => {
           >
             {isMobile ? "" : "New Pokemon"}
           </Button>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* GUESS */}
       {isAdmin && (

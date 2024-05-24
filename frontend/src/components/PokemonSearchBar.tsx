@@ -19,7 +19,7 @@ export default function PokemonSearchBar({
   guessPokemonById: (pokemonId: number) => void;
   applyBestGuess: () => void;
 }>) {
-  const { isPro } = useUser();
+  const { isPro, isAdmin } = useUser();
   return (
     <div className="flex justify-center items-center flex-row gap-4  sm:gap-12 w-full">
       {pokemonList.length > 0 && (
@@ -58,7 +58,7 @@ export default function PokemonSearchBar({
           )}
         </Autocomplete>
       )}
-      {isPro && (
+      {(isAdmin || isPro) && (
         <Button
           size="sm"
           className="w-24"

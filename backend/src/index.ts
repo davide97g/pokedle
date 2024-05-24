@@ -27,7 +27,7 @@ app.get("/", (_: any, res: any) => {
   res.send("Solvedle Server");
 });
 
-app.post("/status/:gen", express.json(), (req: any, res: any) => {
+app.post("/status/:gen/admin", express.json(), (req: any, res: any) => {
   const gen = req.params.gen;
   const validationGuessHistory = req.body as PokemonValidationGuess[];
   const remainingPokemon = countRemainingPokemonFromHistory(
@@ -37,6 +37,19 @@ app.post("/status/:gen", express.json(), (req: any, res: any) => {
 
   res.send({
     pokemonToGuess: POKEMON_TO_GUESS,
+    remainingPokemon,
+  });
+});
+
+app.post("/status/:gen", express.json(), (req: any, res: any) => {
+  const gen = req.params.gen;
+  const validationGuessHistory = req.body as PokemonValidationGuess[];
+  const remainingPokemon = countRemainingPokemonFromHistory(
+    validationGuessHistory,
+    gen
+  );
+
+  res.send({
     remainingPokemon,
   });
 });
