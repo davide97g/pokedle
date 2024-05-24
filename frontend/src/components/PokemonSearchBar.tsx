@@ -48,10 +48,11 @@ export default function PokemonSearchBar({
                   size="md"
                   src={pokemon.image}
                 />
-                <div className="flex flex-col">
+                <div className="flex flex-row justify-between w-full">
                   <span className="text-small text-gray-600 capitalize">
                     {pokemon.name}
                   </span>
+                  <span className="text-xs text-gray-400">#{pokemon.id}</span>
                 </div>
               </div>
             </AutocompleteItem>

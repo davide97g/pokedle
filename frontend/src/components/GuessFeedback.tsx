@@ -26,7 +26,7 @@ export const GuessFeedback = ({
         <CardBody className={`overflow-visible w-24`}>
           <Tooltip
             showArrow
-            content={pokemon.name}
+            content={pokemon.name + " #" + pokemon.id}
             className="text-gray-600 capitalize"
           >
             <Image

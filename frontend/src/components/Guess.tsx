@@ -31,6 +31,12 @@ export default function Guess({
             className="object-cover rounded-xl"
             src={pokemonToGuess?.image}
           />
+          <div className="flex flex-row justify-between w-full items-center p-2">
+            <span className="text-small text-gray-400 capitalize">
+              {pokemonToGuess.name}
+            </span>
+            <span className="text-xs text-gray-400">#{pokemonToGuess.id}</span>
+          </div>
         </Card>
       )}
     </div>
