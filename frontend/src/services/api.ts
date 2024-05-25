@@ -5,7 +5,7 @@ import {
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
 import { GENERATION } from "../types";
-import { appCheck } from "../config/firebase";
+import { appCheck, auth } from "../config/firebase";
 
 const BACKEND_URL =
   import.meta.env.VITE_APP_BACKEND_URL ?? "http://localhost:3000";
@@ -72,18 +72,17 @@ export const API_PRO = {
     guessValidationHistory: PokemonValidationGuess[],
     gen: GENERATION
   ) => {
-    const appCheckTokenResponse = await getToken(appCheck, true).catch(
-      (err) => {
-        console.info(err);
-        return null;
-      }
-    );
-    if (!appCheckTokenResponse?.token) return null;
+    const idToken = await auth.currentUser?.getIdToken().catch((err) => {
+      console.info(err);
+      return null;
+    });
+
+    if (!idToken) return null;
     return fetch(`${BACKEND_URL}/best-guess/${gen}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Firebase-AppCheck": appCheckTokenResponse.token,
+        Authorization: `Bearer ${idToken}`,
       },
       body: JSON.stringify(guessValidationHistory),
     })
@@ -97,6 +96,22 @@ export const API_PRO = {
 };
 
 export const API_ADMIN = {
+  createAdmin: async (idToken: string) => {
+    fetch(`${BACKEND_URL}/create-admin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ idToken }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.info(err);
+      });
+  },
   getStatusAdmin: async (
     gen: GENERATION,
     guessFeedbackHistory: PokemonValidationGuess[]
@@ -107,12 +122,18 @@ export const API_ADMIN = {
         return null;
       }
     );
-    if (!appCheckTokenResponse?.token) return null;
+    const idToken = await auth.currentUser?.getIdToken().catch((err) => {
+      console.info(err);
+      return null;
+    });
+
+    if (!appCheckTokenResponse?.token || !idToken) return null;
     return fetch(`${BACKEND_URL}/status/${gen}/admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Firebase-AppCheck": appCheckTokenResponse.token,
+        Authorization: `Bearer ${idToken}`,
       },
       body: JSON.stringify(guessFeedbackHistory),
     })
@@ -136,12 +157,17 @@ export const API_ADMIN = {
         return null;
       }
     );
-    if (!appCheckTokenResponse?.token) return null;
+    const idToken = await auth.currentUser?.getIdToken().catch((err) => {
+      console.info(err);
+      return null;
+    });
+    if (!appCheckTokenResponse?.token || !idToken) return null;
     return fetch(`${BACKEND_URL}/new-pokemon/${gen}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Firebase-AppCheck": appCheckTokenResponse.token,
+        Authorization: `Bearer ${idToken}`,
       },
     });
   },

@@ -2,8 +2,9 @@ import { Button, Progress } from "@nextui-org/react";
 import { AUTH } from "../services/auth";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase";
-import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
+import { API_ADMIN } from "../services/api";
+import { useUser } from "../hooks/useUser";
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -11,19 +12,30 @@ export default function Admin() {
     AUTH.logout().then(() => navigate("/login"));
   };
 
-  const [user, setUser] = useState<User>();
+  const { isAdmin, setIsAdmin } = useUser();
+  const [loading, setLoading] = useState(false);
+
+  const createAdmin = async () => {
+    const token = await auth.currentUser?.getIdToken();
+    if (!token) return;
+    API_ADMIN.createAdmin(token);
+  };
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    setLoading(true);
+    auth.onAuthStateChanged(async (user) => {
       if (user) {
-        setUser(user);
+        await user.getIdTokenResult().then((idTokenResult) => {
+          setIsAdmin(!!idTokenResult.claims.admin);
+        });
       } else {
         navigate("/login");
       }
+      setLoading(false);
     });
-  }, [navigate]);
+  }, [navigate, setIsAdmin]);
 
-  if (!user) {
+  if (loading) {
     return (
       <Progress
         size="sm"
@@ -36,10 +48,26 @@ export default function Admin() {
 
   return (
     <div className="pt-28 md:pt-20 flex flex-col gap-10 items-center">
-      <h1 className="text-2xl">Pokedle Admin</h1>
-      <Button color="primary" onClick={handleLogout}>
-        Logout
-      </Button>
+      {!isAdmin && (
+        <div className="flex flex-col gap-10 items-center">
+          <p>Unauthorized!</p>
+          <div className="flex flex-row gap-5 items-center">
+            <Button color="danger" onClick={handleLogout}>
+              Logout
+            </Button>
+            <Button onClick={() => navigate("/")}>Home</Button>
+          </div>
+        </div>
+      )}
+      {isAdmin && (
+        <div className="flex flex-col gap-10 items-center">
+          <h1 className="text-2xl">Pokedle Admin</h1>
+          <Button onClick={createAdmin}>Create Admin</Button>
+          <Button color="danger" onClick={handleLogout}>
+            Logout
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

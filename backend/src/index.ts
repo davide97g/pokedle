@@ -11,6 +11,7 @@ import { GENERATION, getPokemonList } from "./data";
 import { isAdmin } from "./middleware/admin";
 import { isPro } from "./middleware/pro";
 import { initializeFirebaseApp } from "./config/firebase";
+import { getAuth } from "firebase-admin/auth";
 
 dotenv.config();
 
@@ -89,6 +90,40 @@ app.post(
 );
 
 // **** ADMIN ****
+
+// ? Create admins
+app.post("/create-admin", express.json(), async (req, res) => {
+  // Get the ID token passed.
+  const idToken = req.body.idToken;
+
+  // Verify the ID token and decode its payload.
+  const claims = await getAuth().verifyIdToken(idToken);
+  console.log(claims);
+
+  // Verify user is eligible for additional privileges.
+  if (
+    typeof claims.email !== "undefined" &&
+    typeof claims.email_verified !== "undefined" &&
+    claims.email_verified &&
+    claims.email === "ghiotto.davidenko@gmail.com"
+  ) {
+    // Add custom claims for additional privileges.
+    await getAuth().setCustomUserClaims(claims.sub, {
+      admin: true,
+    });
+
+    // Tell client to refresh token on user.
+    res.end(
+      JSON.stringify({
+        status: "success",
+      })
+    );
+  } else {
+    // Return nothing.
+    res.end(JSON.stringify({ status: "ineligible" }));
+  }
+});
+
 app.post(
   "/new-pokemon/:gen",
   [isAdmin, express.json()],
