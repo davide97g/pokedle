@@ -17,14 +17,14 @@ import {
 import { GuessFeedback } from "../components/GuessFeedback";
 import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
 
-import { API } from "../services/api";
+import { API, API_ADMIN, API_PRO } from "../services/api";
 import { GENERATION } from "../types";
 import { useUser } from "../hooks/useUser";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
 
-export const Player = () => {
+export default function Player() {
   const { isAdmin, isPro } = useUser();
   const isMobile = window.innerWidth < 640;
   const [isLoading, setIsLoading] = useState(false);
@@ -142,7 +142,7 @@ export const Player = () => {
   const applyBestGuess = () => {
     if (isPro || isAdmin) {
       setIsLoading(true);
-      API.getBestSuggestion(guessFeedbackHistory, generation)
+      API_PRO.getBestSuggestion(guessFeedbackHistory, generation)
         .then((res) => {
           if (res) {
             guessPokemonById(res.id);
@@ -166,7 +166,7 @@ export const Player = () => {
   useEffect(() => {
     setIsLoading(true);
     if (isAdmin) {
-      API.getStatusAdmin(generation, guessFeedbackHistory)
+      API_ADMIN.getStatusAdmin(generation, guessFeedbackHistory)
         .then((res) => {
           setPokemonToGuess(res?.pokemonToGuess);
           setRemainingPokemon(res?.remainingPokemon);
@@ -245,7 +245,7 @@ export const Player = () => {
             onClick={() => {
               setIsLoading(true);
               if (isAdmin)
-                API.newPokemon(generation)
+                API_ADMIN.newPokemon(generation)
                   .then(() => {
                     window.location.reload();
                     localStorage.removeItem("guessFeedbackHistory");
@@ -333,4 +333,4 @@ export const Player = () => {
       )}
     </>
   );
-};
+}

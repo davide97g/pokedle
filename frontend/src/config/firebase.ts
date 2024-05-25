@@ -1,5 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 const firebaseConfig = {
   apiKey: "AIzaSyARKyzdwc2fgeTpwkqTrOKIB0qpRNz_n4c",
@@ -13,4 +16,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
-getAnalytics(app);
+export const analytics = getAnalytics(app);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider("6Lff0ucpAAAAAP6mde0lYAWcBZwKckPO8X4uuaTy"),
+});

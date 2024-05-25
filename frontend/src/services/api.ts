@@ -1,38 +1,16 @@
+import { getToken } from "firebase/app-check";
 import {
   PokemonModel,
   PokemonSummary,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
 import { GENERATION } from "../types";
+import { appCheck } from "../config/firebase";
 
 const BACKEND_URL =
   import.meta.env.VITE_APP_BACKEND_URL ?? "http://localhost:3000";
 
 export const API = {
-  getStatusAdmin: async (
-    gen: GENERATION,
-    guessFeedbackHistory: PokemonValidationGuess[]
-  ) => {
-    return fetch(`${BACKEND_URL}/status/${gen}/admin`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(guessFeedbackHistory),
-    })
-      .then((res) => res.json())
-      .then(
-        (res) =>
-          res as {
-            remainingPokemon: number;
-            pokemonToGuess: PokemonModel;
-          }
-      )
-      .catch((err) => {
-        console.info(err);
-        return null;
-      });
-  },
   getStatus: async (
     gen: GENERATION,
     guessFeedbackHistory: PokemonValidationGuess[]
@@ -56,30 +34,8 @@ export const API = {
         return null;
       });
   },
-  getBestSuggestion: async (
-    guessValidationHistory: PokemonValidationGuess[],
-    gen: GENERATION
-  ) => {
-    return fetch(`${BACKEND_URL}/best-guess/${gen}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(guessValidationHistory),
-    })
-      .then((res) => res.json())
-      .then((res) => res.pokemon as PokemonModel)
-      .catch((err) => {
-        console.info(err);
-        return null;
-      });
-  },
-  newPokemon: async (gen: GENERATION) => {
-    return fetch(`${BACKEND_URL}/new-pokemon/${gen}`, {
-      method: "POST",
-    });
-  },
   getPokemons: async (gen: GENERATION) => {
+    // TODO: paginated
     return fetch(`${BACKEND_URL}/pokemon/all/${gen}`)
       .then((res) => res.json())
       .then((res) => res as PokemonSummary[])
@@ -108,5 +64,85 @@ export const API = {
             remainingPokemon: number;
           }
       );
+  },
+};
+
+export const API_PRO = {
+  getBestSuggestion: async (
+    guessValidationHistory: PokemonValidationGuess[],
+    gen: GENERATION
+  ) => {
+    const appCheckTokenResponse = await getToken(appCheck, true).catch(
+      (err) => {
+        console.info(err);
+        return null;
+      }
+    );
+    if (!appCheckTokenResponse?.token) return null;
+    return fetch(`${BACKEND_URL}/best-guess/${gen}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Firebase-AppCheck": appCheckTokenResponse.token,
+      },
+      body: JSON.stringify(guessValidationHistory),
+    })
+      .then((res) => res.json())
+      .then((res) => res.pokemon as PokemonModel)
+      .catch((err) => {
+        console.info(err);
+        return null;
+      });
+  },
+};
+
+export const API_ADMIN = {
+  getStatusAdmin: async (
+    gen: GENERATION,
+    guessFeedbackHistory: PokemonValidationGuess[]
+  ) => {
+    const appCheckTokenResponse = await getToken(appCheck, true).catch(
+      (err) => {
+        console.info(err);
+        return null;
+      }
+    );
+    if (!appCheckTokenResponse?.token) return null;
+    return fetch(`${BACKEND_URL}/status/${gen}/admin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Firebase-AppCheck": appCheckTokenResponse.token,
+      },
+      body: JSON.stringify(guessFeedbackHistory),
+    })
+      .then((res) => res.json())
+      .then(
+        (res) =>
+          res as {
+            remainingPokemon: number;
+            pokemonToGuess: PokemonModel;
+          }
+      )
+      .catch((err) => {
+        console.info(err);
+        return null;
+      });
+  },
+  newPokemon: async (gen: GENERATION) => {
+    const appCheckTokenResponse = await getToken(appCheck, true).catch(
+      (err) => {
+        console.info(err);
+        return null;
+      }
+    );
+    if (!appCheckTokenResponse?.token) return null;
+    return fetch(`${BACKEND_URL}/new-pokemon/${gen}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Firebase-AppCheck": appCheckTokenResponse.token,
+      },
+    });
   },
 };
