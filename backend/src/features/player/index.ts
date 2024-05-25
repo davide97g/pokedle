@@ -1,21 +1,6 @@
-import {
-  PokemonModel,
-  PokemonValidationGuess,
-} from "../../types/pokemon.model";
-import { GENERATION, getPokemonList } from "./data";
-
-const getRandomPokemon = (gen?: GENERATION): PokemonModel => {
-  const pokemonList = getPokemonList(gen ?? "1");
-  const randomId = Math.floor(Math.random() * pokemonList.length) + 1;
-  return pokemonList.find((p) => p.id === randomId)!;
-};
-
-export let POKEMON_TO_GUESS = getRandomPokemon();
-
-export const getNewPokemonToSolve = (gen?: GENERATION) => {
-  POKEMON_TO_GUESS = getRandomPokemon(gen ?? "1");
-  return POKEMON_TO_GUESS;
-};
+import { PokemonValidationGuess } from "../../../../types/pokemon.model";
+import { GENERATION, getPokemonList } from "../../data";
+import { DAILY_POKEMONS } from "./manager";
 
 const computeComparison = (
   value?: number,
@@ -44,6 +29,19 @@ export const testGuess = (
   if (!pokemonGuess) {
     throw new Error("Pokemon not found");
   }
+
+  if (!DAILY_POKEMONS?.pokemonList.length) {
+    throw new Error("Pokemon list not found");
+  }
+
+  const POKEMON_TO_GUESS = DAILY_POKEMONS.pokemonList.find(
+    (p) => p.gen === gen
+  )?.pokemon;
+
+  if (!POKEMON_TO_GUESS) {
+    throw new Error("Pokemon to guess not found");
+  }
+
   return {
     id: pokemonGuess.id,
     type1: {

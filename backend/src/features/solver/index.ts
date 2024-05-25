@@ -3,10 +3,10 @@ import {
   PokemonFeaturesNegative,
   PokemonModel,
   PokemonValidationGuess,
-} from "../../types/pokemon.model";
+} from "../../../../types/pokemon.model";
 
 import { generateCombinations } from "./combinations";
-import { BEST_FIRST_GUESS, GENERATION, getPokemonList } from "./data";
+import { BEST_FIRST_GUESS, GENERATION, getPokemonList } from "../../data";
 
 let yesterdayGuessedPokemon: PokemonModel | undefined = undefined;
 
@@ -248,29 +248,10 @@ const filterOutPokemonByNegativeFeatures = (
   guessedNegativeFeatures: Partial<PokemonFeaturesNegative>
 ): PokemonModel[] => {
   return pokemonList.filter((p) => {
-    if (
-      guessedNegativeFeatures.type1 &&
-      guessedNegativeFeatures.type1.includes(p.type1)
-    )
-      return false;
-    if (
-      guessedNegativeFeatures.type2 &&
-      guessedNegativeFeatures.type2.includes(p.type2)
-    )
-      return false;
-
-    if (
-      guessedNegativeFeatures.habitat &&
-      guessedNegativeFeatures.habitat.includes(p.habitat)
-    )
-      return false;
-
-    if (
-      guessedNegativeFeatures.color &&
-      guessedNegativeFeatures.color.includes(p.color)
-    )
-      return false;
-
+    if (guessedNegativeFeatures.type1?.includes(p.type1)) return false;
+    if (guessedNegativeFeatures.type2?.includes(p.type2)) return false;
+    if (guessedNegativeFeatures.habitat?.includes(p.habitat)) return false;
+    if (guessedNegativeFeatures.color?.includes(p.color)) return false;
     if (
       guessedNegativeFeatures.generation &&
       (p.generation < guessedNegativeFeatures.generation.min ||

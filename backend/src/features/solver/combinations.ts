@@ -1,4 +1,4 @@
-import { PokemonValidationGuess } from "../../types/pokemon.model";
+import { PokemonValidationGuess } from "../../../../types/pokemon.model";
 
 const validationOptions = [true, false];
 const comparisonOptions = ["equal", "greater", "less"];

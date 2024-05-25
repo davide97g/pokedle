@@ -1,3 +1,5 @@
+import { GENERATION } from "../backend/src/data";
+
 export interface PokemonModel {
   id: number;
   name: string;
@@ -98,4 +100,10 @@ export interface PokemonFeaturesNegative {
     min: number;
     max: number;
   };
+}
+
+export interface PokedleDayStats {
+  pokemonList: { gen: GENERATION; pokemon: PokemonModel }[];
+  date: string;
+  totalGuesses: number;
 }

@@ -12,7 +12,7 @@ export const isPro = async (
 
   if (!appCheckToken || !bearerToken) {
     res.status(401);
-    return next("Unauthorized");
+    return next({ message: "Unauthorized: no token" });
   }
 
   try {
@@ -21,6 +21,6 @@ export const isPro = async (
     return next();
   } catch (err) {
     res.status(401);
-    return next("Unauthorized");
+    return next({ message: "Unauthorized: user not authorized" });
   }
 };

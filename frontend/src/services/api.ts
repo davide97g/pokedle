@@ -1,5 +1,6 @@
 import { getToken } from "firebase/app-check";
 import {
+  PokedleDayStats,
   PokemonModel,
   PokemonSummary,
   PokemonValidationGuess,
@@ -72,16 +73,23 @@ export const API_PRO = {
     guessValidationHistory: PokemonValidationGuess[],
     gen: GENERATION
   ) => {
+    const appCheckTokenResponse = await getToken(appCheck, true).catch(
+      (err) => {
+        console.info(err);
+        return null;
+      }
+    );
     const idToken = await auth.currentUser?.getIdToken().catch((err) => {
       console.info(err);
       return null;
     });
 
-    if (!idToken) return null;
+    if (!appCheckTokenResponse || !idToken) return null;
     return fetch(`${BACKEND_URL}/best-guess/${gen}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-Firebase-AppCheck": appCheckTokenResponse.token,
         Authorization: `Bearer ${idToken}`,
       },
       body: JSON.stringify(guessValidationHistory),
@@ -142,7 +150,7 @@ export const API_ADMIN = {
         (res) =>
           res as {
             remainingPokemon: number;
-            pokemonToGuess: PokemonModel;
+            pokemonDayStats: PokedleDayStats;
           }
       )
       .catch((err) => {
@@ -150,7 +158,7 @@ export const API_ADMIN = {
         return null;
       });
   },
-  newPokemon: async (gen: GENERATION) => {
+  newPokemon: async () => {
     const appCheckTokenResponse = await getToken(appCheck, true).catch(
       (err) => {
         console.info(err);
@@ -162,13 +170,19 @@ export const API_ADMIN = {
       return null;
     });
     if (!appCheckTokenResponse?.token || !idToken) return null;
-    return fetch(`${BACKEND_URL}/new-pokemon/${gen}`, {
+    return fetch(`${BACKEND_URL}/new-pokemon`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Firebase-AppCheck": appCheckTokenResponse.token,
         Authorization: `Bearer ${idToken}`,
       },
-    });
+    })
+      .then((res) => res.json())
+      .then((res) => res.pokemonDayStats as PokedleDayStats)
+      .catch((err) => {
+        console.info(err);
+        return null;
+      });
   },
 };

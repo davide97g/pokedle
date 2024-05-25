@@ -10,16 +10,16 @@ import {
 } from "@nextui-org/react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import {
-  PokemonModel,
+  PokedleDayStats,
   PokemonSummary,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
 import { GuessFeedback } from "../components/GuessFeedback";
 import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
 
+import { useUser } from "../hooks/useUser";
 import { API, API_ADMIN, API_PRO } from "../services/api";
 import { GENERATION } from "../types";
-import { useUser } from "../hooks/useUser";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
@@ -33,7 +33,7 @@ export default function Player() {
     localStorage.getItem("showGoal") === "true"
   );
   const [pokemonList, setPokemonList] = useState<PokemonSummary[]>([]);
-  const [pokemonToGuess, setPokemonToGuess] = useState<PokemonModel>();
+  const [pokemonDayStats, setPokemonDayStats] = useState<PokedleDayStats>();
 
   const [remainingPokemon, setRemainingPokemon] = useState<number>();
 
@@ -168,7 +168,7 @@ export default function Player() {
     if (isAdmin) {
       API_ADMIN.getStatusAdmin(generation, guessFeedbackHistory)
         .then((res) => {
-          setPokemonToGuess(res?.pokemonToGuess);
+          setPokemonDayStats(res?.pokemonDayStats);
           setRemainingPokemon(res?.remainingPokemon);
         })
         .finally(() => setIsLoading(false));
@@ -245,7 +245,7 @@ export default function Player() {
             onClick={() => {
               setIsLoading(true);
               if (isAdmin)
-                API_ADMIN.newPokemon(generation)
+                API_ADMIN.newPokemon()
                   .then(() => {
                     window.location.reload();
                     localStorage.removeItem("guessFeedbackHistory");
@@ -273,7 +273,10 @@ export default function Player() {
           <Guess
             showGoal={showGoal}
             setShowGoal={setShowGoal}
-            pokemonToGuess={pokemonToGuess}
+            pokemonToGuess={
+              pokemonDayStats?.pokemonList.find((p) => p.gen === generation)
+                ?.pokemon
+            }
           />
         </Suspense>
       )}
