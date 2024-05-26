@@ -19,23 +19,27 @@ export const addPublicRoutes = (app: Express) => {
       validationGuessHistory,
       gen
     );
+    const totalPokemon = getPokemonList(gen).length;
 
     res.send({
       remainingPokemon,
+      totalPokemon,
     });
   });
 
-  app.get("/pokemon/all/:gen", (req: Request, res: Response) => {
+  app.get("/pokemon/:gen", (req: Request, res: Response) => {
     const gen = req.params.gen as GENERATION;
-    const summary: PokemonSummary[] = getPokemonList(gen || "1").map(
-      (pokemon) => {
+    const name = req.query.name as string;
+    const summary: PokemonSummary[] = getPokemonList(gen || "1")
+      .filter((p) => !name || p.name.includes(name))
+      .slice(0, 10)
+      .map((pokemon) => {
         return {
           id: pokemon.id,
           name: pokemon.name,
           image: pokemon.image,
         };
-      }
-    );
+      });
     res.send(summary);
   });
 

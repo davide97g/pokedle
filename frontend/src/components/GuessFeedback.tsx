@@ -1,18 +1,9 @@
 import { Card, CardBody, Image, Tooltip } from "@nextui-org/react";
-import {
-  PokemonSummary,
-  PokemonValidationGuess,
-} from "../../../types/pokemon.model";
+import { PokemonValidationGuess } from "../../../types/pokemon.model";
 import { ComparisonIcon } from "./ComparisonIcon";
 
-export const GuessFeedback = ({
-  guess,
-  pokemon,
-}: {
-  guess: PokemonValidationGuess;
-  pokemon?: PokemonSummary;
-}) => {
-  if (!pokemon) return null;
+export const GuessFeedback = ({ guess }: { guess: PokemonValidationGuess }) => {
+  if (!guess?.id) return null;
   return (
     <div className="flex flex-col sm:flex-row gap-2">
       <Card>
@@ -26,16 +17,16 @@ export const GuessFeedback = ({
         <CardBody className={`overflow-visible w-24`}>
           <Tooltip
             showArrow
-            content={pokemon.name + " #" + pokemon.id}
+            content={guess.name + " #" + guess.id}
             className="text-gray-600 capitalize"
           >
             <Image
               alt="Card background"
               className="object-cover rounded-xl cursor-pointer"
-              src={pokemon?.image}
+              src={guess?.image}
               width={150}
               onClick={() =>
-                window.open(`https://www.pokemon.com/us/pokedex/${pokemon.id}`)
+                window.open(`https://www.pokemon.com/us/pokedex/${guess.id}`)
               }
             />
           </Tooltip>

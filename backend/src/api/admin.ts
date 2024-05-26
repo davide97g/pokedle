@@ -1,7 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import { getAuth } from "firebase-admin/auth";
 import { PokemonValidationGuess } from "../../../types/pokemon.model";
-import { GENERATION } from "../data";
+import { GENERATION, getPokemonList } from "../data";
 import { isAdmin } from "../middleware/isAdmin";
 import { countRemainingPokemonFromHistory } from "../features/solver";
 import {
@@ -66,7 +66,10 @@ export const addAdminRoutes = (app: Express) => {
 
       const pokemonDayStats = await getTodayPokemonList();
 
+      const totalPokemon = getPokemonList(gen).length;
+
       res.send({
+        totalPokemon,
         pokemonDayStats,
         remainingPokemon,
       });

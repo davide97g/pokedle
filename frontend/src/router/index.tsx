@@ -13,6 +13,7 @@ export const router = createBrowserRouter([
         <Player />
       </Suspense>
     ),
+    errorElement: <div>404 Not Found</div>,
   },
   {
     path: "/admin",

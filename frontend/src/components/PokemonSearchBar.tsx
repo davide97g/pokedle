@@ -5,60 +5,83 @@ import {
   Avatar,
   Button,
 } from "@nextui-org/react";
-import { PokemonSummary } from "../../../types/pokemon.model";
+import { useDebounce } from "@uidotdev/usehooks";
+import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import { useUser } from "../hooks/useUser";
+import { API } from "../services/api";
+import { GENERATION } from "../types";
 
 export default function PokemonSearchBar({
-  pokemonList,
+  generation,
   gameStatus,
   guessPokemonById,
   applyBestGuess,
 }: Readonly<{
-  pokemonList: PokemonSummary[];
+  generation: GENERATION;
   gameStatus: "PLAYING" | "WON";
   guessPokemonById: (pokemonId: number) => void;
   applyBestGuess: () => void;
 }>) {
   const { isPro, isAdmin } = useUser();
+
+  const [pokemonNameFilter, setPokemonNameFilter] = useState("");
+  const deferredPokemonNameFilter = useDebounce(pokemonNameFilter, 500);
+
+  const {
+    data: pokemonList,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: ["pokemon", generation, deferredPokemonNameFilter],
+    queryFn: () =>
+      API.getPokemons({ gen: generation, name: deferredPokemonNameFilter }),
+    enabled: false,
+  });
+
+  useEffect(() => {
+    refetch();
+  }, [deferredPokemonNameFilter, generation, refetch]);
+
   return (
     <div className="flex justify-center items-center flex-row gap-4  sm:gap-12 w-full">
-      {pokemonList.length > 0 && (
-        <Autocomplete
-          size="sm"
-          isDisabled={gameStatus === "WON"}
-          defaultItems={pokemonList}
-          variant="bordered"
-          label="Choose a pokemon"
-          labelPlacement="inside"
-          className="max-w-[250px] autocomplete"
-          onSelectionChange={(pokemonId) => {
-            if (pokemonId) guessPokemonById(Number(pokemonId));
-          }}
-        >
-          {(pokemon) => (
-            <AutocompleteItem
-              key={pokemon.id}
-              textValue={pokemon.name}
-              className="bg-background"
-            >
-              <div className="flex gap-2 items-center">
-                <Avatar
-                  alt={pokemon.name}
-                  className="flex-shrink-0"
-                  size="md"
-                  src={pokemon.image}
-                />
-                <div className="flex flex-row justify-between w-full">
-                  <span className="text-small text-gray-600 capitalize">
-                    {pokemon.name}
-                  </span>
-                  <span className="text-xs text-gray-400">#{pokemon.id}</span>
-                </div>
+      <Autocomplete
+        size="sm"
+        isDisabled={gameStatus === "WON"}
+        defaultItems={pokemonList ?? []}
+        variant="bordered"
+        label="Choose a pokemon"
+        labelPlacement="inside"
+        className="max-w-[250px] autocomplete"
+        onInputChange={(value) => setPokemonNameFilter(value)}
+        onSelectionChange={(pokemonId) => {
+          if (pokemonId) guessPokemonById(Number(pokemonId));
+        }}
+        isLoading={isFetching}
+      >
+        {(pokemon) => (
+          <AutocompleteItem
+            key={pokemon.id}
+            textValue={pokemon.name}
+            className="bg-background"
+          >
+            <div className="flex gap-2 items-center">
+              <Avatar
+                alt={pokemon.name}
+                className="flex-shrink-0"
+                size="md"
+                src={pokemon.image}
+              />
+              <div className="flex flex-row justify-between w-full">
+                <span className="text-small text-gray-600 capitalize">
+                  {pokemon.name}
+                </span>
+                <span className="text-xs text-gray-400">#{pokemon.id}</span>
               </div>
-            </AutocompleteItem>
-          )}
-        </Autocomplete>
-      )}
+            </div>
+          </AutocompleteItem>
+        )}
+      </Autocomplete>
       {(isAdmin || isPro) && (
         <Button
           size="sm"

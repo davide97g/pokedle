@@ -5,6 +5,7 @@ import {
   Button,
   CircularProgress,
   Progress,
+  ScrollShadow,
   Select,
   SelectItem,
 } from "@nextui-org/react";
@@ -32,7 +33,8 @@ export default function Player() {
   const [showGoal, setShowGoal] = useState(
     localStorage.getItem("showGoal") === "true"
   );
-  const [pokemonList, setPokemonList] = useState<PokemonSummary[]>([]);
+
+  const [totalPokemon, setTotalPokemon] = useState<number>();
   const [pokemonDayStats, setPokemonDayStats] = useState<PokedleDayStats>();
 
   const [remainingPokemon, setRemainingPokemon] = useState<number>();
@@ -112,12 +114,17 @@ export default function Player() {
   };
 
   const guessedPokemon = useMemo(() => {
-    if (gameStatus === "WON")
-      return pokemonList.find(
-        (p) => p.id === reversedGuessFeedbackHistory[0].id
-      );
+    if (gameStatus === "WON") {
+      const lastGuess = reversedGuessFeedbackHistory[0];
+      if (lastGuess)
+        return {
+          id: lastGuess.id,
+          name: lastGuess.name,
+          image: lastGuess.image,
+        } as PokemonSummary;
+    }
     return undefined;
-  }, [gameStatus, reversedGuessFeedbackHistory, pokemonList]);
+  }, [gameStatus, reversedGuessFeedbackHistory]);
 
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
@@ -154,20 +161,10 @@ export default function Player() {
 
   useEffect(() => {
     setIsLoading(true);
-    API.getPokemons(generation)
-      .then((res) => {
-        if (res) {
-          setPokemonList(res);
-        }
-      })
-      .finally(() => setIsLoading(false));
-  }, [generation]);
-
-  useEffect(() => {
-    setIsLoading(true);
     if (isAdmin) {
       API_ADMIN.getStatusAdmin(generation, guessFeedbackHistory)
         .then((res) => {
+          setTotalPokemon(res?.totalPokemon);
           setPokemonDayStats(res?.pokemonDayStats);
           setRemainingPokemon(res?.remainingPokemon);
         })
@@ -175,6 +172,7 @@ export default function Player() {
     } else
       API.getStatus(generation, guessFeedbackHistory)
         .then((res) => {
+          setTotalPokemon(res?.totalPokemon);
           setRemainingPokemon(res?.remainingPokemon);
         })
         .finally(() => setIsLoading(false));
@@ -289,7 +287,7 @@ export default function Player() {
         }
       >
         <PokemonSearchBar
-          pokemonList={pokemonList}
+          generation={generation}
           gameStatus={gameStatus}
           guessPokemonById={guessPokemonById}
           applyBestGuess={applyBestGuess}
@@ -301,7 +299,7 @@ export default function Player() {
         <div className="flex flex-col gap-2 max-w-full px-2">
           {remainingPokemon ? (
             <p className="text-xs text-white/50 flex justify-end mr-2">
-              {remainingPokemon}/{pokemonList.length} left
+              {remainingPokemon}/{totalPokemon} left
             </p>
           ) : (
             <p className="text-xs text-white/50 flex justify-end mr-2">
@@ -314,23 +312,26 @@ export default function Player() {
             aria-label="Loading..."
             value={Math.max(
               Math.round(
-                (100 * (pokemonList.length - (remainingPokemon ?? 0))) /
-                  pokemonList.length
+                (100 * ((totalPokemon ?? 0) - (remainingPokemon ?? 0))) /
+                  (totalPokemon ?? 1)
               ),
               1
             )}
           />
-          <div className="flex flex-row sm:flex-col gap-2 overflow-auto">
+          <div className="flex flex-row sm:flex-col gap-2">
             <GuessFeedbackHeader />
-            <div className="flex flex-row sm:flex-col gap-2 overflow-auto sm:max-h-[36rem]">
-              {reversedGuessFeedbackHistory.map((guess) => (
-                <GuessFeedback
-                  key={guess.id}
-                  guess={guess}
-                  pokemon={pokemonList.find((p) => p.id === guess.id)}
-                />
-              ))}
-            </div>
+            <ScrollShadow
+              className="w-[300px] sm:w-full sm:max-h-[33rem]"
+              hideScrollBar
+              size={40}
+              orientation={isMobile ? "horizontal" : "vertical"}
+            >
+              <div className="flex flex-row sm:flex-col gap-2">
+                {reversedGuessFeedbackHistory.map((guess) => (
+                  <GuessFeedback key={guess.id} guess={guess} />
+                ))}
+              </div>
+            </ScrollShadow>
           </div>
         </div>
       )}

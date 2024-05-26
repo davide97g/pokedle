@@ -27,6 +27,7 @@ export const API = {
       .then(
         (res) =>
           res as {
+            totalPokemon: number;
             remainingPokemon: number;
           }
       )
@@ -35,14 +36,15 @@ export const API = {
         return null;
       });
   },
-  getPokemons: async (gen: GENERATION) => {
-    // TODO: paginated
-    return fetch(`${BACKEND_URL}/pokemon/all/${gen}`)
+  getPokemons: async ({ gen, name }: { gen: GENERATION; name: string }) => {
+    const cleanName = name.trim();
+    const nameQuery = cleanName ? `?name=${cleanName}` : "";
+    return fetch(`${BACKEND_URL}/pokemon/${gen}${nameQuery}`)
       .then((res) => res.json())
       .then((res) => res as PokemonSummary[])
       .catch((err) => {
         console.info(err);
-        return null;
+        return [] as PokemonSummary[];
       });
   },
   sendGuessPokemonId: async (
@@ -149,6 +151,7 @@ export const API_ADMIN = {
       .then(
         (res) =>
           res as {
+            totalPokemon: number;
             remainingPokemon: number;
             pokemonDayStats: PokedleDayStats;
           }

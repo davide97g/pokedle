@@ -44,6 +44,8 @@ export const testGuess = (
 
   return {
     id: pokemonGuess.id,
+    name: pokemonGuess.name,
+    image: pokemonGuess.image,
     type1: {
       value: pokemonGuess.type1,
       valid: pokemonGuess.type1 === POKEMON_TO_GUESS?.type1,
