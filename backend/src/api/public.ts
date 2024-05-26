@@ -30,8 +30,9 @@ export const addPublicRoutes = (app: Express) => {
   app.get("/pokemon/:gen", (req: Request, res: Response) => {
     const gen = req.params.gen as GENERATION;
     const name = req.query.name as string;
-    const summary: PokemonSummary[] = getPokemonList(gen || "1")
-      .filter((p) => !name || p.name.includes(name))
+    const cleanName = name ? name.trim().toLowerCase() : "";
+    const summary: PokemonSummary[] = getPokemonList(gen)
+      .filter((p) => !cleanName || p.name.includes(cleanName))
       .slice(0, 10)
       .map((pokemon) => {
         return {
