@@ -46,12 +46,15 @@ export const updatePokemonToGuess = async () => {
   ];
   const randomPokemonList: { gen: GENERATION; pokemon: PokemonModel }[] =
     generationList.map((gen) => {
-      // const alreadyUsedIdList = yesterdayPokemons?.pokemonList
-      //   .filter((p) => p.gen === gen)
-      //   .map((p) => p.pokemon.id) as number[];
+      const yesterdayPokemon = yesterdayPokemons?.pokemonList.find(
+        (p) => p.gen === gen
+      );
       return {
         gen,
-        pokemon: getRandomPokemon(gen, []),
+        pokemon: getRandomPokemon(
+          gen,
+          yesterdayPokemon?.pokemon.id ? [yesterdayPokemon?.pokemon.id] : []
+        ),
       };
     });
 

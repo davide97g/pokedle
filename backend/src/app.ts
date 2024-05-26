@@ -5,10 +5,13 @@ import { addAdminRoutes } from "./api/admin";
 import { addProRoutes } from "./api/pro";
 import { addPublicRoutes } from "./api/public";
 import { initializeFirebaseApp } from "./config/firebase";
+import { scheduleDailyUpdate } from "./features/update";
 
 dotenv.config();
 
 initializeFirebaseApp();
+
+scheduleDailyUpdate();
 
 const app = express();
 
