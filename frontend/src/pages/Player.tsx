@@ -21,6 +21,7 @@ import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
 import { useUser } from "../hooks/useUser";
 import { API, API_ADMIN, API_PRO } from "../services/api";
 import { GENERATION } from "../types";
+import { Counter } from "../components/Counter";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
@@ -188,9 +189,12 @@ export default function Player() {
           className="absolute w-screen z-50 top-0"
         />
       )}
-      <div className="pt-28 md:pt-20 flex flex-row items-center">
-        <img src="./logo.png" alt="logo" height={45} width={45} />
-        <h1 className="text-2xl">Pokedle</h1>
+      <div className="flex flex-col justify-center items-center">
+        <div className="pt-28 md:pt-20 flex flex-row items-center">
+          <img src="./logo.png" alt="logo" height={45} width={45} />
+          <h1 className="text-2xl">Pokedle</h1>
+        </div>
+        <Counter />
       </div>
       <Select
         label="Generation"

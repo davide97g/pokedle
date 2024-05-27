@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import { getFirestore } from "firebase-admin/firestore";
 import { PokedleDayStats, PokemonModel } from "../../../../types/pokemon.model";
 import { GENERATION, getPokemonList } from "../../data";
+import { resetCounter } from "../counter";
 
 export let DAILY_POKEMONS: PokedleDayStats | null = null;
 
@@ -68,6 +69,7 @@ export const updatePokemonToGuess = async () => {
 
   // save today's pokemon list
   await pokemonsRef.set(todayPokemonList);
+  await resetCounter();
 
   return todayPokemonList;
 };

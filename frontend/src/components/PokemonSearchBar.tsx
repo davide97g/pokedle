@@ -53,9 +53,13 @@ export default function PokemonSearchBar({
         label="Choose a pokemon"
         labelPlacement="inside"
         className="max-w-[250px] autocomplete"
+        inputValue={pokemonNameFilter}
         onInputChange={(value) => setPokemonNameFilter(value)}
         onSelectionChange={(pokemonId) => {
-          if (pokemonId) guessPokemonById(Number(pokemonId));
+          if (pokemonId) {
+            setPokemonNameFilter("");
+            guessPokemonById(Number(pokemonId));
+          }
         }}
         isLoading={isFetching}
       >
@@ -63,7 +67,7 @@ export default function PokemonSearchBar({
           <AutocompleteItem
             key={pokemon.id}
             textValue={pokemon.name}
-            className="bg-background"
+            // className="bg-background"
           >
             <div className="flex gap-2 items-center">
               <Avatar

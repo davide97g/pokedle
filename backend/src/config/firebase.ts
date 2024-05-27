@@ -8,4 +8,6 @@ const serviceAccount = `${process.env.SECRETS_PATH}/service-account.json`;
 export const initializeFirebaseApp = () =>
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
+    databaseURL:
+      "https://pokedle-online-default-rtdb.europe-west1.firebasedatabase.app",
   });

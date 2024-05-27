@@ -47,11 +47,11 @@ export const addPublicRoutes = (app: Express) => {
   app.post(
     "/guess-pokemon/:pokemonId/:gen",
     express.json(),
-    (req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
       const pokemonId = req.params.pokemonId;
       const gen = req.params.gen as GENERATION;
       const validationGuessHistory = req.body as PokemonValidationGuess[];
-      const validation = testGuess(pokemonId, gen);
+      const validation = await testGuess(pokemonId, gen);
       const remainingPokemon = countRemainingPokemonFromHistory(
         validationGuessHistory,
         gen

@@ -1,5 +1,6 @@
 import { PokemonValidationGuess } from "../../../../types/pokemon.model";
 import { GENERATION, getPokemonList } from "../../data";
+import { incrementCounter } from "../counter";
 import { DAILY_POKEMONS } from "./manager";
 
 const computeComparison = (
@@ -19,10 +20,23 @@ const computeComparison = (
   }
 };
 
-export const testGuess = (
+const hasWon = (guess: PokemonValidationGuess): boolean => {
+  return Boolean(
+    guess.type1.valid &&
+      guess.type2.valid &&
+      guess.color.valid &&
+      guess.habitat.valid &&
+      guess.generation.comparison === "equal" &&
+      guess.height.comparison === "equal" &&
+      guess.weight.comparison === "equal" &&
+      guess.evolutionStage.comparison === "equal"
+  );
+};
+
+export const testGuess = async (
   pokemonGuessId: string,
   gen?: GENERATION
-): PokemonValidationGuess => {
+): Promise<PokemonValidationGuess> => {
   const pokemonGuess = getPokemonList(gen ?? "1").find(
     (p) => p.id === Number(pokemonGuessId)
   );
@@ -42,7 +56,7 @@ export const testGuess = (
     throw new Error("Pokemon to guess not found");
   }
 
-  return {
+  const validationGuess: PokemonValidationGuess = {
     id: pokemonGuess.id,
     name: pokemonGuess.name,
     image: pokemonGuess.image,
@@ -91,4 +105,8 @@ export const testGuess = (
       ),
     },
   };
+
+  if (hasWon(validationGuess)) await incrementCounter();
+
+  return validationGuess;
 };

@@ -3,10 +3,13 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyARKyzdwc2fgeTpwkqTrOKIB0qpRNz_n4c",
   authDomain: "pokedle-online.firebaseapp.com",
+  databaseURL:
+    "https://pokedle-online-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "pokedle-online",
   storageBucket: "pokedle-online.appspot.com",
   messagingSenderId: "646061032717",
@@ -19,6 +22,7 @@ export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const rtdb = getDatabase(app);
 export const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider("6Lff0ucpAAAAAP6mde0lYAWcBZwKckPO8X4uuaTy"),
 });
