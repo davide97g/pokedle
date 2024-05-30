@@ -52,10 +52,15 @@ export const API = {
     gen: GENERATION,
     guessValidationHistory: PokemonValidationGuess[]
   ) => {
+    const idToken = await auth.currentUser?.getIdToken().catch((err) => {
+      console.info(err);
+      return null;
+    });
     return fetch(`${BACKEND_URL}/guess-pokemon/${pokemonId}/${gen}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(idToken && { Authorization: `Bearer ${idToken}` }),
       },
       body: JSON.stringify(guessValidationHistory),
     })

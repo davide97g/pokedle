@@ -109,3 +109,7 @@ export interface PokedleDayStats {
   date: string;
   totalGuesses: number;
 }
+
+export interface PokedleCustomGuess {
+  pokemonList: { gen: GENERATION; pokemon: PokemonModel }[];
+}

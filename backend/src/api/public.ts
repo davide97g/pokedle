@@ -6,6 +6,8 @@ import {
   PokemonSummary,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
+import { updateUserStats } from "../features/user";
+import { getAuth } from "firebase-admin/auth";
 
 export const addPublicRoutes = (app: Express) => {
   app.get("/", (_: Request, res: Response) => {
@@ -51,12 +53,31 @@ export const addPublicRoutes = (app: Express) => {
       const pokemonId = req.params.pokemonId;
       const gen = req.params.gen as GENERATION;
       const validationGuessHistory = req.body as PokemonValidationGuess[];
-      const validation = await testGuess(pokemonId, gen);
-      const remainingPokemon = countRemainingPokemonFromHistory(
-        validationGuessHistory,
+
+      const { validationGuess, isWinningGuess } = await testGuess(
+        pokemonId,
         gen
       );
-      res.send({ validation, remainingPokemon });
+      const remainingPokemon = isWinningGuess
+        ? 0
+        : countRemainingPokemonFromHistory(validationGuessHistory, gen);
+
+      if (isWinningGuess) {
+        const bearerToken = req.header("Authorization");
+        if (bearerToken) {
+          const claims = await getAuth().verifyIdToken(
+            bearerToken?.split("Bearer ")[1]
+          );
+          const userId = claims.uid;
+          if (userId) {
+            await updateUserStats({
+              userId,
+              totalGuesses: (validationGuessHistory.length ?? 0) + 1,
+            });
+          }
+        }
+      }
+      res.send({ validation: validationGuess, remainingPokemon });
     }
   );
 

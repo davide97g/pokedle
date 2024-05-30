@@ -4,6 +4,7 @@ import {
   AutocompleteItem,
   Avatar,
   Button,
+  Tooltip,
 } from "@nextui-org/react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
@@ -24,7 +25,7 @@ export default function PokemonSearchBar({
   guessPokemonById: (pokemonId: number) => void;
   applyBestGuess: () => void;
 }>) {
-  const { isLogged } = useAuth();
+  const { isLogged, user } = useAuth();
 
   const [pokemonNameFilter, setPokemonNameFilter] = useState("");
   const deferredPokemonNameFilter = useDebounce(pokemonNameFilter, 500);
@@ -32,7 +33,7 @@ export default function PokemonSearchBar({
   const {
     data: pokemonList,
     isFetching,
-    refetch,
+    refetch: refetchPokemonList,
   } = useQuery({
     queryKey: ["pokemon", generation, deferredPokemonNameFilter],
     queryFn: () =>
@@ -41,8 +42,8 @@ export default function PokemonSearchBar({
   });
 
   useEffect(() => {
-    refetch();
-  }, [deferredPokemonNameFilter, generation, refetch]);
+    refetchPokemonList();
+  }, [deferredPokemonNameFilter, generation, refetchPokemonList]);
 
   return (
     <div className="flex justify-center items-center flex-row gap-4  sm:gap-12 w-full">
@@ -88,16 +89,20 @@ export default function PokemonSearchBar({
         )}
       </Autocomplete>
       {isLogged && (
-        <Button
-          size="sm"
-          className="w-24"
-          color="primary"
-          isDisabled={gameStatus === "WON"}
-          onClick={applyBestGuess}
-          startContent={<StarFilled />}
+        <Tooltip
+          color="secondary"
+          content="Use your best guess to score a perfect guess"
         >
-          Best Guess
-        </Button>
+          <Button
+            size="sm"
+            color="primary"
+            isDisabled={gameStatus === "WON" || !user?.numberOfBestGuesses}
+            onClick={applyBestGuess}
+            startContent={<StarFilled />}
+          >
+            Best Guess ({user?.numberOfBestGuesses})
+          </Button>
+        </Tooltip>
       )}
     </div>
   );

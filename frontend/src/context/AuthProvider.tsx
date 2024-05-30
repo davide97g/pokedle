@@ -1,14 +1,16 @@
 import { User } from "firebase/auth";
 import { createContext, ReactNode, useEffect, useMemo, useState } from "react";
 import { auth } from "../config/firebase";
-import { useUserCreateUpdateUser } from "../hooks/database/useUserCreateUpdateUser";
-import { useUserGetUserById } from "../hooks/database/useUserGetUserById";
+
+import { useUserGetUserById } from "../hooks/database/user/useUserGetUserById";
 import { PUser } from "../types";
+import { useUserCreateUser } from "../hooks/database/user/useUserCreateUser";
 
 interface AuthContext {
   user?: PUser;
   isAdmin: boolean;
   isLogged: boolean;
+  refetch: () => void;
 }
 
 export const AuthContext = createContext({
@@ -19,8 +21,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [firebaseUser, setFirebaseUser] = useState<User>();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const { data: user, isFetching } = useUserGetUserById(firebaseUser?.uid);
-  const { mutateAsync: createUser } = useUserCreateUpdateUser();
+  const {
+    data: user,
+    isFetching,
+    refetch,
+  } = useUserGetUserById(firebaseUser?.uid);
+  const { mutateAsync: createUser } = useUserCreateUser();
 
   const isLogged = useMemo(() => !!firebaseUser, [firebaseUser]);
 
@@ -58,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     isAdmin,
     isLogged,
+    refetch,
   };
 
   return (

@@ -36,7 +36,7 @@ const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
 
 export default function Player() {
-  const { isLogged, isAdmin } = useAuth();
+  const { isLogged, isAdmin, refetch } = useAuth();
   const isMobile = window.innerWidth < 640;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -163,6 +163,7 @@ export default function Player() {
       setIsLoading(true);
       API_PRO.getBestSuggestion(guessFeedbackHistory, generation)
         .then((res) => {
+          refetch();
           if (res) {
             guessPokemonById(res.id);
           }
@@ -250,20 +251,14 @@ export default function Player() {
       </Select>
 
       {isLogged && (
-        <div
-          className="flex flex-col gap-4"
-          style={{
-            position: "absolute",
-            top: "1rem",
-            left: "1rem",
-          }}
-        >
+        <div className="flex flex-col gap-4 absolute top-2 left-2 sm:top-4 sm:left-4">
           <Button
             isIconOnly={isMobile}
             size={isMobile ? "sm" : "md"}
             isDisabled={!guessFeedbackHistory.length}
             onClick={restart}
             startContent={<Restart />}
+            variant="ghost"
           >
             {isMobile ? "" : "Restart"}
           </Button>

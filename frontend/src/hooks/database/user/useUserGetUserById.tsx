@@ -1,6 +1,6 @@
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../config/firebase";
-import { PUser } from "../../types";
+import { db } from "../../../config/firebase";
+import { PUser } from "../../../types";
 import { useQuery } from "@tanstack/react-query";
 
 export const useUserGetUserById = (id?: string) => {

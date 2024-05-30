@@ -1,6 +1,7 @@
 import { PokemonValidationGuess } from "../../../../types/pokemon.model";
 import { GENERATION, getPokemonList } from "../../data";
 import { incrementCounter } from "../counter";
+import { updateUserStats } from "../user";
 import { DAILY_POKEMONS } from "./manager";
 
 const computeComparison = (
@@ -36,7 +37,10 @@ const hasWon = (guess: PokemonValidationGuess): boolean => {
 export const testGuess = async (
   pokemonGuessId: string,
   gen?: GENERATION
-): Promise<PokemonValidationGuess> => {
+): Promise<{
+  validationGuess: PokemonValidationGuess;
+  isWinningGuess: boolean;
+}> => {
   const pokemonGuess = getPokemonList(gen ?? "1").find(
     (p) => p.id === Number(pokemonGuessId)
   );
@@ -106,7 +110,8 @@ export const testGuess = async (
     },
   };
 
-  if (hasWon(validationGuess)) await incrementCounter();
+  const isWinningGuess = hasWon(validationGuess);
+  if (isWinningGuess) await incrementCounter();
 
-  return validationGuess;
+  return { validationGuess, isWinningGuess };
 };
