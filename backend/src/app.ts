@@ -6,6 +6,7 @@ import { addProRoutes } from "./api/pro";
 import { addPublicRoutes } from "./api/public";
 import { initializeFirebaseApp } from "./config/firebase";
 import { scheduleDailyUpdate } from "./features/update";
+import { getTodayPokemonList } from "./features/player/manager";
 
 dotenv.config();
 
@@ -40,4 +41,5 @@ addAdminRoutes(app);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
+  getTodayPokemonList();
 });

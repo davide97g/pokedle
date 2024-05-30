@@ -6,8 +6,8 @@ export const useUser = () => {
   // const url = window.location.href;
 
   const [isLogged, setIsLogged] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(true);
-  const [isPro, setIsPro] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isPro, setIsPro] = useState(false);
 
   return {
     isLogged,
