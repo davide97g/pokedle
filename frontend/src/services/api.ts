@@ -106,22 +106,22 @@ export const API_PRO = {
 };
 
 export const API_ADMIN = {
-  createAdmin: async (idToken: string) => {
-    fetch(`${BACKEND_URL}/create-admin`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ idToken }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.info(err);
-      });
-  },
+  // createAdmin: async (idToken: string) => {
+  //   fetch(`${BACKEND_URL}/create-admin`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({ idToken }),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((res) => {
+  //       console.log(res);
+  //     })
+  //     .catch((err) => {
+  //       console.info(err);
+  //     });
+  // },
   getStatusAdmin: async (
     gen: GENERATION,
     guessFeedbackHistory: PokemonValidationGuess[]

@@ -26,10 +26,11 @@ import { GuessFeedback } from "../components/GuessFeedback";
 import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
 
 import { Counter } from "../components/Counter";
-import { useAuth } from "../hooks/useAuth";
+
 import { API, API_ADMIN, API_PRO } from "../services/api";
 import { GENERATION } from "../types";
 import User from "../components/User";
+import { useAuth } from "../hooks/useAuth";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));

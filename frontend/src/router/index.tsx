@@ -3,7 +3,6 @@ import { createBrowserRouter } from "react-router-dom";
 
 const Player = lazy(() => import("../pages/Player"));
 const Login = lazy(() => import("../pages/Login"));
-const Admin = lazy(() => import("../pages/Admin"));
 const About = lazy(() => import("../pages/About"));
 const PersonalArea = lazy(() => import("../pages/PersonalArea"));
 
@@ -16,14 +15,6 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
     errorElement: <div>404 Not Found</div>,
-  },
-  {
-    path: "/admin",
-    element: (
-      <Suspense>
-        <Admin />
-      </Suspense>
-    ),
   },
   {
     path: "/login",

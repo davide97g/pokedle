@@ -1,13 +1,21 @@
 import { Button, Chip } from "@nextui-org/react";
 import { useNavigate } from "react-router-dom";
 import User from "../components/User";
-import { useAuth } from "../hooks/useAuth";
+
 import { AUTH } from "../services/auth";
+
+import { useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
 
 export default function PersonalArea() {
   const { isLogged, user, isAdmin } = useAuth();
   const navigate = useNavigate();
-  if (!isLogged || !user) navigate("/login");
+
+  useEffect(() => {
+    if (!isLogged) {
+      navigate("/login");
+    }
+  }, [isLogged, navigate]);
 
   const handleLogout = async () => {
     AUTH.logout().then(() => navigate("/"));
@@ -41,6 +49,17 @@ export default function PersonalArea() {
           <Button onClick={() => navigate("/")}>Home</Button>
           <Button color="danger" onClick={handleLogout}>
             Logout
+          </Button>
+        </div>
+        <div className="flex flex-col gap-5">
+          <Button
+            variant="bordered"
+            color="primary"
+            onClick={() =>
+              window.open("https://buy.stripe.com/test_00g7subgM8AXbG8dQQ")
+            }
+          >
+            Become Pro
           </Button>
         </div>
       </div>

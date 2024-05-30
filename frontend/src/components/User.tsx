@@ -1,6 +1,6 @@
 import { Avatar } from "@nextui-org/react";
-import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 export default function User({
   interactive = true,
@@ -9,7 +9,6 @@ export default function User({
 }) {
   const { isLogged, isAdmin, user } = useAuth();
   const navigate = useNavigate();
-  if (!isLogged) return null;
 
   return (
     <Avatar
@@ -19,7 +18,8 @@ export default function User({
       isBordered
       radius="full"
       color={isAdmin ? "primary" : "default"}
-      src={user?.photoURL ?? "https://i.pravatar.cc/150?u=a04258114e29026708c"}
+      showFallback={!isLogged}
+      src={user?.photoURL ?? undefined}
       onClick={() => (interactive ? navigate("/me") : undefined)}
     />
   );

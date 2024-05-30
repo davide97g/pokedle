@@ -7,10 +7,11 @@ import {
 } from "@nextui-org/react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { useAuth } from "../hooks/useAuth";
+
 import { API } from "../services/api";
 import { GENERATION } from "../types";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../hooks/useAuth";
 
 export default function PokemonSearchBar({
   generation,

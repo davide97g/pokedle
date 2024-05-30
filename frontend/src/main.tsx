@@ -1,6 +1,6 @@
 import { NextUIProvider } from "@nextui-org/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
-import { QueryClient, QueryClientProvider } from "react-query";
 import App from "./App";
 import "./index.css";
 
