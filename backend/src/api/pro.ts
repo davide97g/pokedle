@@ -7,7 +7,8 @@ import { guessPokemon } from "../features/solver";
 export const addProRoutes = (app: Express) => {
   app.post(
     "/best-guess/:gen",
-    [isPro, express.json()],
+    [isPro],
+    express.json(),
     (req: Request, res: Response) => {
       const validationGuessHistory = req.body as PokemonValidationGuess[];
       const gen = req.params.gen as GENERATION;

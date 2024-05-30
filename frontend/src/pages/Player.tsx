@@ -9,7 +9,14 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   PokedleDayStats,
   PokemonSummary,
@@ -18,22 +25,19 @@ import {
 import { GuessFeedback } from "../components/GuessFeedback";
 import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
 
-import { useUser } from "../hooks/useUser";
+import { Counter } from "../components/Counter";
+import { useAuth } from "../hooks/useAuth";
 import { API, API_ADMIN, API_PRO } from "../services/api";
 import { GENERATION } from "../types";
-import { Counter } from "../components/Counter";
+import User from "../components/User";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
 
 export default function Player() {
-  const { isAdmin, isPro } = useUser();
+  const { isLogged, isAdmin } = useAuth();
   const isMobile = window.innerWidth < 640;
   const [isLoading, setIsLoading] = useState(false);
-
-  const [showGoal, setShowGoal] = useState(
-    localStorage.getItem("showGoal") === "true"
-  );
 
   const [totalPokemon, setTotalPokemon] = useState<number>();
   const [pokemonDayStats, setPokemonDayStats] = useState<PokedleDayStats>();
@@ -67,13 +71,19 @@ export default function Player() {
       : []
   );
 
-  useEffect(() => {
-    if (isAdmin) localStorage.setItem("showGoal", showGoal.toString());
-  }, [isAdmin, showGoal]);
+  const restart = useCallback(() => {
+    localStorage.removeItem("guessFeedbackHistory");
+    setGuessFeedbackHistory([]);
+    setGameStatus("PLAYING");
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem("generation", generation);
-  }, [generation]);
+    const savedGeneration = localStorage.getItem("generation");
+    if (savedGeneration !== generation) {
+      localStorage.setItem("generation", generation);
+      restart();
+    }
+  }, [generation, restart]);
 
   useEffect(() => {
     if (gameStatus === "WON") {
@@ -148,7 +158,7 @@ export default function Player() {
   };
 
   const applyBestGuess = () => {
-    if (isPro || isAdmin) {
+    if (isLogged || isAdmin) {
       setIsLoading(true);
       API_PRO.getBestSuggestion(guessFeedbackHistory, generation)
         .then((res) => {
@@ -189,6 +199,7 @@ export default function Player() {
           className="absolute w-screen z-50 top-0"
         />
       )}
+      <User />
       <div className="flex flex-col justify-center items-center">
         <div className="pt-28 md:pt-20 flex flex-row items-center">
           <img src="./logo.png" alt="logo" height={45} width={45} />
@@ -196,11 +207,29 @@ export default function Player() {
         </div>
         <Counter />
       </div>
+      {/* GUESS */}
+      {isAdmin && (
+        <Suspense
+          fallback={
+            <div className="flex justify-center items-center">
+              <CircularProgress color="default" aria-label="Loading..." />
+            </div>
+          }
+        >
+          <Guess
+            pokemonToGuess={
+              pokemonDayStats?.pokemonList.find((p) => p.gen === generation)
+                ?.pokemon
+            }
+          />
+        </Suspense>
+      )}
       <Select
         label="Generation"
         variant="bordered"
         placeholder="Select an generation"
         selectedKeys={generation}
+        isDisabled
         className="max-w-xs w-48"
         multiple={false}
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -219,69 +248,48 @@ export default function Player() {
         ))}
       </Select>
 
-      <div
-        className="flex flex-col gap-4"
-        style={{
-          position: "absolute",
-          top: "1rem",
-          left: "1rem",
-        }}
-      >
-        <Button
-          isIconOnly={isMobile}
-          size={isMobile ? "sm" : "md"}
-          isDisabled={!guessFeedbackHistory.length}
-          onClick={() => {
-            localStorage.removeItem("guessFeedbackHistory");
-            setGuessFeedbackHistory([]);
-            setGameStatus("PLAYING");
+      {isLogged && (
+        <div
+          className="flex flex-col gap-4"
+          style={{
+            position: "absolute",
+            top: "1rem",
+            left: "1rem",
           }}
-          startContent={<Restart />}
         >
-          {isMobile ? "" : "Restart"}
-        </Button>
-        {isAdmin && (
           <Button
-            size={isMobile ? "sm" : "md"}
             isIconOnly={isMobile}
-            onClick={() => {
-              setIsLoading(true);
-              if (isAdmin)
-                API_ADMIN.newPokemon()
-                  .then(() => {
-                    window.location.reload();
-                    localStorage.removeItem("guessFeedbackHistory");
-                    setGuessFeedbackHistory([]);
-                  })
-                  .finally(() => setIsLoading(false));
-            }}
-            color="danger"
-            startContent={<Add />}
+            size={isMobile ? "sm" : "md"}
+            isDisabled={!guessFeedbackHistory.length}
+            onClick={restart}
+            startContent={<Restart />}
           >
-            {isMobile ? "" : "New Pokemon"}
+            {isMobile ? "" : "Restart"}
           </Button>
-        )}
-      </div>
-
-      {/* GUESS */}
-      {isAdmin && (
-        <Suspense
-          fallback={
-            <div className="flex justify-center items-center">
-              <CircularProgress color="default" aria-label="Loading..." />
-            </div>
-          }
-        >
-          <Guess
-            showGoal={showGoal}
-            setShowGoal={setShowGoal}
-            pokemonToGuess={
-              pokemonDayStats?.pokemonList.find((p) => p.gen === generation)
-                ?.pokemon
-            }
-          />
-        </Suspense>
+          {isAdmin && (
+            <Button
+              size={isMobile ? "sm" : "md"}
+              isIconOnly={isMobile}
+              onClick={() => {
+                setIsLoading(true);
+                if (isAdmin)
+                  API_ADMIN.newPokemon()
+                    .then(() => {
+                      window.location.reload();
+                      localStorage.removeItem("guessFeedbackHistory");
+                      setGuessFeedbackHistory([]);
+                    })
+                    .finally(() => setIsLoading(false));
+              }}
+              color="danger"
+              startContent={<Add />}
+            >
+              {isMobile ? "" : "New Pokemon"}
+            </Button>
+          )}
+        </div>
       )}
+
       {/* SEARCH BAR */}
       <Suspense
         fallback={

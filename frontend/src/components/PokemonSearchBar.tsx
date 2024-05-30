@@ -8,7 +8,7 @@ import {
 import { useDebounce } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
-import { useUser } from "../hooks/useUser";
+import { useAuth } from "../hooks/useAuth";
 import { API } from "../services/api";
 import { GENERATION } from "../types";
 
@@ -23,7 +23,7 @@ export default function PokemonSearchBar({
   guessPokemonById: (pokemonId: number) => void;
   applyBestGuess: () => void;
 }>) {
-  const { isPro, isAdmin } = useUser();
+  const { isLogged } = useAuth();
 
   const [pokemonNameFilter, setPokemonNameFilter] = useState("");
   const deferredPokemonNameFilter = useDebounce(pokemonNameFilter, 500);
@@ -86,7 +86,7 @@ export default function PokemonSearchBar({
           </AutocompleteItem>
         )}
       </Autocomplete>
-      {(isAdmin || isPro) && (
+      {isLogged && (
         <Button
           size="sm"
           className="w-24"

@@ -22,8 +22,8 @@ export const isAdmin = async (
     );
 
     if (!claims.admin) {
-      res.status(401);
-      return next({ message: "Unauthorized: user not admin" });
+      res.status(403);
+      return next({ message: "Forbidden: user not admin" });
     }
     return next();
   } catch (err) {

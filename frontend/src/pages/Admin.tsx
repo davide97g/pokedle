@@ -62,9 +62,8 @@ export default function Admin() {
       {isAdmin && (
         <div className="flex flex-col gap-10 items-center">
           <h1 className="text-2xl">Pokedle Admin</h1>
-          <Button onClick={createAdmin}>Create Admin</Button>
-          <Button color="danger" onClick={handleLogout}>
-            Logout
+          <Button onClick={createAdmin} color="danger">
+            Create Admin
           </Button>
         </div>
       )}

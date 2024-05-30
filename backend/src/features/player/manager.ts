@@ -77,8 +77,6 @@ export const updatePokemonToGuess = async () => {
 export const getTodayPokemonList = async () => {
   const today = dayjs().format("YYYY-MM-DD");
 
-  console.info("DAILY_POKEMONS", DAILY_POKEMONS);
-
   if (DAILY_POKEMONS && DAILY_POKEMONS.date === today) {
     return DAILY_POKEMONS;
   }
