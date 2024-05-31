@@ -42,19 +42,14 @@ export const addBestGuessToUser = async (
     return;
   }
 
-  const quantity = firstItem.quantity;
+  const quantity = (firstItem.quantity ?? 0) * 10;
 
   if (!quantity) {
     console.error("No quantity found");
     return;
   }
 
-  console.info(
-    "Adding best guess to user",
-    userId,
-    quantity * 10,
-    "best guesses"
-  );
+  console.info("Adding best guess to user", userId, quantity, "best guesses");
 
   // Add best guess to user
   await incrementUserBestGuess({ userId, quantity });

@@ -62,7 +62,7 @@ export const incrementUserBestGuess = async ({
   const db = getFirestore();
   const userRef = db.collection("users").doc(userId);
 
-  console.info("Firestore", userRef.id, quantity * 10, "best guesses");
+  console.info("Firestore", userRef.id, quantity, "best guesses");
 
   return userRef.update({
     numberOfBestGuesses: FieldValue.increment(quantity),
