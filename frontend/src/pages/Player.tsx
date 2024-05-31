@@ -31,13 +31,14 @@ import { API, API_ADMIN, API_PRO } from "../services/api";
 import { GENERATION } from "../types";
 import User from "../components/User";
 import { useAuth } from "../hooks/useAuth";
+import { useLayout } from "../hooks/useLayout";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
 
 export default function Player() {
   const { isLogged, isAdmin, refetch } = useAuth();
-  const isMobile = window.innerWidth < 640;
+  const { isMobile } = useLayout();
   const [isLoading, setIsLoading] = useState(false);
 
   const [totalPokemon, setTotalPokemon] = useState<number>();
@@ -163,8 +164,10 @@ export default function Player() {
       setIsLoading(true);
       API_PRO.getBestSuggestion(guessFeedbackHistory, generation)
         .then((res) => {
-          refetch();
           if (res) {
+            setTimeout(() => {
+              refetch();
+            }, 500);
             guessPokemonById(res.id);
           }
         })
@@ -203,7 +206,7 @@ export default function Player() {
       )}
       <User />
       <div className="flex flex-col justify-center items-center">
-        <div className="pt-28 md:pt-20 flex flex-row items-center">
+        <div className="pt-8 md:pt-20 flex flex-row items-center">
           <img src="./logo.png" alt="logo" height={45} width={45} />
           <h1 className="text-2xl">Pokedle</h1>
         </div>

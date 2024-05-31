@@ -9,10 +9,10 @@ import {
 import { useDebounce } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
 
-import { API } from "../services/api";
-import { GENERATION } from "../types";
-import { useQuery } from "@tanstack/react-query";
+import { useGetSearchPokemon } from "../hooks/pokemon/useGetSearchPokemon";
 import { useAuth } from "../hooks/useAuth";
+import { useLayout } from "../hooks/useLayout";
+import { GENERATION } from "../types";
 
 export default function PokemonSearchBar({
   generation,
@@ -26,6 +26,7 @@ export default function PokemonSearchBar({
   applyBestGuess: () => void;
 }>) {
   const { isLogged, user } = useAuth();
+  const { isMobile } = useLayout();
 
   const [pokemonNameFilter, setPokemonNameFilter] = useState("");
   const deferredPokemonNameFilter = useDebounce(pokemonNameFilter, 500);
@@ -34,11 +35,9 @@ export default function PokemonSearchBar({
     data: pokemonList,
     isFetching,
     refetch: refetchPokemonList,
-  } = useQuery({
-    queryKey: ["pokemon", generation, deferredPokemonNameFilter],
-    queryFn: () =>
-      API.getPokemons({ gen: generation, name: deferredPokemonNameFilter }),
-    enabled: false,
+  } = useGetSearchPokemon({
+    name: deferredPokemonNameFilter,
+    gen: generation,
   });
 
   useEffect(() => {
@@ -46,7 +45,7 @@ export default function PokemonSearchBar({
   }, [deferredPokemonNameFilter, generation, refetchPokemonList]);
 
   return (
-    <div className="flex justify-center items-center flex-row gap-4  sm:gap-12 w-full">
+    <div className="flex justify-center items-center flex-row gap-2 sm:gap-4 w-full">
       <Autocomplete
         size="sm"
         isDisabled={gameStatus === "WON"}
@@ -94,13 +93,19 @@ export default function PokemonSearchBar({
           content="Use your best guess to score a perfect guess"
         >
           <Button
-            size="sm"
             color="primary"
+            className="p-1 w-16 sm:w-36"
+            isIconOnly={isMobile}
             isDisabled={gameStatus === "WON" || !user?.numberOfBestGuesses}
             onClick={applyBestGuess}
-            startContent={<StarFilled />}
           >
-            Best Guess ({user?.numberOfBestGuesses})
+            {isMobile ? (
+              <span className="flex flex-row gap-1 align-center">
+                {user?.numberOfBestGuesses} <StarFilled />
+              </span>
+            ) : (
+              `Best Guess (${user?.numberOfBestGuesses})`
+            )}
           </Button>
         </Tooltip>
       )}

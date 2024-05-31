@@ -9,30 +9,29 @@ import { useAuth } from "../hooks/useAuth";
 import { Loader } from "../components/Loader";
 import { ArrowLeft } from "@carbon/icons-react";
 import { useUserUpdateUser } from "../hooks/database/user/useUserUpdateUser";
+import { useLayout } from "../hooks/useLayout";
 
 const Stats = lazy(() => import("../components/Stats"));
 
 export default function PersonalArea() {
   const { isLogged, user, isAdmin, refetch } = useAuth();
   const { mutateAsync: updateUser, isPending } = useUserUpdateUser();
-  const isMobile = window.innerWidth < 768;
+  const { isMobile } = useLayout();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLogged) {
-      navigate("/login");
-    }
+    if (!isLogged) navigate("/login");
   }, [isLogged, navigate]);
 
-  const handleLogout = async () => {
-    AUTH.logout().then(() => navigate("/"));
-  };
+  const handleLogout = async () => AUTH.logout().then(() => navigate("/"));
 
-  const add10BestGuesses = () =>
-    updateUser({
-      id: user!.id!,
-      numberOfBestGuesses: (user?.numberOfBestGuesses ?? 0) + 10,
-    }).then(refetch);
+  const add10BestGuesses = () => {
+    if (user)
+      updateUser({
+        id: user.id,
+        numberOfBestGuesses: (user?.numberOfBestGuesses ?? 0) + 10,
+      }).then(refetch);
+  };
 
   return (
     <div className="w-full sm:w-6/12 flex flex-col justify-center items-center gap-4 px-10">

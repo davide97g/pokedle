@@ -17,7 +17,7 @@ export const AuthContext = createContext({
   user: undefined,
 } as AuthContext);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [loading, setLoading] = useState(true);
   const [firebaseUser, setFirebaseUser] = useState<User>();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -60,12 +60,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [createUser, firebaseUser, isFetching, user]);
 
-  const value = {
-    user,
-    isAdmin,
-    isLogged,
-    refetch,
-  };
+  const value = useMemo(
+    () => ({
+      user,
+      isAdmin,
+      isLogged,
+      refetch,
+    }),
+    [user, isAdmin, isLogged, refetch]
+  );
 
   return (
     <AuthContext.Provider value={value}>

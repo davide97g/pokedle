@@ -1,7 +1,8 @@
 import { Card, CardBody } from "@nextui-org/react";
+import { useLayout } from "../hooks/useLayout";
 
 export const GuessFeedbackHeader = () => {
-  const isMobile = window.innerWidth < 640;
+  const { isMobile } = useLayout();
   return (
     <div className="flex flex-col sm:flex-row gap-2">
       <Card>
