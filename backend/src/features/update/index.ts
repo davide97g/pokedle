@@ -9,3 +9,11 @@ export const scheduleDailyUpdate = () => {
     console.info("[update]: Daily update completed!");
   });
 };
+
+export const keepAlive = () => {
+  // Run every 5 minutes
+  console.info("[update]: Scheduling keep-alive...");
+  cron.schedule("*/5 * * * *", () => {
+    console.info("[update]: Keep-alive!");
+  });
+};
