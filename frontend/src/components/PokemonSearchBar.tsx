@@ -101,10 +101,10 @@ export default function PokemonSearchBar({
           >
             {isMobile ? (
               <span className="flex flex-row gap-1 align-center">
-                {user?.numberOfBestGuesses} <StarFilled />
+                {user?.numberOfBestGuesses ?? 0} <StarFilled />
               </span>
             ) : (
-              `Best Guess (${user?.numberOfBestGuesses})`
+              `Best Guess (${user?.numberOfBestGuesses ?? 0})`
             )}
           </Button>
         </Tooltip>
