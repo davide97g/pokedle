@@ -14,8 +14,8 @@ import { useLayout } from "../hooks/useLayout";
 const Stats = lazy(() => import("../components/Stats"));
 
 export default function PersonalArea() {
-  const { isLogged, user, isAdmin, refetch } = useAuth();
-  const { mutateAsync: updateUser, isPending } = useUserUpdateUser();
+  const { isLogged, user, isAdmin } = useAuth();
+  const { isPending } = useUserUpdateUser();
   const { isMobile } = useLayout();
   const navigate = useNavigate();
 
@@ -27,10 +27,10 @@ export default function PersonalArea() {
 
   const add10BestGuesses = () => {
     if (user)
-      updateUser({
-        id: user.id,
-        numberOfBestGuesses: (user?.numberOfBestGuesses ?? 0) + 10,
-      }).then(refetch);
+      window.open(
+        `https://buy.stripe.com/test_fZe9ACacI7wT39CcMN?client_reference_id=${user.id}`,
+        "_blank"
+      );
   };
 
   return (
@@ -116,7 +116,10 @@ export default function PersonalArea() {
             variant="bordered"
             color="primary"
             onClick={() =>
-              window.open("https://buy.stripe.com/test_00g7subgM8AXbG8dQQ")
+              window.open(
+                `https://buy.stripe.com/test_00g7subgM8AXbG8dQQ?client_reference_id=${user?.id}`,
+                "_blank"
+              )
             }
           >
             Become Pro
