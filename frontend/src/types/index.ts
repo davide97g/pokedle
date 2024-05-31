@@ -10,6 +10,7 @@ export interface PUser {
   stats?: PStats;
   customPokemonGuesses?: PokedleCustomGuess;
   numberOfBestGuesses?: number;
+  paymentHistory?: PaymentRecord[];
 }
 
 export interface PStats {
@@ -17,4 +18,10 @@ export interface PStats {
   totalGames: number;
   totalGuesses: number;
   lastGameDate: string; // YYYY-MM-DD
+}
+
+export interface PaymentRecord {
+  amount: number;
+  product: string;
+  date: string;
 }

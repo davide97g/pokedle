@@ -35,6 +35,25 @@ export const updateUserStats = async ({
   });
 };
 
+export const addRecordToUserPaymentHistory = async ({
+  userId,
+  record,
+}: {
+  userId: string;
+  record: {
+    amount: number;
+    product: string;
+    date: string;
+  };
+}) => {
+  const db = getFirestore();
+  const userRef = db.collection("users").doc(userId);
+
+  return userRef.update({
+    paymentHistory: FieldValue.arrayUnion(record),
+  });
+};
+
 export const decrementUserBestGuesses = async ({
   userId,
 }: {

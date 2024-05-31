@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { stripe } from "../../config/stripe";
-import { incrementUserBestGuess } from "../user";
+import { addRecordToUserPaymentHistory, incrementUserBestGuess } from "../user";
 
 export const getCheckoutSession = async (id: string) => {
   try {
@@ -53,4 +53,12 @@ export const addBestGuessToUser = async (
 
   // Add best guess to user
   await incrementUserBestGuess({ userId, quantity });
+  await addRecordToUserPaymentHistory({
+    userId,
+    record: {
+      amount: quantity,
+      product: firstItem.description,
+      date: new Date().toISOString(),
+    },
+  });
 };
