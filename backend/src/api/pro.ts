@@ -47,7 +47,6 @@ export const addProRoutes = (app: Express) => {
       let event;
 
       try {
-        console.info(sig);
         event = stripe?.webhooks.constructEvent(
           request.body,
           sig,
@@ -61,7 +60,7 @@ export const addProRoutes = (app: Express) => {
       // Handle the event
       switch (event?.type) {
         case "checkout.session.completed":
-          console.info("checkout.session.completed");
+          console.info("[Event]: checkout.session.completed");
           await addBestGuessToUser(event.data.object);
           break;
         // ... handle other event types

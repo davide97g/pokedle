@@ -39,13 +39,13 @@ export const decrementUserBestGuesses = async ({
   userId,
 }: {
   userId: string;
-}): Promise<void> => {
+}) => {
   if (!userId) throw new Error("User not found");
 
   const db = getFirestore();
   const userRef = db.collection("users").doc(userId);
 
-  userRef.update({
+  return userRef.update({
     numberOfBestGuesses: FieldValue.increment(-1),
   });
 };
@@ -56,13 +56,15 @@ export const incrementUserBestGuess = async ({
 }: {
   userId: string;
   quantity: number;
-}): Promise<void> => {
+}) => {
   if (!userId) throw new Error("User not found");
 
   const db = getFirestore();
   const userRef = db.collection("users").doc(userId);
 
-  userRef.update({
+  console.info("Firestore", userRef.id, quantity * 10, "best guesses");
+
+  return userRef.update({
     numberOfBestGuesses: FieldValue.increment(quantity),
   });
 };
