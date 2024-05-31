@@ -1,4 +1,6 @@
+import Stripe from "stripe";
 import { stripe } from "../../config/stripe";
+import { incrementUserBestGuess } from "../user";
 
 export const getCheckoutSession = async (id: string) => {
   try {
@@ -18,4 +20,38 @@ export const getCheckoutSessionListItems = async (id: string) => {
     console.error(error);
     return null;
   }
+};
+
+export const addBestGuessToUser = async (
+  checkoutSession: Stripe.Checkout.Session
+) => {
+  console.info("Adding best guess to user");
+  const userId = checkoutSession.client_reference_id;
+  if (!userId) {
+    console.error("No user found");
+    return;
+  }
+  const listLineItems = await getCheckoutSessionListItems(checkoutSession.id);
+  if (!listLineItems) {
+    console.error("No line items found");
+    return;
+  }
+  const firstItem = listLineItems.data[0];
+
+  if (firstItem.price?.product !== "prod_QCpdgazOa3lEft") {
+    console.error("Not the right product");
+    return;
+  }
+
+  const quantity = firstItem.quantity;
+
+  if (!quantity) {
+    console.error("No quantity found");
+    return;
+  }
+
+  console.info("Adding best guess to user", userId, quantity * 10);
+
+  // Add best guess to user
+  await incrementUserBestGuess({ userId, quantity });
 };

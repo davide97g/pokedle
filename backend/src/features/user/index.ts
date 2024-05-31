@@ -49,3 +49,20 @@ export const decrementUserBestGuesses = async ({
     numberOfBestGuesses: FieldValue.increment(-1),
   });
 };
+
+export const incrementUserBestGuess = async ({
+  userId,
+  quantity,
+}: {
+  userId: string;
+  quantity: number;
+}): Promise<void> => {
+  if (!userId) throw new Error("User not found");
+
+  const db = getFirestore();
+  const userRef = db.collection("users").doc(userId);
+
+  userRef.update({
+    numberOfBestGuesses: FieldValue.increment(quantity),
+  });
+};
