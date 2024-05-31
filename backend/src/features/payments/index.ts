@@ -9,4 +9,13 @@ export const getCheckoutSession = async (id: string) => {
     return null;
   }
 };
-//
+
+export const getCheckoutSessionListItems = async (id: string) => {
+  try {
+    const lineItems = await stripe?.checkout.sessions.listLineItems(id);
+    return lineItems;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};

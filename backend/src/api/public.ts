@@ -8,7 +8,10 @@ import {
 } from "../../../types/pokemon.model";
 import { updateUserStats } from "../features/user";
 import { getAuth } from "firebase-admin/auth";
-import { getCheckoutSession } from "../features/payments";
+import {
+  getCheckoutSession,
+  getCheckoutSessionListItems,
+} from "../features/payments";
 
 export const addPublicRoutes = (app: Express) => {
   app.get("/", (_: Request, res: Response) => {
@@ -85,7 +88,8 @@ export const addPublicRoutes = (app: Express) => {
   app.get("/checkout-session/:id", async (req: Request, res: Response) => {
     const sessionId = req.params.id;
     const checkoutSession = await getCheckoutSession(sessionId);
-    res.send({ checkoutSession });
+    const lineItems = await getCheckoutSessionListItems(sessionId);
+    res.send({ checkoutSession, lineItems });
   });
 
   return app;

@@ -111,7 +111,15 @@ export const API_PRO = {
   getCheckoutSession: async (id: string) => {
     return fetch(`${BACKEND_URL}/checkout-session/${id}`)
       .then((res) => res.json())
-      .then((res) => res.checkoutSession)
+      .then(
+        (res) =>
+          res as {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            checkoutSession: any;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            lineItems: any;
+          }
+      )
       .catch((err) => {
         console.info(err);
         return null;
