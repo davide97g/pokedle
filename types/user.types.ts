@@ -1,4 +1,4 @@
-import { PokedleCustomGuess } from "../../../types/pokemon.model";
+import { PokedleCustomGuess } from "./pokemon.model";
 
 export type GENERATION = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
@@ -21,7 +21,18 @@ export interface PStats {
 }
 
 export interface PaymentRecord {
+  /** @description stripe checkout session id */
+  id: string;
   amount: number;
   product: string;
+  date: string;
+}
+
+export interface CheckoutItem {
+  id: string;
+  description: string;
+  total: number;
+  quantity: number;
+  price: number;
   date: string;
 }

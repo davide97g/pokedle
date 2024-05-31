@@ -1,7 +1,7 @@
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../../../config/firebase";
-import { PUser } from "../../../types";
 import { useMutation } from "@tanstack/react-query";
+import { doc, setDoc } from "firebase/firestore";
+import { PUser } from "../../../../../types/user.types";
+import { db } from "../../../config/firebase";
 
 export const useUserCreateUser = () => {
   return useMutation({

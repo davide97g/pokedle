@@ -3,9 +3,9 @@ import { Button, Code, Divider, Snippet } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_PRO } from "../services/api";
-import { CheckoutItem } from "../types/payments";
 import { CheckoutItemSummary } from "../components/CheckoutItemSummary";
 import dayjs from "dayjs";
+import { CheckoutItem } from "../../../types/user.types";
 
 export default function Checkout() {
   const navigate = useNavigate();

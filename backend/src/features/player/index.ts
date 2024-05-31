@@ -1,7 +1,7 @@
 import { PokemonValidationGuess } from "../../../../types/pokemon.model";
-import { GENERATION, getPokemonList } from "../../data";
+import { GENERATION } from "../../../../types/user.types";
+import { getPokemonList } from "../../data";
 import { incrementCounter } from "../counter";
-import { updateUserStats } from "../user";
 import { DAILY_POKEMONS } from "./manager";
 
 const computeComparison = (

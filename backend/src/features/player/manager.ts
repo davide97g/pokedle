@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
 import { getFirestore } from "firebase-admin/firestore";
 import { PokedleDayStats, PokemonModel } from "../../../../types/pokemon.model";
-import { GENERATION, getPokemonList } from "../../data";
+import { getPokemonList } from "../../data";
 import { resetCounter } from "../counter";
+import { GENERATION } from "../../../../types/user.types";
 
 export let DAILY_POKEMONS: PokedleDayStats | null = null;
 

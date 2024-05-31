@@ -1,13 +1,14 @@
 import express, { Express, Request, Response } from "express";
 import { getAuth } from "firebase-admin/auth";
 import { PokemonValidationGuess } from "../../../types/pokemon.model";
-import { GENERATION, getPokemonList } from "../data";
+import { getPokemonList } from "../data";
 import { isAdmin } from "../middleware/isAdmin";
 import { countRemainingPokemonFromHistory } from "../features/solver";
 import {
   getTodayPokemonList,
   updatePokemonToGuess,
 } from "../features/player/manager";
+import { GENERATION } from "../../../types/user.types";
 
 export const addAdminRoutes = (app: Express) => {
   // ? Create admins

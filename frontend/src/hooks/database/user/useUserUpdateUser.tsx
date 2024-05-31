@@ -1,7 +1,7 @@
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../../config/firebase";
-import { PUser } from "../../../types";
 import { useMutation } from "@tanstack/react-query";
+import { PUser } from "../../../../../types/user.types";
 
 export const useUserUpdateUser = () => {
   return useMutation({

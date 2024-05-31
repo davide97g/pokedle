@@ -6,7 +6,8 @@ import {
 } from "../../../../types/pokemon.model";
 
 import { generateCombinations } from "./combinations";
-import { BEST_FIRST_GUESS, GENERATION, getPokemonList } from "../../data";
+import { BEST_FIRST_GUESS, getPokemonList } from "../../data";
+import { GENERATION } from "../../../../types/user.types";
 
 let yesterdayGuessedPokemon: PokemonModel | undefined = undefined;
 

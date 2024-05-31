@@ -5,8 +5,8 @@ import {
   PokemonSummary,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
-import { GENERATION } from "../types";
 import { appCheck, auth } from "../config/firebase";
+import { GENERATION } from "../../../types/user.types";
 
 const BACKEND_URL =
   import.meta.env.VITE_APP_BACKEND_URL ?? "http://localhost:3000";

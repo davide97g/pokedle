@@ -6,7 +6,7 @@ import {
   Divider,
   Tooltip,
 } from "@nextui-org/react";
-import { CheckoutItem } from "../types/payments";
+import { CheckoutItem } from "../../../types/user.types";
 
 export const CheckoutItemSummary = ({ item }: { item: CheckoutItem }) => {
   return (

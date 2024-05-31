@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { API } from "../../services/api";
-import { GENERATION } from "../../types";
+import { GENERATION } from "../../../../types/user.types";
 
 export const useGetSearchPokemon = ({
   name,

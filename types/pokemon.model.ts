@@ -1,4 +1,4 @@
-import { GENERATION } from "../backend/src/data";
+import { GENERATION } from "./user.types";
 
 export interface PokemonModel {
   id: number;

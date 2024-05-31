@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { PaymentRecord, PUser } from "../../../../types/user.types";
 
 export const updateUserStats = async ({
   userId,
@@ -14,21 +15,21 @@ export const updateUserStats = async ({
   if (!userDoc.exists) {
     throw new Error("User not found");
   }
-  const user = userDoc.data();
+  const user = userDoc.data() as PUser;
   if (!user) {
     throw new Error("User data is empty");
   }
 
-  const previousDate = user.stats.lastGameDate;
+  const previousDate = user.stats?.lastGameDate;
   const dayStreak =
     dayjs().diff(dayjs(previousDate), "day") === 1
-      ? (user.stats.dayStreak ?? 0) + 1
+      ? (user.stats?.dayStreak ?? 0) + 1
       : 1;
 
   await userRef.update({
     stats: {
-      totalGuesses: (user.stats.totalGuesses ?? 0) + totalGuesses,
-      totalGames: (user.stats.totalGames ?? 0) + 1,
+      totalGuesses: (user.stats?.totalGuesses ?? 0) + totalGuesses,
+      totalGames: (user.stats?.totalGames ?? 0) + 1,
       dayStreak,
       lastGameDate: dayjs().format("YYYY-MM-DD"),
     },
@@ -40,11 +41,7 @@ export const addRecordToUserPaymentHistory = async ({
   record,
 }: {
   userId: string;
-  record: {
-    amount: number;
-    product: string;
-    date: string;
-  };
+  record: PaymentRecord;
 }) => {
   const db = getFirestore();
   const userRef = db.collection("users").doc(userId);
@@ -80,8 +77,6 @@ export const incrementUserBestGuess = async ({
 
   const db = getFirestore();
   const userRef = db.collection("users").doc(userId);
-
-  console.info("Firestore", userRef.id, quantity, "best guesses");
 
   return userRef.update({
     numberOfBestGuesses: FieldValue.increment(quantity),

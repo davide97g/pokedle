@@ -3,8 +3,8 @@ import { createContext, ReactNode, useEffect, useMemo, useState } from "react";
 import { auth } from "../config/firebase";
 
 import { useUserGetUserById } from "../hooks/database/user/useUserGetUserById";
-import { PUser } from "../types";
 import { useUserCreateUser } from "../hooks/database/user/useUserCreateUser";
+import { PUser } from "../../../types/user.types";
 
 interface AuthContext {
   user?: PUser;

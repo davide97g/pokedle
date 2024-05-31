@@ -1,5 +1,5 @@
 import express, { Request, Response, Express } from "express";
-import { GENERATION, getPokemonList } from "../data";
+import { getPokemonList } from "../data";
 import { testGuess } from "../features/player";
 import { countRemainingPokemonFromHistory } from "../features/solver";
 import {
@@ -12,6 +12,7 @@ import {
   getCheckoutSession,
   getCheckoutSessionListItems,
 } from "../features/payments";
+import { GENERATION } from "../../../types/user.types";
 
 export const addPublicRoutes = (app: Express) => {
   app.get("/", (_: Request, res: Response) => {

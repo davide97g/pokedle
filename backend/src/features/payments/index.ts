@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import Stripe from "stripe";
 import { stripe } from "../../config/stripe";
 import { addRecordToUserPaymentHistory, incrementUserBestGuess } from "../user";
@@ -56,9 +57,10 @@ export const addBestGuessToUser = async (
   await addRecordToUserPaymentHistory({
     userId,
     record: {
+      id: checkoutSession.id,
       amount: quantity,
       product: firstItem.description,
-      date: new Date().toISOString(),
+      date: dayjs().format("YYYY-MM-DD HH:mm:ss"),
     },
   });
 };

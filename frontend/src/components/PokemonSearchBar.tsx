@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useGetSearchPokemon } from "../hooks/pokemon/useGetSearchPokemon";
 import { useAuth } from "../hooks/useAuth";
 import { useLayout } from "../hooks/useLayout";
-import { GENERATION } from "../types";
+import { GENERATION } from "../../../types/user.types";
 
 export default function PokemonSearchBar({
   generation,

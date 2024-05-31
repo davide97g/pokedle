@@ -1,12 +1,12 @@
 import express, { Express, Request, Response } from "express";
 import { PokemonValidationGuess } from "../../../types/pokemon.model";
-import { GENERATION } from "../data";
 import { isPro } from "../middleware/isPro";
 import { guessPokemon } from "../features/solver";
 import { decrementUserBestGuesses } from "../features/user";
 import { getAuth } from "firebase-admin/auth";
 import { stripe } from "../config/stripe";
 import { addBestGuessToUser } from "../features/payments";
+import { GENERATION } from "../../../types/user.types";
 
 const endpointSecret = process.env.STRIPE_CHECKOUT_SIGNING_SECRET;
 

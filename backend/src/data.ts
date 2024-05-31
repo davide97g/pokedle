@@ -1,4 +1,5 @@
 import { PokemonModel } from "../../types/pokemon.model";
+import { GENERATION } from "../../types/user.types";
 import database from "../data/pokemon-model.json";
 
 const FIRST_GEN = 151;
@@ -12,8 +13,6 @@ const EIGHTH_GEN = 905;
 const NINTH_GEN = 1025;
 
 const POKEMON_LIST: PokemonModel[] = database as PokemonModel[];
-
-export type GENERATION = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
 export const getPokemonList = (gen?: GENERATION): PokemonModel[] => {
   switch (gen) {
