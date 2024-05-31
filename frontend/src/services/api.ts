@@ -108,6 +108,15 @@ export const API_PRO = {
         return null;
       });
   },
+  getCheckoutSession: async (id: string) => {
+    return fetch(`${BACKEND_URL}/checkout-session/${id}`)
+      .then((res) => res.json())
+      .then((res) => res.checkoutSession)
+      .catch((err) => {
+        console.info(err);
+        return null;
+      });
+  },
 };
 
 export const API_ADMIN = {

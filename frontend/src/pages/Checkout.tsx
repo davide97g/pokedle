@@ -1,12 +1,24 @@
 import { Warning } from "@carbon/icons-react";
 import { Button, Code, Divider } from "@nextui-org/react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_PRO } from "../services/api";
 
 export default function Checkout() {
   const navigate = useNavigate();
   const checkoutSessionId = new URLSearchParams(window.location.search).get(
     "checkout_session_id"
   );
+
+  const [checkoutSessionInfo, setCheckoutSessionInfo] = useState();
+
+  useEffect(() => {
+    if (!checkoutSessionId) return;
+    API_PRO.getCheckoutSession(checkoutSessionId).then((session) => {
+      console.log(session);
+      setCheckoutSessionInfo(session);
+    });
+  }, [checkoutSessionId]);
 
   return (
     <div className="flex flex-col justify-center items-center gap-10 px-10">
@@ -32,6 +44,9 @@ export default function Checkout() {
             Order Information
           </h3>
           <Code>Checkout Session ID: {checkoutSessionId}</Code>
+          <Code className="text-sm text-left text-wrap">
+            <pre>{JSON.stringify(checkoutSessionInfo, null, 2)}</pre>
+          </Code>
         </div>
       )}
       {!checkoutSessionId && (
