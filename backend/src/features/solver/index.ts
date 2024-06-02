@@ -334,10 +334,13 @@ export const countRemainingPokemonFromHistory = (
   const pokemonStillToGuess = getPokemonList(gen).filter(
     (p) => !guessedPokemonIds.includes(p.id)
   );
+  console.log("pokemon still to guess", pokemonStillToGuess.length);
 
   const { guessedFeatures, guessedNegativeFeatures } = generateInfo(
     validationGuessHistory
   );
+
+  console.info("guessedFeatures", guessedFeatures);
 
   //  Filter out the pokemons that have the guessed features
   const guessedFeaturesKeys = Object.keys(guessedFeatures) as FEATURE[];
@@ -345,10 +348,17 @@ export const countRemainingPokemonFromHistory = (
     guessedFeaturesKeys.every((key) => p[key] === guessedFeatures[key])
   );
 
+  console.log(
+    "pokemon with correct features",
+    pokemonWithCorrectFeatures.length
+  );
+
   const pokemonFiltered = filterOutPokemonByNegativeFeatures(
     pokemonWithCorrectFeatures,
     guessedNegativeFeatures
   );
+
+  console.log("pokemon filtered", pokemonFiltered.length);
 
   return pokemonFiltered.length;
 };

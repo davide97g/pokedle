@@ -67,9 +67,14 @@ export const addPublicRoutes = (app: Express) => {
         pokemonId,
         gen
       );
+      validationGuess.order = validationGuessHistory.length + 1;
+
       const remainingPokemon = isWinningGuess
         ? 0
-        : countRemainingPokemonFromHistory(validationGuessHistory, gen);
+        : countRemainingPokemonFromHistory(
+            [...validationGuessHistory, validationGuess],
+            gen
+          );
 
       if (isWinningGuess) {
         const bearerToken = req.header("Authorization");

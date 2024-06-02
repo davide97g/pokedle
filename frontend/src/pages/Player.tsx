@@ -105,7 +105,7 @@ export default function Player() {
   };
 
   const applyBestGuess = () => {
-    if (isLogged || isAdmin) {
+    if (isLogged) {
       setIsLoading(true);
       API_PRO.getBestSuggestion(guessFeedbackHistory, generation)
         .then((res) => {
@@ -117,7 +117,7 @@ export default function Player() {
           }
         })
         .finally(() => setIsLoading(false));
-    } else console.warn("You need to be a pro to use this feature");
+    } else console.warn("You need to logged to use this feature");
   };
 
   return (
