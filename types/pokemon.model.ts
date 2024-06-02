@@ -33,6 +33,7 @@ export type FEATURE =
 export type ValidationComparison = "greater" | "less" | "equal";
 export interface PokemonValidationGuess {
   id: number;
+  date: string;
   name: string;
   image: string;
   order?: number;
@@ -105,7 +106,7 @@ export interface PokemonFeaturesNegative {
 }
 
 export interface PokedleDayStats {
-  pokemonList: { gen: GENERATION; pokemon: PokemonModel }[];
+  pokemonList: { gen: GENERATION; pokemon: PokemonModel; sid: string }[];
   date: string;
   totalGuesses: number;
 }

@@ -1,8 +1,9 @@
+import dayjs from "dayjs";
 import { PokemonValidationGuess } from "../../../../types/pokemon.model";
 import { GENERATION } from "../../../../types/user.types";
 import { getPokemonList } from "../../data";
 import { incrementCounter } from "../counter";
-import { DAILY_POKEMONS } from "./manager";
+import { DayStats } from "./manager";
 
 const computeComparison = (
   value?: number,
@@ -48,11 +49,11 @@ export const testGuess = async (
     throw new Error("Pokemon not found");
   }
 
-  if (!DAILY_POKEMONS?.pokemonList.length) {
+  if (!DayStats?.pokemonList.length) {
     throw new Error("Pokemon list not found");
   }
 
-  const POKEMON_TO_GUESS = DAILY_POKEMONS.pokemonList.find(
+  const POKEMON_TO_GUESS = DayStats.pokemonList.find(
     (p) => p.gen === gen
   )?.pokemon;
 
@@ -62,6 +63,7 @@ export const testGuess = async (
 
   const validationGuess: PokemonValidationGuess = {
     id: pokemonGuess.id,
+    date: dayjs().format("YYYY-MM-DD"),
     name: pokemonGuess.name,
     image: pokemonGuess.image,
     type1: {

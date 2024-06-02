@@ -21,7 +21,7 @@ export default function PokemonSearchBar({
   applyBestGuess,
 }: Readonly<{
   generation: GENERATION;
-  gameStatus: "PLAYING" | "WON";
+  gameStatus?: "PLAYING" | "WON";
   guessPokemonById: (pokemonId: number) => void;
   applyBestGuess: () => void;
 }>) {

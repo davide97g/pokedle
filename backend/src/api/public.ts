@@ -13,10 +13,12 @@ import {
   getCheckoutSessionListItems,
 } from "../features/payments";
 import { GENERATION } from "../../../types/user.types";
+import { getCurrentStatsID } from "../features/player/manager";
+import { version } from "../../package.json";
 
 export const addPublicRoutes = (app: Express) => {
   app.get("/", (_: Request, res: Response) => {
-    res.send("Pokedle Server");
+    res.send({ message: "Pokedle Server", version });
   });
 
   app.post("/status/:gen", express.json(), (req: Request, res: Response) => {
@@ -27,10 +29,12 @@ export const addPublicRoutes = (app: Express) => {
       gen
     );
     const totalPokemon = getPokemonList(gen).length;
+    const sid = getCurrentStatsID(gen);
 
     res.send({
       remainingPokemon,
       totalPokemon,
+      sid,
     });
   });
 

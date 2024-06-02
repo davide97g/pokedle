@@ -9,29 +9,19 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  PokedleDayStats,
-  PokemonSummary,
-  PokemonValidationGuess,
-} from "../../../types/pokemon.model";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { PokemonSummary } from "../../../types/pokemon.model";
 import { GuessFeedback } from "../components/GuessFeedback";
 import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
 
 import { Counter } from "../components/Counter";
 
-import { API, API_ADMIN, API_PRO } from "../services/api";
+import { GENERATION } from "../../../types/user.types";
 import User from "../components/User";
 import { useAuth } from "../hooks/useAuth";
 import { useLayout } from "../hooks/useLayout";
-import { GENERATION } from "../../../types/user.types";
+import { useStatus } from "../hooks/useStatus";
+import { API, API_ADMIN, API_PRO } from "../services/api";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
@@ -40,15 +30,20 @@ export default function Player() {
   const { isLogged, isAdmin, refetch } = useAuth();
   const { isMobile } = useLayout();
   const [isLoading, setIsLoading] = useState(false);
+  const {
+    generation,
+    guessFeedbackHistory,
+    totalPokemon,
+    remainingPokemon,
+    dayStats,
+    gameStatus,
+    isLoading: isLoadingStatus,
+    setGeneration,
+    setGuessFeedbackHistory,
+    setRemainingPokemon,
+    reset,
+  } = useStatus();
 
-  const [totalPokemon, setTotalPokemon] = useState<number>();
-  const [pokemonDayStats, setPokemonDayStats] = useState<PokedleDayStats>();
-
-  const [remainingPokemon, setRemainingPokemon] = useState<number>();
-
-  const [generation, setGeneration] = useState<GENERATION>(
-    (localStorage.getItem("generation") as GENERATION) || "1"
-  );
   const generations = [
     { value: "1", label: "Generation 1" },
     { value: "2", label: "Generation 2" },
@@ -60,32 +55,6 @@ export default function Player() {
     { value: "8", label: "Generation 8" },
     { value: "9", label: "Generation 9" },
   ];
-
-  const [gameStatus, setGameStatus] = useState<"PLAYING" | "WON">("PLAYING");
-
-  const [guessFeedbackHistory, setGuessFeedbackHistory] = useState<
-    PokemonValidationGuess[]
-  >(
-    localStorage.getItem("guessFeedbackHistory")
-      ? (JSON.parse(
-          localStorage.getItem("guessFeedbackHistory") as string
-        ) as PokemonValidationGuess[])
-      : []
-  );
-
-  const restart = useCallback(() => {
-    localStorage.removeItem("guessFeedbackHistory");
-    setGuessFeedbackHistory([]);
-    setGameStatus("PLAYING");
-  }, []);
-
-  useEffect(() => {
-    const savedGeneration = localStorage.getItem("generation");
-    if (savedGeneration !== generation) {
-      localStorage.setItem("generation", generation);
-      restart();
-    }
-  }, [generation, restart]);
 
   useEffect(() => {
     if (gameStatus === "WON") {
@@ -100,31 +69,11 @@ export default function Player() {
     }
   }, [gameStatus, guessFeedbackHistory.length]);
 
-  useEffect(() => {
-    if (guessFeedbackHistory.length > 0) {
-      if (guessFeedbackHistory.some((feedback) => hasWon(feedback))) {
-        setTimeout(() => setGameStatus("WON"), 250);
-      }
-    }
-  }, [guessFeedbackHistory]);
-
   const reversedGuessFeedbackHistory = useMemo(() => {
     return structuredClone(
       guessFeedbackHistory.sort((a, b) => (b.order ?? 0) - (a.order ?? 0))
     );
   }, [guessFeedbackHistory]);
-
-  const hasWon = (feedbackGuess: PokemonValidationGuess) => {
-    return (
-      feedbackGuess.type1.valid &&
-      feedbackGuess.type2.valid &&
-      feedbackGuess.color.valid &&
-      feedbackGuess.habitat.valid &&
-      feedbackGuess.height.comparison === "equal" &&
-      feedbackGuess.weight.comparison === "equal" &&
-      feedbackGuess.evolutionStage.comparison === "equal"
-    );
-  };
 
   const guessedPokemon = useMemo(() => {
     if (gameStatus === "WON") {
@@ -149,11 +98,7 @@ export default function Player() {
             { ...response.validation, order: guessFeedbackHistory.length },
           ];
           setGuessFeedbackHistory(updatedHistory);
-          setRemainingPokemon(response.remainingPokemon);
-          localStorage.setItem(
-            "guessFeedbackHistory",
-            JSON.stringify(updatedHistory)
-          );
+          setRemainingPokemon?.(response.remainingPokemon);
         })
         .finally(() => setIsLoading(false));
     }
@@ -175,28 +120,9 @@ export default function Player() {
     } else console.warn("You need to be a pro to use this feature");
   };
 
-  useEffect(() => {
-    setIsLoading(true);
-    if (isAdmin) {
-      API_ADMIN.getStatusAdmin(generation, guessFeedbackHistory)
-        .then((res) => {
-          setTotalPokemon(res?.totalPokemon);
-          setPokemonDayStats(res?.pokemonDayStats);
-          setRemainingPokemon(res?.remainingPokemon);
-        })
-        .finally(() => setIsLoading(false));
-    } else
-      API.getStatus(generation, guessFeedbackHistory)
-        .then((res) => {
-          setTotalPokemon(res?.totalPokemon);
-          setRemainingPokemon(res?.remainingPokemon);
-        })
-        .finally(() => setIsLoading(false));
-  }, [generation, guessFeedbackHistory, isAdmin]);
-
   return (
     <>
-      {isLoading && (
+      {(isLoading || isLoadingStatus) && (
         <Progress
           size="sm"
           isIndeterminate
@@ -223,8 +149,7 @@ export default function Player() {
         >
           <Guess
             pokemonToGuess={
-              pokemonDayStats?.pokemonList.find((p) => p.gen === generation)
-                ?.pokemon
+              dayStats?.pokemonList.find((p) => p.gen === generation)?.pokemon
             }
           />
         </Suspense>
@@ -259,7 +184,7 @@ export default function Player() {
             isIconOnly={isMobile}
             size={isMobile ? "sm" : "md"}
             isDisabled={!guessFeedbackHistory.length}
-            onClick={restart}
+            onClick={reset}
             startContent={<Restart />}
             variant="ghost"
           >
@@ -272,13 +197,7 @@ export default function Player() {
               onClick={() => {
                 setIsLoading(true);
                 if (isAdmin)
-                  API_ADMIN.newPokemon()
-                    .then(() => {
-                      window.location.reload();
-                      localStorage.removeItem("guessFeedbackHistory");
-                      setGuessFeedbackHistory([]);
-                    })
-                    .finally(() => setIsLoading(false));
+                  API_ADMIN.newPokemon().finally(() => setIsLoading(false));
               }}
               color="danger"
               startContent={<Add />}
@@ -339,7 +258,10 @@ export default function Player() {
             >
               <div className="flex flex-row sm:flex-col gap-2">
                 {reversedGuessFeedbackHistory.map((guess) => (
-                  <GuessFeedback key={guess.id} guess={guess} />
+                  <GuessFeedback
+                    key={`${guess.id}-${guess.order ?? 0}`}
+                    guess={guess}
+                  />
                 ))}
               </div>
             </ScrollShadow>

@@ -5,6 +5,7 @@ import { getPokemonList } from "../data";
 import { isAdmin } from "../middleware/isAdmin";
 import { countRemainingPokemonFromHistory } from "../features/solver";
 import {
+  getCurrentStatsID,
   getTodayPokemonList,
   updatePokemonToGuess,
 } from "../features/player/manager";
@@ -60,25 +61,13 @@ export const addAdminRoutes = (app: Express) => {
   );
 
   app.post(
-    "/status/:gen/admin",
+    "/day-stats",
     [isAdmin],
     express.json(),
-    async (req: Request, res: Response) => {
-      const gen = req.params.gen as GENERATION;
-      const validationGuessHistory = req.body as PokemonValidationGuess[];
-      const remainingPokemon = countRemainingPokemonFromHistory(
-        validationGuessHistory,
-        gen
-      );
-
+    async (_: Request, res: Response) => {
       const pokemonDayStats = await getTodayPokemonList();
-
-      const totalPokemon = getPokemonList(gen).length;
-
       res.send({
-        totalPokemon,
         pokemonDayStats,
-        remainingPokemon,
       });
     }
   );

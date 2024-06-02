@@ -5,7 +5,11 @@ import { getPokemonList } from "../../data";
 import { resetCounter } from "../counter";
 import { GENERATION } from "../../../../types/user.types";
 
-export let DAILY_POKEMONS: PokedleDayStats | null = null;
+export const DayStats: PokedleDayStats = {
+  pokemonList: [],
+  date: dayjs().format("YYYY-MM-DD"),
+  totalGuesses: 0,
+};
 
 export const updatePokemonToGuess = async () => {
   const db = getFirestore();
@@ -46,54 +50,59 @@ export const updatePokemonToGuess = async () => {
     "8",
     "9",
   ];
-  const randomPokemonList: { gen: GENERATION; pokemon: PokemonModel }[] =
-    generationList.map((gen) => {
-      const yesterdayPokemon = yesterdayPokemons?.pokemonList.find(
-        (p) => p.gen === gen
-      );
-      return {
+  const randomPokemonList: {
+    gen: GENERATION;
+    pokemon: PokemonModel;
+    sid: string;
+  }[] = generationList.map((gen) => {
+    const yesterdayPokemon = yesterdayPokemons?.pokemonList.find(
+      (p) => p.gen === gen
+    );
+    return {
+      gen,
+      pokemon: getRandomPokemon(
         gen,
-        pokemon: getRandomPokemon(
-          gen,
-          yesterdayPokemon?.pokemon.id ? [yesterdayPokemon?.pokemon.id] : []
-        ),
-      };
-    });
+        yesterdayPokemon?.pokemon.id ? [yesterdayPokemon?.pokemon.id] : []
+      ),
+      sid: crypto.randomUUID(), // ? this is useful for understanding wether the pokemon has changed or not
+    };
+  });
 
-  const todayPokemonList: PokedleDayStats = {
-    pokemonList: randomPokemonList,
-    date: today,
-    totalGuesses: 0,
-  };
-
-  DAILY_POKEMONS = todayPokemonList;
+  DayStats.pokemonList = randomPokemonList;
+  DayStats.date = today;
+  DayStats.totalGuesses = 0;
 
   // save today's pokemon list
-  await pokemonsRef.set(todayPokemonList);
+  await pokemonsRef.set(DayStats);
   await resetCounter();
 
-  return todayPokemonList;
+  return DayStats;
 };
 
 export const getTodayPokemonList = async () => {
   const today = dayjs().format("YYYY-MM-DD");
 
-  if (DAILY_POKEMONS && DAILY_POKEMONS.date === today) {
-    return DAILY_POKEMONS;
-  }
+  if (DayStats.pokemonList.length > 0 && DayStats.date === today)
+    return DayStats;
 
   const db = getFirestore();
   const pokemonCollection = db.collection("pokemon");
   const pokemonsRef = pokemonCollection.doc(today);
 
   const todayPokemons = await pokemonsRef.get().then((doc) => {
-    if (doc.exists) {
-      return doc.data() as PokedleDayStats;
-    }
+    if (doc.exists) return doc.data() as PokedleDayStats;
     return null;
   });
 
-  DAILY_POKEMONS = todayPokemons;
+  if (todayPokemons) {
+    DayStats.date = todayPokemons?.date;
+    DayStats.totalGuesses = todayPokemons?.totalGuesses;
+    DayStats.pokemonList = todayPokemons?.pokemonList;
+  }
 
   return todayPokemons;
+};
+
+export const getCurrentStatsID = (gen: GENERATION) => {
+  return DayStats.pokemonList.find((p) => p.gen === gen)?.sid;
 };

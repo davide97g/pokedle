@@ -29,11 +29,12 @@ export const API = {
           res as {
             totalPokemon: number;
             remainingPokemon: number;
+            sid: string;
           }
       )
       .catch((err) => {
         console.info(err);
-        return null;
+        return undefined;
       });
   },
   getPokemons: async ({ gen, name }: { gen: GENERATION; name: string }) => {
@@ -128,26 +129,7 @@ export const API_PRO = {
 };
 
 export const API_ADMIN = {
-  // createAdmin: async (idToken: string) => {
-  //   fetch(`${BACKEND_URL}/create-admin`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ idToken }),
-  //   })
-  //     .then((res) => res.json())
-  //     .then((res) => {
-  //       console.log(res);
-  //     })
-  //     .catch((err) => {
-  //       console.info(err);
-  //     });
-  // },
-  getStatusAdmin: async (
-    gen: GENERATION,
-    guessFeedbackHistory: PokemonValidationGuess[]
-  ) => {
+  getDayStats: async () => {
     const appCheckTokenResponse = await getToken(appCheck, true).catch(
       (err) => {
         console.info(err);
@@ -160,21 +142,18 @@ export const API_ADMIN = {
     });
 
     if (!appCheckTokenResponse?.token || !idToken) return null;
-    return fetch(`${BACKEND_URL}/status/${gen}/admin`, {
+    return fetch(`${BACKEND_URL}/day-stats`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Firebase-AppCheck": appCheckTokenResponse.token,
         Authorization: `Bearer ${idToken}`,
       },
-      body: JSON.stringify(guessFeedbackHistory),
     })
       .then((res) => res.json())
       .then(
         (res) =>
           res as {
-            totalPokemon: number;
-            remainingPokemon: number;
             pokemonDayStats: PokedleDayStats;
           }
       )
