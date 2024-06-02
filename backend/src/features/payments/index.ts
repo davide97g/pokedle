@@ -18,7 +18,7 @@ export const getCheckoutSessionListItems = async (id: string) => {
     const lineItems = await stripe?.checkout.sessions.listLineItems(id);
     return lineItems;
   } catch (error) {
-    console.error(error);
+    console.error("ERROR", error);
     return null;
   }
 };

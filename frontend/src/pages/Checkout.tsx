@@ -18,7 +18,6 @@ export default function Checkout() {
   useEffect(() => {
     if (!checkoutSessionId) return;
     API_PRO.getCheckoutSession(checkoutSessionId).then((data) => {
-      console.log(data);
       const items: CheckoutItem[] = data?.lineItems?.data?.map(
         (item: {
           id: string;

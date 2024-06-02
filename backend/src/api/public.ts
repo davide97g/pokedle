@@ -1,20 +1,16 @@
-import express, { Request, Response, Express } from "express";
-import { getPokemonList } from "../data";
-import { testGuess } from "../features/player";
-import { countRemainingPokemonFromHistory } from "../features/solver";
+import express, { Express, Request, Response } from "express";
+import { getAuth } from "firebase-admin/auth";
 import {
   PokemonSummary,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
-import { updateUserStats } from "../features/user";
-import { getAuth } from "firebase-admin/auth";
-import {
-  getCheckoutSession,
-  getCheckoutSessionListItems,
-} from "../features/payments";
 import { GENERATION } from "../../../types/user.types";
-import { getCurrentStatsID } from "../features/player/manager";
 import { version } from "../../package.json";
+import { getPokemonList } from "../data";
+import { testGuess } from "../features/player";
+import { getCurrentStatsID } from "../features/player/manager";
+import { countRemainingPokemonFromHistory } from "../features/solver";
+import { updateUserStats } from "../features/user";
 
 export const addPublicRoutes = (app: Express) => {
   app.get("/", (_: Request, res: Response) => {
@@ -94,13 +90,6 @@ export const addPublicRoutes = (app: Express) => {
       res.send({ validation: validationGuess, remainingPokemon });
     }
   );
-
-  app.get("/checkout-session/:id", async (req: Request, res: Response) => {
-    const sessionId = req.params.id;
-    const checkoutSession = await getCheckoutSession(sessionId);
-    const lineItems = await getCheckoutSessionListItems(sessionId);
-    res.send({ checkoutSession, lineItems });
-  });
 
   return app;
 };

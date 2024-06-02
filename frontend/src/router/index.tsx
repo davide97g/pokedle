@@ -6,6 +6,7 @@ const Login = lazy(() => import("../pages/Login"));
 const About = lazy(() => import("../pages/About"));
 const PersonalArea = lazy(() => import("../pages/PersonalArea"));
 const Checkout = lazy(() => import("../pages/Checkout"));
+const Orders = lazy(() => import("../pages/Orders"));
 
 export const router = createBrowserRouter([
   {
@@ -46,6 +47,14 @@ export const router = createBrowserRouter([
     element: (
       <Suspense>
         <Checkout />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/orders",
+    element: (
+      <Suspense>
+        <Orders />
       </Suspense>
     ),
   },

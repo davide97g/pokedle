@@ -110,15 +110,68 @@ export const API_PRO = {
       });
   },
   getCheckoutSession: async (id: string) => {
-    return fetch(`${BACKEND_URL}/checkout-session/${id}`)
+    const appCheckTokenResponse = await getToken(appCheck, true).catch(
+      (err) => {
+        console.info(err);
+        return null;
+      }
+    );
+    const idToken = await auth.currentUser?.getIdToken().catch((err) => {
+      console.info(err);
+      return null;
+    });
+    if (!appCheckTokenResponse || !idToken) return null;
+    return fetch(`${BACKEND_URL}/checkout-session/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "X-Firebase-AppCheck": appCheckTokenResponse.token,
+        Authorization: `Bearer ${idToken}`,
+      },
+    })
       .then((res) => res.json())
       .then(
         (res) =>
           res as {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            checkoutSession: any;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             lineItems: any;
+          }
+      )
+      .catch((err) => {
+        console.info(err);
+        return null;
+      });
+  },
+  getOrderHistory: async ({
+    checkoutSessionIdList,
+  }: {
+    checkoutSessionIdList: string[];
+  }) => {
+    const appCheckTokenResponse = await getToken(appCheck, true).catch(
+      (err) => {
+        console.info(err);
+        return null;
+      }
+    );
+    const idToken = await auth.currentUser?.getIdToken().catch((err) => {
+      console.info(err);
+      return null;
+    });
+    if (!appCheckTokenResponse || !idToken) return null;
+    return fetch(`${BACKEND_URL}/order/history`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Firebase-AppCheck": appCheckTokenResponse.token,
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify(checkoutSessionIdList),
+    })
+      .then((res) => res.json())
+      .then(
+        (res) =>
+          res as {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            history: any[];
           }
       )
       .catch((err) => {

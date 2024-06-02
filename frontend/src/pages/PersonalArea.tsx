@@ -12,6 +12,7 @@ import { useUserUpdateUser } from "../hooks/database/user/useUserUpdateUser";
 import { useLayout } from "../hooks/useLayout";
 
 const Stats = lazy(() => import("../components/Stats"));
+const Orders = lazy(() => import("../pages/Orders"));
 
 export default function PersonalArea() {
   const { isLogged, user, isAdmin } = useAuth();
@@ -102,6 +103,12 @@ export default function PersonalArea() {
             Add 10 Best Guesses
           </Button>
         </div>
+
+        <Divider className="my-2" />
+
+        <Suspense fallback={<Loader />}>
+          <Orders />
+        </Suspense>
 
         <Divider className="my-2" />
 
