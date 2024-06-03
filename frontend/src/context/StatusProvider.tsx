@@ -95,14 +95,21 @@ export function StatusProvider({
     pokemonValidationGuess: guessFeedbackHistory,
   });
 
+  const reset = useCallback(() => {
+    localStorage.removeItem("guessFeedbackHistory");
+    localStorage.removeItem("generation");
+    localStorage.removeItem("sid");
+    setGeneration("1");
+    setGuessFeedbackHistory([]);
+    setGameStatus("PLAYING");
+    setSid("");
+  }, []);
+
   // *** update variable to local storage
 
   useEffect(() => {
-    if (status?.sid && sid !== status?.sid) {
-      setSid(status?.sid);
-      localStorage.setItem("sid", status?.sid);
-    }
-  }, [sid, status?.sid]);
+    if (status?.sid && sid !== status?.sid) reset();
+  }, [reset, sid, status?.sid]);
 
   useEffect(() => {
     localStorage.setItem("generation", generation);
@@ -136,16 +143,6 @@ export function StatusProvider({
       window.removeEventListener("online", handleOfflineChange);
     };
   }, [handleOfflineChange]);
-
-  const reset = useCallback(() => {
-    localStorage.removeItem("guessFeedbackHistory");
-    localStorage.removeItem("generation");
-    localStorage.removeItem("sid");
-    setGeneration("1");
-    setGuessFeedbackHistory([]);
-    setGameStatus("PLAYING");
-    setSid("");
-  }, []);
 
   // ? reset everything when day changes
   useEffect(() => {
