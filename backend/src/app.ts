@@ -6,13 +6,13 @@ import { addProRoutes } from "./api/pro";
 import { addPublicRoutes } from "./api/public";
 import { initializeFirebaseApp } from "./config/firebase";
 import { getTodayPokemonList } from "./features/player/manager";
-import { keepAlive, scheduleDailyUpdate } from "./features/update";
+import { keepAliveJob, scheduleDailyUpdate } from "./features/update";
 
 dotenv.config();
 
 initializeFirebaseApp();
 
-keepAlive();
+keepAliveJob.start();
 scheduleDailyUpdate();
 
 const app = express();
