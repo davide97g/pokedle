@@ -98,9 +98,16 @@ export const getTodayPokemonList = async () => {
     DayStats.date = todayPokemons?.date;
     DayStats.totalGuesses = todayPokemons?.totalGuesses;
     DayStats.pokemonList = todayPokemons?.pokemonList;
+    return todayPokemons;
   }
 
-  return todayPokemons;
+  if (!todayPokemons) {
+    const updated = await updatePokemonToGuess();
+    DayStats.date = updated.date;
+    DayStats.totalGuesses = updated.totalGuesses;
+    DayStats.pokemonList = updated.pokemonList;
+    return updated;
+  }
 };
 
 export const getCurrentStatsID = (gen: GENERATION) => {
