@@ -11,7 +11,7 @@ import { testGuess } from "../features/player";
 import { getCurrentStatsID } from "../features/player/manager";
 import { countRemainingPokemonFromHistory } from "../features/solver";
 import { updateUserStats } from "../features/user";
-import { getUserIdFromToken } from "../middleware/utils";
+import { getUserInfoFromToken } from "../middleware/utils";
 
 export const addPublicRoutes = (app: Express) => {
   app.get("/", (_: Request, res: Response) => {
@@ -59,12 +59,12 @@ export const addPublicRoutes = (app: Express) => {
       const pokemonId = req.params.pokemonId;
       const gen = req.params.gen as GENERATION;
       const validationGuessHistory = req.body as PokemonValidationGuess[];
-      const userId = await getUserIdFromToken(req);
+      const user = await getUserInfoFromToken(req);
 
       const { validationGuess, isWinningGuess } = await testGuess({
         gen,
         pokemonGuessId: pokemonId,
-        userId: userId ?? undefined,
+        user: user ?? undefined,
       });
       validationGuess.order = validationGuessHistory.length + 1;
 
@@ -75,9 +75,9 @@ export const addPublicRoutes = (app: Express) => {
             gen
           );
 
-      if (isWinningGuess && userId) {
+      if (isWinningGuess && user?.uid) {
         await updateUserStats({
-          userId,
+          userId: user.uid,
           totalGuesses: (validationGuessHistory.length ?? 0) + 1,
         });
       }

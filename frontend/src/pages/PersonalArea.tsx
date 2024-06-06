@@ -7,7 +7,7 @@ import { AUTH } from "../services/auth";
 import { lazy, Suspense, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Loader } from "../components/Loader";
-import { ArrowLeft } from "@carbon/icons-react";
+import { ArrowLeft, Trophy } from "@carbon/icons-react";
 import { useUserUpdateUser } from "../hooks/database/user/useUserUpdateUser";
 import { useLayout } from "../hooks/useLayout";
 
@@ -122,6 +122,19 @@ export default function PersonalArea() {
         <Suspense fallback={<Loader />}>
           <Stats />
         </Suspense>
+
+        <Divider className="my-2" />
+
+        <div className="flex flex-col gap-5">
+          <Button
+            variant="bordered"
+            className="bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+            onClick={() => navigate("/rankings")}
+          >
+            <Trophy />
+            Rankings
+          </Button>
+        </div>
 
         <Divider className="my-2" />
 

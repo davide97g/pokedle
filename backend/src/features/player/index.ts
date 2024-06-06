@@ -36,13 +36,17 @@ const hasWon = (guess: PokemonValidationGuess): boolean => {
 };
 
 export const testGuess = async ({
-  userId,
   pokemonGuessId,
   gen,
+  user,
 }: {
   pokemonGuessId: string;
   gen?: GENERATION;
-  userId?: string;
+  user?: {
+    uid: string;
+    displayName: string;
+    photoURL: string;
+  };
 }): Promise<{
   validationGuess: PokemonValidationGuess;
   isWinningGuess: boolean;
@@ -118,7 +122,7 @@ export const testGuess = async ({
   };
 
   const isWinningGuess = hasWon(validationGuess);
-  if (isWinningGuess) await incrementCounter(userId);
+  if (isWinningGuess) await incrementCounter({ user });
 
   return { validationGuess, isWinningGuess };
 };

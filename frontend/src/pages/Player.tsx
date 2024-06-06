@@ -136,7 +136,6 @@ export default function Player() {
           <img src="./logo.png" alt="logo" height={45} width={45} />
           <h1 className="text-2xl">Pokedle</h1>
         </div>
-        <Counter />
       </div>
       {/* GUESS */}
       {isAdmin && (
@@ -207,6 +206,8 @@ export default function Player() {
           )}
         </div>
       )}
+
+      <Counter />
 
       {/* SEARCH BAR */}
       <Suspense

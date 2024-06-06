@@ -36,3 +36,10 @@ export interface CheckoutItem {
   price: number;
   date: string;
 }
+
+export interface UserDailyGuessInfo {
+  timestamp: number;
+  order: number;
+  photoURL: string;
+  displayName: string;
+}

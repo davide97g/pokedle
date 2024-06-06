@@ -118,7 +118,6 @@ export function StatusProvider({
   }, [generation]);
 
   useEffect(() => {
-    console.log("guessFeedbackHistory", guessFeedbackHistory);
     localStorage.setItem(
       "guessFeedbackHistory",
       JSON.stringify(guessFeedbackHistory)
