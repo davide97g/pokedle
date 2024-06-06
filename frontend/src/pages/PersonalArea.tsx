@@ -24,7 +24,14 @@ export default function PersonalArea() {
     if (!isLogged) navigate("/login");
   }, [isLogged, navigate]);
 
-  const handleLogout = async () => AUTH.logout().then(() => navigate("/"));
+  const handleLogout = async () => {
+    AUTH.logout().then(() => {
+      localStorage.removeItem("sid");
+      localStorage.removeItem("gen");
+      localStorage.removeItem("guessFeedbackHistory");
+      navigate("/");
+    });
+  };
 
   const add10BestGuesses = () => {
     if (user)

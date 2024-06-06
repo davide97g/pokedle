@@ -1,17 +1,26 @@
+import dayjs from "dayjs";
 import { getDatabase } from "firebase-admin/database";
 
-export const incrementCounter = async (): Promise<number> => {
+export const incrementCounter = async (userId?: string) => {
   const rtdb = getDatabase();
-  const ref = rtdb.ref("counter");
-  const snap = await ref.get();
+  const refCounter = rtdb.ref("counter");
+  const snap = await refCounter.get();
   const counter = snap.val();
-  await ref.set((counter ?? 0) + 1);
-  return counter + 1;
+  const newCounter = (counter ?? 0) + 1;
+  await refCounter.set(newCounter);
+  if (userId) {
+    const refUsers = rtdb.ref(`users/${userId}`);
+    await refUsers.set({
+      timestampGuess: dayjs().format("YYYY-MM-DD HH:mm:ss"),
+      order: newCounter,
+    });
+  }
 };
 
-export const resetCounter = async (): Promise<number> => {
+export const resetCounter = async () => {
   const rtdb = getDatabase();
-  const ref = rtdb.ref("counter");
-  await ref.set(0);
-  return 0;
+  const refCounter = rtdb.ref("counter");
+  const refUsers = rtdb.ref("users");
+  await refCounter.set(0);
+  await refUsers.set([]);
 };

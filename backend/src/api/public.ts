@@ -11,6 +11,7 @@ import { testGuess } from "../features/player";
 import { getCurrentStatsID } from "../features/player/manager";
 import { countRemainingPokemonFromHistory } from "../features/solver";
 import { updateUserStats } from "../features/user";
+import { getUserIdFromToken } from "../middleware/utils";
 
 export const addPublicRoutes = (app: Express) => {
   app.get("/", (_: Request, res: Response) => {
@@ -58,11 +59,13 @@ export const addPublicRoutes = (app: Express) => {
       const pokemonId = req.params.pokemonId;
       const gen = req.params.gen as GENERATION;
       const validationGuessHistory = req.body as PokemonValidationGuess[];
+      const userId = await getUserIdFromToken(req);
 
-      const { validationGuess, isWinningGuess } = await testGuess(
-        pokemonId,
-        gen
-      );
+      const { validationGuess, isWinningGuess } = await testGuess({
+        gen,
+        pokemonGuessId: pokemonId,
+        userId: userId ?? undefined,
+      });
       validationGuess.order = validationGuessHistory.length + 1;
 
       const remainingPokemon = isWinningGuess
@@ -72,21 +75,13 @@ export const addPublicRoutes = (app: Express) => {
             gen
           );
 
-      if (isWinningGuess) {
-        const bearerToken = req.header("Authorization");
-        if (bearerToken) {
-          const claims = await getAuth().verifyIdToken(
-            bearerToken?.split("Bearer ")[1]
-          );
-          const userId = claims.uid;
-          if (userId) {
-            await updateUserStats({
-              userId,
-              totalGuesses: (validationGuessHistory.length ?? 0) + 1,
-            });
-          }
-        }
+      if (isWinningGuess && userId) {
+        await updateUserStats({
+          userId,
+          totalGuesses: (validationGuessHistory.length ?? 0) + 1,
+        });
       }
+
       res.send({ validation: validationGuess, remainingPokemon });
     }
   );
