@@ -28,6 +28,7 @@ export const Counter = () => {
     });
   }, [userInfoRef, user?.id]);
 
+  if (!count) return null;
   return !userDailyGuessInfo ? (
     <p className="text-xs">{count} have already find out</p>
   ) : (

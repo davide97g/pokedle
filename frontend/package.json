@@ -41,5 +41,5 @@
     "vite": "^5.2.0",
     "vite-plugin-pwa": "^0.20.0"
   },
-  "packageManager": "yarn@4.2.2"
+  "packageManager": "yarn@4.3.0"
 }
