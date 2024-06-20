@@ -179,6 +179,70 @@ export const API_PRO = {
         return null;
       });
   },
+  newPokemon: async () => {
+    const appCheckTokenResponse = await getToken(appCheck, true).catch(
+      (err) => {
+        console.info(err);
+        return null;
+      }
+    );
+    const idToken = await auth.currentUser?.getIdToken().catch((err) => {
+      console.info(err);
+      return null;
+    });
+    if (!appCheckTokenResponse?.token || !idToken) return null;
+    return fetch(`${BACKEND_URL}/new-pokemon/personal`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Firebase-AppCheck": appCheckTokenResponse.token,
+        Authorization: `Bearer ${idToken}`,
+      },
+    })
+      .then((res) => res.json())
+      .then(
+        (res) =>
+          res as {
+            message: string;
+          }
+      )
+      .catch((err) => {
+        console.info(err);
+        return null;
+      });
+  },
+  sendGuessPokemonId: async (
+    pokemonId: number,
+    gen: GENERATION,
+    guessValidationHistory: PokemonValidationGuess[]
+  ) => {
+    const idToken = await auth.currentUser?.getIdToken().catch((err) => {
+      console.info(err);
+      return null;
+    });
+
+    if (!auth.currentUser?.uid) return null;
+
+    return fetch(
+      `${BACKEND_URL}/guess-pokemon/${auth.currentUser.uid}/${pokemonId}/${gen}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(idToken && { Authorization: `Bearer ${idToken}` }),
+        },
+        body: JSON.stringify(guessValidationHistory),
+      }
+    )
+      .then((res) => res.json())
+      .then(
+        (res) =>
+          res as {
+            validation: PokemonValidationGuess;
+            remainingPokemon: number;
+          }
+      );
+  },
 };
 
 export const API_ADMIN = {

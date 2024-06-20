@@ -1,34 +1,29 @@
 import confetti from "canvas-confetti";
 
-import { Add, Restart, Rocket } from "@carbon/icons-react";
+import { Add } from "@carbon/icons-react";
 import {
   Button,
   CircularProgress,
   Progress,
   ScrollShadow,
-  Select,
-  SelectItem,
 } from "@nextui-org/react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { PokemonSummary } from "../../../types/pokemon.model";
 import { GuessFeedback } from "../components/GuessFeedback";
 import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
 
-import { Counter } from "../components/Counter";
-
-import { GENERATION } from "../../../types/user.types";
+import { useNavigate } from "react-router-dom";
 import User from "../components/User";
 import { useAuth } from "../hooks/useAuth";
 import { useLayout } from "../hooks/useLayout";
 import { useStatus } from "../hooks/useStatus";
-import { API, API_ADMIN, API_PRO } from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { API_PRO } from "../services/api";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
 
-export default function Player() {
-  const { isLogged, isAdmin, refetch } = useAuth();
+export default function CustomGame() {
+  const { isLogged, isAdmin, refetch, user } = useAuth();
   const navigate = useNavigate();
   const { isMobile } = useLayout();
   const [isLoading, setIsLoading] = useState(false);
@@ -37,29 +32,19 @@ export default function Player() {
     guessFeedbackHistory,
     totalPokemon,
     remainingPokemon,
-    dayStats,
+
     gameStatus,
     isLoading: isLoadingStatus,
-    setGeneration,
     setGuessFeedbackHistory,
     setRemainingPokemon,
-    reset,
     setMode,
   } = useStatus();
 
   useEffect(() => setMode("CUSTOM"), [setMode]);
 
-  const generations = [
-    { value: "1", label: "Generation 1" },
-    { value: "2", label: "Generation 2" },
-    { value: "3", label: "Generation 3" },
-    { value: "4", label: "Generation 4" },
-    { value: "5", label: "Generation 5" },
-    { value: "6", label: "Generation 6" },
-    { value: "7", label: "Generation 7" },
-    { value: "8", label: "Generation 8" },
-    { value: "9", label: "Generation 9" },
-  ];
+  useEffect(() => {
+    if (!isLogged) navigate("/login");
+  }, [isLogged, navigate]);
 
   useEffect(() => {
     if (gameStatus === "WON") {
@@ -96,14 +81,16 @@ export default function Player() {
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
       setIsLoading(true);
-      API.sendGuessPokemonId(pokemonId, generation, guessFeedbackHistory)
+      API_PRO.sendGuessPokemonId(pokemonId, generation, guessFeedbackHistory)
         .then((response) => {
-          const updatedHistory = [
-            ...guessFeedbackHistory,
-            { ...response.validation, order: guessFeedbackHistory.length },
-          ];
-          setGuessFeedbackHistory(updatedHistory);
-          setRemainingPokemon?.(response.remainingPokemon);
+          if (response) {
+            const updatedHistory = [
+              ...guessFeedbackHistory,
+              { ...response.validation, order: guessFeedbackHistory.length },
+            ];
+            setGuessFeedbackHistory(updatedHistory);
+            setRemainingPokemon?.(response.remainingPokemon);
+          }
         })
         .finally(() => setIsLoading(false));
     }
@@ -139,7 +126,7 @@ export default function Player() {
       <div className="flex flex-col justify-center items-center">
         <div className="pt-8 md:pt-20 flex flex-row items-center">
           <img src="./logo.png" alt="logo" height={45} width={45} />
-          <h1 className="text-2xl">Pokedle</h1>
+          <h1 className="text-2xl">Pokedle Custom</h1>
         </div>
       </div>
       {/* GUESS */}
@@ -151,77 +138,26 @@ export default function Player() {
             </div>
           }
         >
-          <Guess
-            pokemonToGuess={
-              dayStats?.pokemonList.find((p) => p.gen === generation)?.pokemon
-            }
-          />
+          <Guess pokemonToGuess={user?.customPokemonGuess} />
         </Suspense>
       )}
-      <Select
-        label="Generation"
-        variant="bordered"
-        placeholder="Select an generation"
-        selectedKeys={generation}
-        isDisabled
-        className="max-w-xs w-48"
-        multiple={false}
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onSelectionChange={(keys: any) => {
-          if (keys) setGeneration(keys.currentKey as GENERATION);
-        }}
-      >
-        {generations.map((gen) => (
-          <SelectItem
-            className="text-gray-600"
-            key={gen.value}
-            value={gen.value}
-          >
-            {gen.label}
-          </SelectItem>
-        ))}
-      </Select>
-
       {isLogged && (
         <div className="flex flex-col gap-4 absolute top-2 left-2 sm:top-4 sm:left-4">
           <Button
-            isIconOnly={isMobile}
             size={isMobile ? "sm" : "md"}
-            isDisabled={!guessFeedbackHistory.length}
-            onClick={reset}
-            startContent={<Restart />}
-            variant="ghost"
-          >
-            {isMobile ? "" : "Restart"}
-          </Button>
-          {isAdmin && (
-            <Button
-              size={isMobile ? "sm" : "md"}
-              isIconOnly={isMobile}
-              onClick={() => {
-                setIsLoading(true);
-                if (isAdmin)
-                  API_ADMIN.newPokemon().finally(() => setIsLoading(false));
-              }}
-              color="danger"
-              startContent={<Add />}
-            >
-              {isMobile ? "" : "New Pokemon"}
-            </Button>
-          )}
-          <Button
             isIconOnly={isMobile}
-            size={isMobile ? "sm" : "md"}
-            onClick={() => navigate("/custom")}
-            startContent={<Rocket />}
-            color="success"
+            onClick={() => {
+              setIsLoading(true);
+              if (isLogged)
+                API_PRO.newPokemon().finally(() => setIsLoading(false));
+            }}
+            color="danger"
+            startContent={<Add />}
           >
-            {isMobile ? "" : "Custom"}
+            {isMobile ? "" : "New Pokemon"}
           </Button>
         </div>
       )}
-
-      <Counter />
 
       {/* SEARCH BAR */}
       <Suspense

@@ -120,11 +120,12 @@ export const getCurrentStatsID = (gen: GENERATION) => {
 
 export const updatePersonalPokemonToGuess = async (userId: string) => {
   const db = getFirestore();
-  const userRef = db.doc(`users/${userId}`);
+
+  const userRef = db.collection("users").doc(userId);
 
   const pokemonGuess = getRandomPokemon("1", []);
   PersonalPokemonGuesses[userId] = pokemonGuess;
-  await userRef.set(pokemonGuess);
+  await userRef.set({ customPokemonGuess: pokemonGuess }, { merge: true });
 
   return PersonalPokemonGuesses[userId];
 };

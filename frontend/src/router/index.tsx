@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
 const Player = lazy(() => import("../pages/Player"));
+const CustomGame = lazy(() => import("../pages/CustomGame"));
 const Login = lazy(() => import("../pages/Login"));
 const About = lazy(() => import("../pages/About"));
 const PersonalArea = lazy(() => import("../pages/PersonalArea"));
@@ -18,6 +19,14 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
     errorElement: <div>404 Not Found</div>,
+  },
+  {
+    path: "/custom",
+    element: (
+      <Suspense>
+        <CustomGame />
+      </Suspense>
+    ),
   },
   {
     path: "/login",

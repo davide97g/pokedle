@@ -30,6 +30,7 @@ interface StatusContext {
   refetch: () => void;
   isLoading: boolean;
   reset: () => void;
+  setMode: (mode: "NORMAL" | "CUSTOM") => void;
 }
 
 export const StatusContext = createContext({
@@ -46,6 +47,7 @@ export const StatusContext = createContext({
   totalPokemon: 0,
   remainingPokemon: 0,
   reset: () => {},
+  setMode: () => {},
 } as StatusContext);
 
 export function StatusProvider({
@@ -65,6 +67,10 @@ export function StatusProvider({
 
   const [sid, setSid] = useState<string>(
     (localStorage.getItem("sid") as string) || ""
+  );
+
+  const [mode, setMode] = useState<"NORMAL" | "CUSTOM">(
+    (localStorage.getItem("mode") as "NORMAL" | "CUSTOM") || "NORMAL"
   );
 
   const [gameStatus, setGameStatus] = useState<"PLAYING" | "WON">("PLAYING");
@@ -112,6 +118,11 @@ export function StatusProvider({
       reset();
     }
   }, [reset, sid, status?.sid]);
+
+  useEffect(() => {
+    localStorage.setItem("mode", mode);
+    reset();
+  }, [mode, reset]);
 
   useEffect(() => {
     localStorage.setItem("generation", generation);
@@ -170,6 +181,7 @@ export function StatusProvider({
       setRemainingPokemon,
       dayStats,
       reset,
+      setMode,
     }),
     [
       offline,
@@ -182,6 +194,7 @@ export function StatusProvider({
       remainingPokemon,
       dayStats,
       reset,
+      setMode,
     ]
   );
 

@@ -44,17 +44,14 @@ export const addProRoutes = (app: Express) => {
   );
 
   app.post(
-    "/new-personal-guess",
+    "/new-pokemon/personal",
     [isPro],
     express.json(),
     async (req: Request, res: Response) => {
       const bearerToken = req.header("Authorization");
       if (bearerToken) {
-        const claims = await getAuth().verifyIdToken(
-          bearerToken?.split("Bearer ")[1]
-        );
-        const userId = claims.uid;
-        if (userId) await updatePersonalPokemonToGuess(userId);
+        const info = await getUserInfoFromToken(req);
+        if (info?.uid) await updatePersonalPokemonToGuess(info?.uid);
         else res.status(401).send({ message: "Unauthorized" });
         res.send({ message: "New personal guess" });
       }
