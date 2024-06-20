@@ -1,4 +1,4 @@
-import { PokedleCustomGuess } from "./pokemon.model";
+import { PokemonModel } from "./pokemon.model";
 
 export type GENERATION = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 
@@ -8,7 +8,7 @@ export interface PUser {
   displayName: string;
   photoURL: string;
   stats?: PStats;
-  customPokemonGuesses?: PokedleCustomGuess;
+  customPokemonGuess?: PokemonModel;
   numberOfBestGuesses?: number;
   paymentHistory?: PaymentRecord[];
 }

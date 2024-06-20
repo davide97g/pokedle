@@ -3,7 +3,7 @@ import { PokemonValidationGuess } from "../../../../types/pokemon.model";
 import { GENERATION } from "../../../../types/user.types";
 import { getPokemonList } from "../../data";
 import { incrementCounter } from "../counter";
-import { DayStats } from "./manager";
+import { DayStats, PersonalPokemonGuesses } from "./manager";
 
 const computeComparison = (
   value?: number,
@@ -65,6 +65,101 @@ export const testGuess = async ({
   const POKEMON_TO_GUESS = DayStats.pokemonList.find(
     (p) => p.gen === gen
   )?.pokemon;
+
+  if (!POKEMON_TO_GUESS) {
+    throw new Error("Pokemon to guess not found");
+  }
+
+  const validationGuess: PokemonValidationGuess = {
+    id: pokemonGuess.id,
+    date: dayjs().format("YYYY-MM-DD"),
+    name: pokemonGuess.name,
+    image: pokemonGuess.image,
+    type1: {
+      value: pokemonGuess.type1,
+      valid: pokemonGuess.type1 === POKEMON_TO_GUESS?.type1,
+    },
+    type2: {
+      value: pokemonGuess.type2,
+      valid: pokemonGuess.type2 === POKEMON_TO_GUESS?.type2,
+    },
+    color: {
+      value: pokemonGuess.color,
+      valid: pokemonGuess.color === POKEMON_TO_GUESS?.color,
+    },
+    habitat: {
+      value: pokemonGuess.habitat,
+      valid: pokemonGuess.habitat === POKEMON_TO_GUESS?.habitat,
+    },
+    generation: {
+      value: pokemonGuess.generation,
+      comparison: computeComparison(
+        POKEMON_TO_GUESS?.generation,
+        pokemonGuess?.generation
+      ),
+    },
+    height: {
+      value: pokemonGuess.height,
+      comparison: computeComparison(
+        POKEMON_TO_GUESS?.height,
+        pokemonGuess?.height
+      ),
+    },
+    weight: {
+      value: pokemonGuess.weight,
+      comparison: computeComparison(
+        POKEMON_TO_GUESS?.weight,
+        pokemonGuess?.weight
+      ),
+    },
+    evolutionStage: {
+      value: pokemonGuess.evolutionStage,
+      comparison: computeComparison(
+        POKEMON_TO_GUESS?.evolutionStage,
+        pokemonGuess?.evolutionStage
+      ),
+    },
+  };
+
+  const isWinningGuess = hasWon(validationGuess);
+  if (isWinningGuess) await incrementCounter({ user });
+
+  return { validationGuess, isWinningGuess };
+};
+
+export const testGuessPersonal = async ({
+  pokemonGuessId,
+  gen,
+  user,
+}: {
+  pokemonGuessId: string;
+  gen?: GENERATION;
+  user?: {
+    uid: string;
+    displayName: string;
+    photoURL: string;
+  };
+}): Promise<{
+  validationGuess: PokemonValidationGuess;
+  isWinningGuess: boolean;
+}> => {
+  const pokemonGuess = getPokemonList(gen ?? "1").find(
+    (p) => p.id === Number(pokemonGuessId)
+  );
+  if (!pokemonGuess) {
+    throw new Error("Pokemon not found");
+  }
+
+  if (!Object.keys(PersonalPokemonGuesses ?? {})?.length) {
+    throw new Error("Pokemon list not found");
+  }
+
+  if (!user?.uid) throw new Error("User not found");
+
+  if (!PersonalPokemonGuesses[user?.uid])
+    throw new Error("Personal Pokemon list not found");
+
+  const POKEMON_TO_GUESS = PersonalPokemonGuesses[user.uid];
 
   if (!POKEMON_TO_GUESS) {
     throw new Error("Pokemon to guess not found");

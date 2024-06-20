@@ -105,8 +105,14 @@ export interface PokemonFeaturesNegative {
   };
 }
 
+export type PokemonGuessList = {
+  gen: GENERATION;
+  pokemon: PokemonModel;
+  sid: string;
+}[];
+
 export interface PokedleDayStats {
-  pokemonList: { gen: GENERATION; pokemon: PokemonModel; sid: string }[];
+  pokemonList: PokemonGuessList;
   date: string;
   totalGuesses: number;
 }

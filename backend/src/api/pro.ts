@@ -8,9 +8,15 @@ import {
   addBestGuessToUser,
   getCheckoutSessionListItems,
 } from "../features/payments";
-import { guessPokemon } from "../features/solver";
+import { testGuessPersonal } from "../features/player";
+import { updatePersonalPokemonToGuess } from "../features/player/manager";
+import {
+  countRemainingPokemonFromHistory,
+  guessPokemon,
+} from "../features/solver";
 import { decrementUserBestGuesses } from "../features/user";
 import { isPro } from "../middleware/isPro";
+import { getUserInfoFromToken } from "../middleware/utils";
 
 const endpointSecret = process.env.STRIPE_CHECKOUT_SIGNING_SECRET;
 
@@ -33,6 +39,24 @@ export const addProRoutes = (app: Express) => {
         res.send({ pokemon });
       } else {
         res.status(401).send({ message: "Unauthorized" });
+      }
+    }
+  );
+
+  app.post(
+    "/new-personal-guess",
+    [isPro],
+    express.json(),
+    async (req: Request, res: Response) => {
+      const bearerToken = req.header("Authorization");
+      if (bearerToken) {
+        const claims = await getAuth().verifyIdToken(
+          bearerToken?.split("Bearer ")[1]
+        );
+        const userId = claims.uid;
+        if (userId) await updatePersonalPokemonToGuess(userId);
+        else res.status(401).send({ message: "Unauthorized" });
+        res.send({ message: "New personal guess" });
       }
     }
   );
@@ -107,6 +131,33 @@ export const addProRoutes = (app: Express) => {
           Stripe.ApiList<Stripe.LineItem>
         >) ?? [];
       res.send({ history });
+    }
+  );
+
+  app.post(
+    "/guess-pokemon/:userId/:pokemonId/:gen",
+    express.json(),
+    async (req: Request, res: Response) => {
+      const pokemonId = req.params.pokemonId;
+      const gen = req.params.gen as GENERATION;
+      const validationGuessHistory = req.body as PokemonValidationGuess[];
+      const user = await getUserInfoFromToken(req);
+
+      const { validationGuess, isWinningGuess } = await testGuessPersonal({
+        gen,
+        pokemonGuessId: pokemonId,
+        user: user ?? undefined,
+      });
+      validationGuess.order = validationGuessHistory.length + 1;
+
+      const remainingPokemon = isWinningGuess
+        ? 0
+        : countRemainingPokemonFromHistory(
+            [...validationGuessHistory, validationGuess],
+            gen
+          );
+
+      res.send({ validation: validationGuess, remainingPokemon });
     }
   );
 

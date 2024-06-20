@@ -1,14 +1,30 @@
 import dayjs from "dayjs";
 import { getFirestore } from "firebase-admin/firestore";
 import { PokedleDayStats, PokemonModel } from "../../../../types/pokemon.model";
+import { GENERATION, PUser } from "../../../../types/user.types";
 import { getPokemonList } from "../../data";
 import { resetCounter } from "../counter";
-import { GENERATION } from "../../../../types/user.types";
 
 export const DayStats: PokedleDayStats = {
   pokemonList: [],
   date: dayjs().format("YYYY-MM-DD"),
   totalGuesses: 0,
+};
+
+export const PersonalPokemonGuesses: {
+  [userId: string]: PokemonModel;
+} = {};
+
+const getRandomPokemon = (
+  gen: GENERATION,
+  alreadyUsedIdList: number[]
+): PokemonModel => {
+  const pokemonList = getPokemonList(gen ?? "1");
+  const filterdList = pokemonList.filter(
+    (pokemon) => !alreadyUsedIdList.includes(pokemon.id)
+  );
+  const randomId = Math.floor(Math.random() * filterdList.length) + 1;
+  return filterdList[randomId];
 };
 
 export const updatePokemonToGuess = async () => {
@@ -26,18 +42,6 @@ export const updatePokemonToGuess = async () => {
     }
     return null;
   });
-
-  const getRandomPokemon = (
-    gen: GENERATION,
-    alreadyUsedIdList: number[]
-  ): PokemonModel => {
-    const pokemonList = getPokemonList(gen ?? "1");
-    const filterdList = pokemonList.filter(
-      (pokemon) => !alreadyUsedIdList.includes(pokemon.id)
-    );
-    const randomId = Math.floor(Math.random() * filterdList.length) + 1;
-    return filterdList[randomId];
-  };
 
   const generationList: GENERATION[] = [
     "1",
@@ -112,4 +116,15 @@ export const getTodayPokemonList = async () => {
 
 export const getCurrentStatsID = (gen: GENERATION) => {
   return DayStats.pokemonList.find((p) => p.gen === gen)?.sid;
+};
+
+export const updatePersonalPokemonToGuess = async (userId: string) => {
+  const db = getFirestore();
+  const userRef = db.doc(`users/${userId}`);
+
+  const pokemonGuess = getRandomPokemon("1", []);
+  PersonalPokemonGuesses[userId] = pokemonGuess;
+  await userRef.set(pokemonGuess);
+
+  return PersonalPokemonGuesses[userId];
 };
