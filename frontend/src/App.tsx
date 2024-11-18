@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthProvider";
 import { router } from "./router";
 import { LayoutProvider } from "./context/LayoutProvider";
 import { StatusProvider } from "./context/StatusProvider";
+import { ServerLoaded } from "./components/ServerLoaded";
 
 export default function App() {
   return (
@@ -11,7 +12,9 @@ export default function App() {
       <LayoutProvider>
         <AuthProvider>
           <StatusProvider>
-            <RouterProvider router={router} />
+            <ServerLoaded>
+              <RouterProvider router={router} />
+            </ServerLoaded>
           </StatusProvider>
         </AuthProvider>
       </LayoutProvider>

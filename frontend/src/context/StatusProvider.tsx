@@ -31,6 +31,8 @@ interface StatusContext {
   isLoading: boolean;
   reset: () => void;
   setMode: (mode: "NORMAL" | "CUSTOM") => void;
+  isLoadingServerInfo: boolean;
+  serverVersion?: string;
 }
 
 export const StatusContext = createContext({
@@ -48,6 +50,8 @@ export const StatusContext = createContext({
   remainingPokemon: 0,
   reset: () => {},
   setMode: () => {},
+  isLoadingServerInfo: false,
+  serverVersion: "",
 } as StatusContext);
 
 export function StatusProvider({
@@ -96,7 +100,14 @@ export function StatusProvider({
     }
   }, [guessFeedbackHistory]);
 
-  const { status, refetch, isLoading, dayStats } = useStatusGetStatus({
+  const {
+    status,
+    refetch,
+    isLoading,
+    isLoadingServerInfo,
+    serverVersion,
+    dayStats,
+  } = useStatusGetStatus({
     generation,
     pokemonValidationGuess: guessFeedbackHistory,
   });
@@ -182,6 +193,8 @@ export function StatusProvider({
       dayStats,
       reset,
       setMode,
+      isLoadingServerInfo,
+      serverVersion,
     }),
     [
       offline,
@@ -195,6 +208,8 @@ export function StatusProvider({
       dayStats,
       reset,
       setMode,
+      isLoadingServerInfo,
+      serverVersion,
     ]
   );
 

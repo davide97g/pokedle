@@ -14,6 +14,11 @@ export const useStatusGetStatus = ({
 }) => {
   const { isAdmin } = useAuth();
 
+  const serverInfo = useQuery({
+    queryKey: ["server-info"],
+    queryFn: async () => API.getServerInfo(),
+  });
+
   const status = useQuery({
     queryKey: ["status", generation, "public"],
     queryFn: async () => API.getStatus(generation, pokemonValidationGuess),
@@ -40,6 +45,8 @@ export const useStatusGetStatus = ({
     status: status.data ?? undefined,
     dayStats: dayStats.data?.pokemonDayStats ?? undefined,
     isLoading,
+    isLoadingServerInfo: serverInfo.isFetching,
+    serverVersion: serverInfo.data?.version,
     refetch,
   };
 };
