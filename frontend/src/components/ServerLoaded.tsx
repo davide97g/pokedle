@@ -4,7 +4,7 @@ import { Loader } from "./Loader";
 
 export function ServerLoaded({ children }: { children: ReactNode }) {
   const { isLoadingServerInfo } = useStatus();
-  if (!isLoadingServerInfo)
+  if (isLoadingServerInfo)
     return (
       <div className="flex flex-col justify-center items-center gap-10 px-10 h-full">
         <div className="flex flex-col items-center">
