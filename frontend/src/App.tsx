@@ -1,10 +1,10 @@
 import { RouterProvider } from "react-router-dom";
 
+import { ServerLoaded } from "./components/ServerLoaded";
 import { AuthProvider } from "./context/AuthProvider";
-import { router } from "./router";
 import { LayoutProvider } from "./context/LayoutProvider";
 import { StatusProvider } from "./context/StatusProvider";
-import { ServerLoaded } from "./components/ServerLoaded";
+import { router } from "./router";
 
 export default function App() {
   return (

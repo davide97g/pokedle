@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { useStatus } from "../hooks/useStatus";
 import { Loader } from "./Loader";
 
-export function ServerLoaded({ children }: { children: ReactNode }) {
+export function ServerLoaded({ children }: Readonly<{ children: ReactNode }>) {
   const { isLoadingServerInfo } = useStatus();
   if (isLoadingServerInfo)
     return (

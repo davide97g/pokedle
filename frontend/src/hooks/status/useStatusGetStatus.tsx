@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import { PokemonValidationGuess } from "../../../../types/pokemon.model";
 import { GENERATION } from "../../../../types/user.types";
 import { API, API_ADMIN } from "../../services/api";
-import { useCallback, useMemo } from "react";
 import { useAuth } from "../useAuth";
 
 export const useStatusGetStatus = ({
@@ -16,7 +16,7 @@ export const useStatusGetStatus = ({
 
   const serverInfo = useQuery({
     queryKey: ["server-info"],
-    queryFn: async () => API.getServerInfo(),
+    queryFn: () => API.getServerInfo(),
   });
 
   const status = useQuery({

@@ -6,8 +6,6 @@ import {
   CircularProgress,
   Progress,
   ScrollShadow,
-  Select,
-  SelectItem,
 } from "@nextui-org/react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { PokemonSummary } from "../../../types/pokemon.model";
@@ -16,13 +14,12 @@ import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
 
 import { Counter } from "../components/Counter";
 
-import { GENERATION } from "../../../types/user.types";
+import { useNavigate } from "react-router-dom";
 import User from "../components/User";
 import { useAuth } from "../hooks/useAuth";
 import { useLayout } from "../hooks/useLayout";
 import { useStatus } from "../hooks/useStatus";
 import { API, API_ADMIN, API_PRO } from "../services/api";
-import { useNavigate } from "react-router-dom";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 const Guess = lazy(() => import("../components/Guess"));
@@ -40,26 +37,26 @@ export default function Player() {
     dayStats,
     gameStatus,
     isLoading: isLoadingStatus,
-    setGeneration,
     setGuessFeedbackHistory,
     setRemainingPokemon,
     reset,
     setMode,
+    refetch: refetchStatus,
   } = useStatus();
 
   useEffect(() => setMode("CUSTOM"), [setMode]);
 
-  const generations = [
-    { value: "1", label: "Generation 1" },
-    { value: "2", label: "Generation 2" },
-    { value: "3", label: "Generation 3" },
-    { value: "4", label: "Generation 4" },
-    { value: "5", label: "Generation 5" },
-    { value: "6", label: "Generation 6" },
-    { value: "7", label: "Generation 7" },
-    { value: "8", label: "Generation 8" },
-    { value: "9", label: "Generation 9" },
-  ];
+  // const generations = [
+  //   { value: "1", label: "Generation 1" },
+  //   { value: "2", label: "Generation 2" },
+  //   { value: "3", label: "Generation 3" },
+  //   { value: "4", label: "Generation 4" },
+  //   { value: "5", label: "Generation 5" },
+  //   { value: "6", label: "Generation 6" },
+  //   { value: "7", label: "Generation 7" },
+  //   { value: "8", label: "Generation 8" },
+  //   { value: "9", label: "Generation 9" },
+  // ];
 
   useEffect(() => {
     if (gameStatus === "WON") {
@@ -158,7 +155,7 @@ export default function Player() {
           />
         </Suspense>
       )}
-      <Select
+      {/* <Select
         label="Generation"
         variant="bordered"
         placeholder="Select an generation"
@@ -180,7 +177,10 @@ export default function Player() {
             {gen.label}
           </SelectItem>
         ))}
-      </Select>
+      </Select> */}
+      <p className="text-xs text-white/50 flex justify-end mr-2">
+        Generation 1
+      </p>
 
       {isLogged && (
         <div className="flex flex-col gap-4 absolute top-2 left-2 sm:top-4 sm:left-4">
@@ -201,7 +201,10 @@ export default function Player() {
               onClick={() => {
                 setIsLoading(true);
                 if (isAdmin)
-                  API_ADMIN.newPokemon().finally(() => setIsLoading(false));
+                  API_ADMIN.newPokemon().finally(() => {
+                    refetchStatus();
+                    setIsLoading(false);
+                  });
               }}
               color="danger"
               startContent={<Add />}

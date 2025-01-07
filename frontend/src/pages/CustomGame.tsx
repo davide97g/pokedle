@@ -32,12 +32,12 @@ export default function CustomGame() {
     guessFeedbackHistory,
     totalPokemon,
     remainingPokemon,
-
     gameStatus,
     isLoading: isLoadingStatus,
     setGuessFeedbackHistory,
     setRemainingPokemon,
     setMode,
+    reset,
   } = useStatus();
 
   useEffect(() => setMode("CUSTOM"), [setMode]);
@@ -149,7 +149,11 @@ export default function CustomGame() {
             onClick={() => {
               setIsLoading(true);
               if (isLogged)
-                API_PRO.newPokemon().finally(() => setIsLoading(false));
+                API_PRO.newPokemon().finally(() => {
+                  refetch();
+                  reset();
+                  setIsLoading(false);
+                });
             }}
             color="danger"
             startContent={<Add />}
