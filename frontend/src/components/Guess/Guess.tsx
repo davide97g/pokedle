@@ -5,7 +5,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@nextui-org/react";
-import { PokemonSummary } from "../../../types/pokemon.model";
+import { PokemonSummary } from "../../../../types/pokemon.model";
 
 export default function Guess({
   pokemonToGuess,

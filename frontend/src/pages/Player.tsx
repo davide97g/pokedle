@@ -9,12 +9,12 @@ import {
 } from "@nextui-org/react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { PokemonSummary } from "../../../types/pokemon.model";
-import { GuessFeedback } from "../components/GuessFeedback";
-import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
+import { GuessFeedback } from "../components/Guess/GuessFeedback";
 
 import { Counter } from "../components/Counter";
 
 import { useNavigate } from "react-router-dom";
+import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
 import User from "../components/User";
 import { useAuth } from "../hooks/useAuth";
 import { useLayout } from "../hooks/useLayout";
@@ -22,7 +22,7 @@ import { useStatus } from "../hooks/useStatus";
 import { API, API_ADMIN, API_PRO } from "../services/api";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
-const Guess = lazy(() => import("../components/Guess"));
+const Guess = lazy(() => import("../components/Guess/Guess"));
 
 export default function Player() {
   const { isLogged, isAdmin, refetch } = useAuth();
@@ -60,14 +60,16 @@ export default function Player() {
 
   useEffect(() => {
     if (gameStatus === "WON") {
-      const particleCount = Math.max(
-        Math.floor(1000 - guessFeedbackHistory.length * 100),
-        100
-      );
-      confetti({
-        particleCount,
-        spread: 100000,
-      });
+      setTimeout(() => {
+        const particleCount = Math.max(
+          Math.floor(1000 - guessFeedbackHistory.length * 100),
+          100
+        );
+        confetti({
+          particleCount,
+          spread: 100000,
+        });
+      }, 7500);
     }
   }, [gameStatus, guessFeedbackHistory.length]);
 

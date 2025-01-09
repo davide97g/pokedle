@@ -1,5 +1,5 @@
 import { Card, CardBody } from "@nextui-org/react";
-import { useLayout } from "../hooks/useLayout";
+import { useLayout } from "../../hooks/useLayout";
 
 export const GuessFeedbackHeader = () => {
   const { isMobile } = useLayout();

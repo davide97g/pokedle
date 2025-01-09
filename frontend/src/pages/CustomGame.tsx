@@ -9,10 +9,10 @@ import {
 } from "@nextui-org/react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { PokemonSummary } from "../../../types/pokemon.model";
-import { GuessFeedback } from "../components/GuessFeedback";
-import { GuessFeedbackHeader } from "../components/GuessFeedbackHeader";
+import { GuessFeedback } from "../components/Guess/GuessFeedback";
 
 import { useNavigate } from "react-router-dom";
+import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
 import User from "../components/User";
 import { useAuth } from "../hooks/useAuth";
 import { useLayout } from "../hooks/useLayout";
@@ -20,7 +20,7 @@ import { useStatus } from "../hooks/useStatus";
 import { API_PRO } from "../services/api";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
-const Guess = lazy(() => import("../components/Guess"));
+const Guess = lazy(() => import("../components/Guess/Guess"));
 
 export default function CustomGame() {
   const { isLogged, isAdmin, refetch, user } = useAuth();
