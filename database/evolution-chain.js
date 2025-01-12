@@ -5,9 +5,7 @@ import { writeFileSync } from "fs";
 import { join } from "path";
 
 const NUMBER_EVOLUTION_CHAINS = 549;
-const NUMBER_OF_POKEMON = 1025;
-// const NUMBER_OF_POKEMON = 1025;
-// const NUMBER_EVOLUTION_CHAINS = 549;
+const NUMBER_OF_POKEMON = 151;
 
 const getPokemonFromEvolutionChain = async (evolutionChainId) => {
   const evolutionChain = await axios

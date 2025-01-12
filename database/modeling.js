@@ -15,10 +15,10 @@
 
 // write the file as a unique json array of objects
 
-import { readFileSync, writeFileSync, existsSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const NUMBER_OF_POKEMON = 1025;
+const NUMBER_OF_POKEMON = 151;
 
 const modeling = () => {
   const pokemonData = [];

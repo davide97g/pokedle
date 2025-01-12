@@ -1,14 +1,14 @@
 // for each pokemon from id 1 to 151 add a new json related to enhanced data (color, evolution stage, habitat)
 
 import axios from "axios";
-import { writeFileSync, readFileSync, existsSync } from "fs";
-import { join } from "path";
 import cliProgress from "cli-progress";
+import { readFileSync, writeFileSync } from "fs";
+import { join } from "path";
 
 // create a new progress bar instance and use shades_classic theme
 const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 
-const NUMBER_OF_POKEMON = 1025;
+const NUMBER_OF_POKEMON = 151;
 
 const enhancer = async () => {
   const evolutionData = JSON.parse(

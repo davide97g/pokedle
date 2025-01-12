@@ -1,10 +1,10 @@
 //  DOWNLOAD THE FIRST 151 POKEMON FROM THE POKEAPI
 import axios from "axios";
-import { writeFileSync, existsSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 import { join } from "path";
 
-// const NUMBER_OF_POKEMON = 151;
-const NUMBER_OF_POKEMON = 1025;
+const NUMBER_OF_POKEMON = 151;
+// const NUMBER_OF_POKEMON = 1025;
 
 const scraper = async () => {
   //    save each pokemon also as a separate file
