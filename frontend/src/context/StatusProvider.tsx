@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { PokemonValidationGuess } from "../../../types/pokemon.model";
+import { updatePokemonToGuess } from "../services/dailyGuess";
 
 interface StatusContext {
   gameStatus?: "PLAYING" | "WON";
@@ -59,8 +60,12 @@ export function StatusProvider({
   const reset = useCallback(() => {
     localStorage.removeItem("guessFeedbackHistory");
     localStorage.removeItem("generation");
+    updatePokemonToGuess();
     setGuessFeedbackHistory([]);
     setGameStatus("PLAYING");
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
   }, []);
 
   // *** update variable to local storage

@@ -1,6 +1,6 @@
 import confetti from "canvas-confetti";
 
-import { CircularProgress, ScrollShadow } from "@nextui-org/react";
+import { Button, CircularProgress, ScrollShadow } from "@nextui-org/react";
 import { lazy, Suspense, useEffect, useMemo } from "react";
 import { PokemonSummary } from "../../../types/pokemon.model";
 import { GuessFeedback } from "../components/Guess/GuessFeedback";
@@ -15,7 +15,7 @@ const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 export default function Player() {
   const { isMobile } = useLayout();
 
-  const { guessFeedbackHistory, gameStatus, setGuessFeedbackHistory } =
+  const { guessFeedbackHistory, gameStatus, setGuessFeedbackHistory, reset } =
     useStatus();
 
   useEffect(() => {
@@ -66,11 +66,14 @@ export default function Player() {
 
   return (
     <>
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center gap-4">
         <div className="pt-8 md:pt-20 flex flex-row items-center">
           <img src="./logo.png" alt="logo" height={45} width={45} />
           <h1 className="text-2xl">Pokedle</h1>
         </div>
+        <Button variant="ghost" color="danger" onClick={reset}>
+          Reset
+        </Button>
       </div>
 
       <p className="text-xs text-white/50 flex justify-end mr-2">

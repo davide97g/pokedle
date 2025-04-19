@@ -6,7 +6,7 @@ export const getDatabase = async () => {
   const currentOriginal = window.location.origin;
   const response = await fetch(`${currentOriginal}/data.json`);
   const data = await response.json();
-  console.log("data", data);
+
   database = data as PokemonModel[];
   return database;
 };
