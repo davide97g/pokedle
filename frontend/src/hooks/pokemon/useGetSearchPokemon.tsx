@@ -1,17 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { API } from "../../services/api";
-import { GENERATION } from "../../../../types/user.types";
+import { getDatabase } from "../../config/database";
 
-export const useGetSearchPokemon = ({
-  name,
-  gen,
-}: {
-  name: string;
-  gen: GENERATION;
-}) => {
+export const useGetSearchPokemon = ({ name }: { name: string }) => {
   return useQuery({
-    queryKey: ["pokemon", gen, name],
-    queryFn: () => API.getPokemons({ gen, name }),
+    queryKey: ["pokemon", name],
+    queryFn: () =>
+      getDatabase().then((db) =>
+        db.filter((p) => p.name.toLowerCase().includes(name.toLowerCase()))
+      ),
     enabled: false,
   });
 };

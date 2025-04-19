@@ -1,5 +1,3 @@
-import { GENERATION } from "./user.types";
-
 export interface PokemonModel {
   id: number;
   name: string;
@@ -106,7 +104,6 @@ export interface PokemonFeaturesNegative {
 }
 
 export type PokemonGuessList = {
-  gen: GENERATION;
   pokemon: PokemonModel;
   sid: string;
 }[];
@@ -118,5 +115,5 @@ export interface PokedleDayStats {
 }
 
 export interface PokedleCustomGuess {
-  pokemonList: { gen: GENERATION; pokemon: PokemonModel }[];
+  pokemonList: { pokemon: PokemonModel }[];
 }

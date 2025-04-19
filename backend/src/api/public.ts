@@ -1,10 +1,9 @@
 import express, { Express, Request, Response } from "express";
-import { getAuth } from "firebase-admin/auth";
 import {
   PokemonSummary,
   PokemonValidationGuess,
 } from "../../../types/pokemon.model";
-import { GENERATION } from "../../../types/user.types";
+
 import { version } from "../../package.json";
 import { getPokemonList } from "../data";
 import { testGuess } from "../features/player";

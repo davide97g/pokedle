@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {
   createContext,
   ReactNode,
@@ -6,79 +7,34 @@ import {
   useMemo,
   useState,
 } from "react";
-import { GENERATION } from "../../../types/user.types";
-import {
-  PokedleDayStats,
-  PokemonValidationGuess,
-} from "../../../types/pokemon.model";
-import { useStatusGetStatus } from "../hooks/status/useStatusGetStatus";
-import dayjs from "dayjs";
+import { PokemonValidationGuess } from "../../../types/pokemon.model";
 
 interface StatusContext {
-  offline: boolean;
-  generation: GENERATION;
   gameStatus?: "PLAYING" | "WON";
-  setGeneration: (generation: GENERATION) => void;
   guessFeedbackHistory: PokemonValidationGuess[];
   setGuessFeedbackHistory: (
     guessFeedbackHistory: PokemonValidationGuess[]
   ) => void;
-  totalPokemon: number;
-  remainingPokemon?: number;
-  setRemainingPokemon?: (remainingPokemon: number) => void;
-  dayStats?: PokedleDayStats;
-  refetch: () => void;
-  isLoading: boolean;
   reset: () => void;
-  setMode: (mode: "NORMAL" | "CUSTOM") => void;
-  isLoadingServerInfo: boolean;
-  serverVersion?: string;
 }
 
 export const StatusContext = createContext({
-  offline: false,
-  generation: "1",
   gameStatus: "PLAYING",
-  setGeneration: () => {},
   guessFeedbackHistory: [],
   setGuessFeedbackHistory: () => {},
-  sid: "",
-  refetch: () => {},
-  isLoading: false,
-  dayStats: undefined,
-  totalPokemon: 0,
-  remainingPokemon: 0,
   reset: () => {},
-  setMode: () => {},
-  isLoadingServerInfo: false,
-  serverVersion: "",
 } as StatusContext);
 
 export function StatusProvider({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  const [offline, setOffline] = useState<boolean>(Boolean);
-
-  const [generation, setGeneration] = useState<GENERATION>(
-    (localStorage.getItem("generation") as GENERATION) || "1"
-  );
-
   const [guessFeedbackHistory, setGuessFeedbackHistory] = useState<
     PokemonValidationGuess[]
   >(
     JSON.parse((localStorage.getItem("guessFeedbackHistory") as string) || "[]")
   );
 
-  const [sid, setSid] = useState<string>(
-    (localStorage.getItem("sid") as string) || ""
-  );
-
-  const [mode, setMode] = useState<"NORMAL" | "CUSTOM">(
-    (localStorage.getItem("mode") as "NORMAL" | "CUSTOM") || "NORMAL"
-  );
-
   const [gameStatus, setGameStatus] = useState<"PLAYING" | "WON">("PLAYING");
-  const [remainingPokemon, setRemainingPokemon] = useState<number>();
 
   const hasWon = (feedbackGuess: PokemonValidationGuess) => {
     return (
@@ -100,44 +56,14 @@ export function StatusProvider({
     }
   }, [guessFeedbackHistory]);
 
-  const {
-    status,
-    refetch,
-    isLoading,
-    isLoadingServerInfo,
-    serverVersion,
-    dayStats,
-  } = useStatusGetStatus({
-    generation,
-    pokemonValidationGuess: guessFeedbackHistory,
-  });
-
   const reset = useCallback(() => {
     localStorage.removeItem("guessFeedbackHistory");
     localStorage.removeItem("generation");
-    setGeneration("1");
     setGuessFeedbackHistory([]);
     setGameStatus("PLAYING");
   }, []);
 
   // *** update variable to local storage
-
-  useEffect(() => {
-    if (status?.sid && sid !== status?.sid) {
-      setSid(status?.sid);
-      localStorage.setItem("sid", status?.sid);
-      reset();
-    }
-  }, [reset, sid, status?.sid]);
-
-  useEffect(() => {
-    localStorage.setItem("mode", mode);
-    reset();
-  }, [mode, reset]);
-
-  useEffect(() => {
-    localStorage.setItem("generation", generation);
-  }, [generation]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -146,26 +72,7 @@ export function StatusProvider({
     );
   }, [guessFeedbackHistory]);
 
-  useEffect(() => {
-    if (status?.remainingPokemon) setRemainingPokemon(status?.remainingPokemon);
-  }, [status?.remainingPokemon]);
-
   // ****
-
-  // ? handle offline
-  const handleOfflineChange = useCallback(() => {
-    setOffline(!navigator.onLine);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener("offline", handleOfflineChange);
-    window.addEventListener("online", handleOfflineChange);
-    handleOfflineChange();
-    return () => {
-      window.removeEventListener("offline", handleOfflineChange);
-      window.removeEventListener("online", handleOfflineChange);
-    };
-  }, [handleOfflineChange]);
 
   // ? reset everything when day changes
   useEffect(() => {
@@ -179,38 +86,12 @@ export function StatusProvider({
 
   const value = useMemo(
     () => ({
-      offline,
-      generation,
       gameStatus,
-      setGeneration,
       guessFeedbackHistory,
       setGuessFeedbackHistory,
-      refetch,
-      isLoading,
-      totalPokemon: status?.totalPokemon ?? 0,
-      remainingPokemon,
-      setRemainingPokemon,
-      dayStats,
       reset,
-      setMode,
-      isLoadingServerInfo,
-      serverVersion,
     }),
-    [
-      offline,
-      generation,
-      gameStatus,
-      guessFeedbackHistory,
-      refetch,
-      isLoading,
-      status?.totalPokemon,
-      remainingPokemon,
-      dayStats,
-      reset,
-      setMode,
-      isLoadingServerInfo,
-      serverVersion,
-    ]
+    [gameStatus, guessFeedbackHistory, reset]
   );
 
   return (

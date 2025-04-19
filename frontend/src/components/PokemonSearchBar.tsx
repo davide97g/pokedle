@@ -1,33 +1,16 @@
-import { StarFilled } from "@carbon/icons-react";
-import {
-  Autocomplete,
-  AutocompleteItem,
-  Avatar,
-  Button,
-  Tooltip,
-} from "@nextui-org/react";
+import { Autocomplete, AutocompleteItem, Avatar } from "@nextui-org/react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
 
 import { useGetSearchPokemon } from "../hooks/pokemon/useGetSearchPokemon";
-import { useAuth } from "../hooks/useAuth";
-import { useLayout } from "../hooks/useLayout";
-import { GENERATION } from "../../../types/user.types";
 
 export default function PokemonSearchBar({
-  generation,
   gameStatus,
   guessPokemonById,
-  applyBestGuess,
 }: Readonly<{
-  generation: GENERATION;
   gameStatus?: "PLAYING" | "WON";
   guessPokemonById: (pokemonId: number) => void;
-  applyBestGuess: () => void;
 }>) {
-  const { isLogged, user } = useAuth();
-  const { isMobile } = useLayout();
-
   const [pokemonNameFilter, setPokemonNameFilter] = useState("");
   const deferredPokemonNameFilter = useDebounce(pokemonNameFilter, 500);
 
@@ -37,12 +20,11 @@ export default function PokemonSearchBar({
     refetch: refetchPokemonList,
   } = useGetSearchPokemon({
     name: deferredPokemonNameFilter,
-    gen: generation,
   });
 
   useEffect(() => {
     refetchPokemonList();
-  }, [deferredPokemonNameFilter, generation, refetchPokemonList]);
+  }, [deferredPokemonNameFilter, refetchPokemonList]);
 
   return (
     <div className="flex justify-center items-center flex-row gap-2 sm:gap-4 w-full">
@@ -87,28 +69,6 @@ export default function PokemonSearchBar({
           </AutocompleteItem>
         )}
       </Autocomplete>
-      {isLogged && (
-        <Tooltip
-          color="secondary"
-          content="Use your best guess to score a perfect guess"
-        >
-          <Button
-            color="primary"
-            className="p-1 w-16 sm:w-36"
-            isIconOnly={isMobile}
-            isDisabled={gameStatus === "WON" || !user?.numberOfBestGuesses}
-            onClick={applyBestGuess}
-          >
-            {isMobile ? (
-              <span className="flex flex-row gap-1 align-center">
-                {user?.numberOfBestGuesses ?? 0} <StarFilled />
-              </span>
-            ) : (
-              `Best Guess (${user?.numberOfBestGuesses ?? 0})`
-            )}
-          </Button>
-        </Tooltip>
-      )}
     </div>
   );
 }

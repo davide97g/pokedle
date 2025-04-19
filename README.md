@@ -7,7 +7,6 @@ Wordle-inspired game based on pokemon to guess
 ## Tech stack
 
 - Frontend: React
-- Backend: Nodejs
 
 ## Setup
 
