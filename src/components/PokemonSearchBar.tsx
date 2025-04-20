@@ -3,6 +3,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
 
 import { useGetSearchPokemon } from "../hooks/pokemon/useGetSearchPokemon";
+import { useLayout } from "../hooks/useLayout";
 
 export default function PokemonSearchBar({
   gameStatus,
@@ -11,6 +12,7 @@ export default function PokemonSearchBar({
   gameStatus?: "PLAYING" | "WON";
   guessPokemonById: (pokemonId: number) => void;
 }>) {
+  const { isMobile } = useLayout();
   const [pokemonNameFilter, setPokemonNameFilter] = useState("");
   const deferredPokemonNameFilter = useDebounce(pokemonNameFilter, 500);
 
@@ -32,10 +34,10 @@ export default function PokemonSearchBar({
         size="sm"
         isDisabled={gameStatus === "WON"}
         defaultItems={pokemonList ?? []}
-        variant="bordered"
-        label="Choose a pokemon"
+        variant={isMobile ? "flat" : "underlined"}
+        label="Search a pokemon"
         labelPlacement="inside"
-        className="max-w-[250px] autocomplete"
+        className="md:max-w-[300px] autocomplete p-4"
         inputValue={pokemonNameFilter}
         onInputChange={(value) => setPokemonNameFilter(value)}
         onSelectionChange={(pokemonId) => {

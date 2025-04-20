@@ -1,10 +1,11 @@
 import confetti from "canvas-confetti";
 
-import { Button, CircularProgress, ScrollShadow } from "@nextui-org/react";
+import { CircularProgress, ScrollShadow } from "@nextui-org/react";
 import { lazy, Suspense, useEffect, useMemo } from "react";
 
 import { GuessFeedback } from "../components/Guess/GuessFeedback";
 
+import { Reset } from "@carbon/icons-react";
 import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
 import { useLayout } from "../hooks/useLayout";
 import { useStatus } from "../hooks/useStatus";
@@ -16,8 +17,13 @@ const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 export default function Player() {
   const { isMobile } = useLayout();
 
-  const { guessFeedbackHistory, gameStatus, setGuessFeedbackHistory, reset } =
-    useStatus();
+  const {
+    savedGuessNumber,
+    guessFeedbackHistory,
+    gameStatus,
+    setGuessFeedbackHistory,
+    reset,
+  } = useStatus();
 
   useEffect(() => {
     if (gameStatus === "WON") {
@@ -68,36 +74,56 @@ export default function Player() {
   return (
     <>
       <div className="flex flex-col justify-center items-center gap-4">
-        <div className="pt-8 md:pt-20 flex flex-row items-center">
+        <div className="pt-8 md:pt-20 flex flex-row items-center gap-2">
           <img src="./logo.png" alt="logo" height={45} width={45} />
           <h1 className="text-2xl">Pokedle</h1>
         </div>
-        <Button variant="ghost" color="danger" onClick={reset}>
-          Reset
-        </Button>
+        <Reset
+          style={{
+            position: "absolute",
+            top: "1rem",
+            right: "1rem",
+          }}
+          color="danger"
+          className="w-5 h-5"
+          onClick={reset}
+        />
       </div>
 
       <p className="text-xs text-white/50 flex justify-end mr-2">
-        First Generation
+        Guess the hidden pokemon between the "First Generation"
       </p>
 
       {/* SEARCH BAR */}
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center">
-            <CircularProgress color="default" aria-label="Loading..." />
-          </div>
-        }
+      <div
+        style={{
+          ...(isMobile && {
+            position: "fixed",
+            bottom: "0%",
+            left: "50%",
+            transform: "translate(-50%, 0%)",
+            zIndex: 10,
+            width: "100%",
+          }),
+        }}
       >
-        <PokemonSearchBar
-          gameStatus={gameStatus}
-          guessPokemonById={guessPokemonById}
-        />
-      </Suspense>
+        <Suspense
+          fallback={
+            <div className="flex justify-center items-center">
+              <CircularProgress color="default" aria-label="Loading..." />
+            </div>
+          }
+        >
+          <PokemonSearchBar
+            gameStatus={gameStatus}
+            guessPokemonById={guessPokemonById}
+          />
+        </Suspense>
+      </div>
 
       {/* VALIDATION LINES */}
       {Boolean(reversedGuessFeedbackHistory.length) && (
-        <div className="flex flex-col gap-2 max-w-full px-2">
+        <div className="flex flex-col gap-2 max-w-full px-2 mt-5">
           {gameStatus === "WON" && (
             <p className="text-xs text-white/50 flex justify-end mr-2">
               🎉 Congratulations! You found{" "}
@@ -108,7 +134,7 @@ export default function Player() {
           <div className="flex flex-row sm:flex-col gap-2">
             <GuessFeedbackHeader />
             <ScrollShadow
-              className="w-[300px] sm:w-full sm:max-h-[33rem]"
+              className=" md:w-full sm:max-h-[33rem]"
               hideScrollBar
               size={40}
               orientation={isMobile ? "horizontal" : "vertical"}
@@ -118,6 +144,7 @@ export default function Player() {
                   <GuessFeedback
                     key={`${guess.id}-${guess.order ?? 0}`}
                     guess={guess}
+                    isNew={savedGuessNumber > (guess.order ?? 0)}
                   />
                 ))}
               </div>

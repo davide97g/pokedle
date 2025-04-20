@@ -3,8 +3,16 @@ import { Card, CardBody, Image, Tooltip } from "@nextui-org/react";
 import { PokemonValidationGuess } from "../../types/pokemon.model";
 import { GuessFeatureCard } from "./GuessFeatureCard";
 
-const TIMEOUTS = [0, 1, 2, 3, 4, 5, 6, 7];
-export const GuessFeedback = ({ guess }: { guess: PokemonValidationGuess }) => {
+export function GuessFeedback({
+  guess,
+  isNew = false,
+}: {
+  guess: PokemonValidationGuess;
+  isNew?: boolean;
+}) {
+  const TIMEOUTS = [0, 1, 2, 3, 4, 5, 6, 7].map((i) =>
+    isNew ? -0.5 : i * 0.75
+  );
   if (!guess?.id) return null;
   return (
     <div className="flex flex-col sm:flex-row gap-2">
@@ -81,4 +89,4 @@ export const GuessFeedback = ({ guess }: { guess: PokemonValidationGuess }) => {
       />
     </div>
   );
-};
+}

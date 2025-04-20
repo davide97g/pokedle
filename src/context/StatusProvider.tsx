@@ -17,6 +17,7 @@ interface StatusContext {
   setGuessFeedbackHistory: (
     guessFeedbackHistory: PokemonValidationGuess[]
   ) => void;
+  savedGuessNumber: number;
   reset: () => void;
 }
 
@@ -25,6 +26,7 @@ export const StatusContext = createContext({
   guessFeedbackHistory: [],
   setGuessFeedbackHistory: () => {},
   reset: () => {},
+  savedGuessNumber: 0,
 } as StatusContext);
 
 export function StatusProvider({
@@ -34,6 +36,14 @@ export function StatusProvider({
     PokemonValidationGuess[]
   >(
     JSON.parse((localStorage.getItem("guessFeedbackHistory") as string) || "[]")
+  );
+
+  const savedGuessNumber = useMemo<number>(
+    () =>
+      JSON.parse(
+        (localStorage.getItem("guessFeedbackHistory") as string) || "[]"
+      ).length,
+    []
   );
 
   const [gameStatus, setGameStatus] = useState<"PLAYING" | "WON">("PLAYING");
@@ -96,8 +106,9 @@ export function StatusProvider({
       guessFeedbackHistory,
       setGuessFeedbackHistory,
       reset,
+      savedGuessNumber,
     }),
-    [gameStatus, guessFeedbackHistory, reset]
+    [gameStatus, guessFeedbackHistory, reset, savedGuessNumber]
   );
 
   return (

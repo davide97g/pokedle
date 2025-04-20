@@ -6,7 +6,9 @@ export const useGetSearchPokemon = ({ name }: { name: string }) => {
     queryKey: ["pokemon", name],
     queryFn: () =>
       getDatabase().then((db) =>
-        db.filter((p) => p.name.toLowerCase().includes(name.toLowerCase()))
+        db
+          .filter((p) => p.name.toLowerCase().includes(name.toLowerCase()))
+          .slice(0, 10)
       ),
     enabled: false,
   });
