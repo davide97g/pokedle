@@ -16,6 +16,7 @@ export interface PokemonSummary {
   id: number;
   name: string;
   image: string;
+  color?: string;
 }
 
 export type FEATURE =

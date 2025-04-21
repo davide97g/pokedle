@@ -1,12 +1,11 @@
-import confetti from "canvas-confetti";
-
-import { CircularProgress, ScrollShadow } from "@nextui-org/react";
-import { lazy, Suspense, useEffect, useMemo } from "react";
+import { Button, CircularProgress, ScrollShadow } from "@nextui-org/react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
 import { GuessFeedback } from "../components/Guess/GuessFeedback";
 
 import { Reset } from "@carbon/icons-react";
 import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
+import { WinningModal } from "../components/WinningModal";
 import { useLayout } from "../hooks/useLayout";
 import { useStatus } from "../hooks/useStatus";
 import { sendGuessPokemonId } from "../services/guess";
@@ -17,6 +16,8 @@ const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 export default function Player() {
   const { isMobile } = useLayout();
 
+  const [winningModalOpen, setWinningModalOpen] = useState(false);
+
   const {
     savedGuessNumber,
     guessFeedbackHistory,
@@ -26,19 +27,8 @@ export default function Player() {
   } = useStatus();
 
   useEffect(() => {
-    if (gameStatus === "WON") {
-      setTimeout(() => {
-        const particleCount = Math.max(
-          Math.floor(1000 - guessFeedbackHistory.length * 100),
-          100
-        );
-        confetti({
-          particleCount,
-          spread: 100000,
-        });
-      }, 7500);
-    }
-  }, [gameStatus, guessFeedbackHistory.length]);
+    if (gameStatus === "WON") setWinningModalOpen(true);
+  }, [gameStatus]);
 
   const reversedGuessFeedbackHistory = useMemo(() => {
     return structuredClone(
@@ -54,6 +44,7 @@ export default function Player() {
           id: lastGuess.id,
           name: lastGuess.name,
           image: lastGuess.image,
+          color: lastGuess.color.value,
         } as PokemonSummary;
     }
     return undefined;
@@ -69,6 +60,12 @@ export default function Player() {
         setGuessFeedbackHistory(updatedHistory);
       });
     }
+  };
+
+  const startNewGame = () => {
+    reset();
+    setGuessFeedbackHistory([]);
+    setWinningModalOpen(false);
   };
 
   return (
@@ -93,6 +90,16 @@ export default function Player() {
       <p className="text-xs text-white/50 flex justify-end mr-2">
         Guess the hidden pokemon between the "First Generation"
       </p>
+
+      {gameStatus === "WON" && (
+        <Button
+          className="flex-shrink-0"
+          color="primary"
+          onPress={startNewGame}
+        >
+          Start New Game
+        </Button>
+      )}
 
       {/* SEARCH BAR */}
       <div
@@ -151,6 +158,18 @@ export default function Player() {
             </ScrollShadow>
           </div>
         </div>
+      )}
+
+      {/* GAME OVER */}
+      {winningModalOpen && (
+        <WinningModal
+          pokemon={guessedPokemon as PokemonSummary}
+          numberOfGuesses={guessFeedbackHistory.length}
+          onRestart={startNewGame}
+          onClose={() => {
+            setWinningModalOpen(false);
+          }}
+        />
       )}
     </>
   );

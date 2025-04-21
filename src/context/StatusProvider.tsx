@@ -63,10 +63,12 @@ export function StatusProvider({
   useEffect(() => {
     if (guessFeedbackHistory.length > 0) {
       if (guessFeedbackHistory.some((feedback) => hasWon(feedback))) {
-        setTimeout(() => setGameStatus("WON"), 250);
+        if (savedGuessNumber === guessFeedbackHistory.length) {
+          setGameStatus("WON");
+        } else setTimeout(() => setGameStatus("WON"), 7000);
       }
     }
-  }, [guessFeedbackHistory]);
+  }, [guessFeedbackHistory, savedGuessNumber]);
 
   const reset = useCallback(() => {
     localStorage.removeItem("guessFeedbackHistory");
