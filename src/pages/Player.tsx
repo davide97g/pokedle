@@ -85,12 +85,12 @@ export default function Player() {
           className="w-5 h-5"
           onClick={reset}
         />
+        <p className="md:text-md text-xs text-white/50 flex justify-end mr-2 mt-2">
+          Guess the hidden pokemon between the "First Generation"
+        </p>
       </div>
 
-      <p className="text-xs text-white/50 flex justify-end mr-2">
-        Guess the hidden pokemon between the "First Generation"
-      </p>
-
+      {/* START NEW GAME */}
       {gameStatus === "WON" && (
         <Button
           className="flex-shrink-0"
@@ -102,31 +102,18 @@ export default function Player() {
       )}
 
       {/* SEARCH BAR */}
-      <div
-        style={{
-          ...(isMobile && {
-            position: "fixed",
-            bottom: "0%",
-            left: "50%",
-            transform: "translate(-50%, 0%)",
-            zIndex: 10,
-            width: "100%",
-          }),
-        }}
+      <Suspense
+        fallback={
+          <div className="flex justify-center items-center">
+            <CircularProgress color="default" aria-label="Loading..." />
+          </div>
+        }
       >
-        <Suspense
-          fallback={
-            <div className="flex justify-center items-center">
-              <CircularProgress color="default" aria-label="Loading..." />
-            </div>
-          }
-        >
-          <PokemonSearchBar
-            gameStatus={gameStatus}
-            guessPokemonById={guessPokemonById}
-          />
-        </Suspense>
-      </div>
+        <PokemonSearchBar
+          gameStatus={gameStatus}
+          guessPokemonById={guessPokemonById}
+        />
+      </Suspense>
 
       {/* VALIDATION LINES */}
       {Boolean(reversedGuessFeedbackHistory.length) && (
