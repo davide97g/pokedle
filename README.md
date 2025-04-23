@@ -6,29 +6,20 @@ Wordle-inspired game based on pokemon to guess
 
 ## Tech stack
 
-- Frontend: React
+- React 18.2
+- Typescript
+- [Tailwind](https://tailwindcss.com/)
+- [Vite](https://vite.dev/)
+- NextUI (now [HeroUI](https://www.heroui.com/))
 
 ## Setup
-
-### Project structure
-
-- `types`: all the models and interfaces for typescript
-- `backend`
-- `frontend`
-- `database`: the source of the pokemon data model
 
 ### Requirements
 
 - Node.js (>=20 recommended)
 
-### Environment variables
+### Running
 
-You will need an env locally to link to firebase test project.
-
-> Still in progress how to open this up
-
-### Install
-
-Run `cd frontend && yarn`.
-
-Run `cd backend && yarn`
+- `yarn` to install dependecies
+- `yarn build` to build the project for production
+- `yarn dev` to test it locally at [http://localhost:8080](http://localhost:8080)
