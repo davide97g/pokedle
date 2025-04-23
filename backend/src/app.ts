@@ -1,0 +1,28 @@
+import cors from "cors";
+import express from "express";
+import { initializeFirebaseApp } from "./config/firebase";
+import { createPokemonController } from "./controller/pokemon.controller";
+
+initializeFirebaseApp();
+
+const app = express();
+
+app.use(express.json());
+
+const allowedOrigins = ["http://localhost:8080", "https://pokedle.online"];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+  })
+);
+
+app.get("/", (req, res) => {
+  res.send("Hello World from Pokedle Server!");
+});
+
+createPokemonController(app);
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
