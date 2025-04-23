@@ -1,0 +1,11 @@
+{
+  "name": "pokedle-server",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "description": "Backend service for Pokedle"
+}

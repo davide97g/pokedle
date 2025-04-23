@@ -1,4 +1,4 @@
-# pokèdle
+# pokèdle-frontend
 
 Wordle-inspired game based on pokemon to guess
 
@@ -6,12 +6,11 @@ Wordle-inspired game based on pokemon to guess
 
 ## Tech stack
 
-- Frontend:
-  - React 18.2
-  - Typescript
-  - [Tailwind](https://tailwindcss.com/)
-  - [Vite](https://vite.dev/)
-  - NextUI (now [HeroUI](https://www.heroui.com/))
+- React 18.2
+- Typescript
+- [Tailwind](https://tailwindcss.com/)
+- [Vite](https://vite.dev/)
+- NextUI (now [HeroUI](https://www.heroui.com/))
 
 ## Setup
 
@@ -19,9 +18,7 @@ Wordle-inspired game based on pokemon to guess
 
 - Node.js (>=20 recommended)
 
-### Local development
-
-For the **frontend**:
+### Running
 
 - `yarn` to install dependecies
 - `yarn build` to build the project for production
