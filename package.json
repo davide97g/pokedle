@@ -1,0 +1,22 @@
+{
+  "name": "pokedle",
+  "version": "1.0.0",
+  "description": "Wordle-inspired game based on pokemon to guess",
+  "main": "index.js",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build"
+  },
+  "keywords": [],
+  "author": "Davide Ghiotto",
+  "license": "MIT",
+  "devDependencies": {
+    "turbo": "^2.5.1"
+  },
+  "packageManager": "yarn@1.22.22",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
