@@ -19,7 +19,7 @@ export const createPokemonController = (app: Express) => {
   });
 
   // get guess feedback results
-  app.post("/pokemon/guess/:pokemonId", (req, res) => {
+  app.post("/pokemon/guess/:pokemonId", async (req, res) => {
     try {
       const { pokemonId } = req.params;
       if (!pokemonId) {
@@ -30,7 +30,7 @@ export const createPokemonController = (app: Express) => {
         return res.status(400).send("Invalid Pokemon Id");
       }
 
-      const validationGuess = computeValidationGuess(pokemonIdNumber);
+      const validationGuess = await computeValidationGuess(pokemonIdNumber);
 
       if (!validationGuess) {
         return res.status(400).send("Pokemon not found");

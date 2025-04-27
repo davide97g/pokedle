@@ -20,9 +20,9 @@ const computeComparison = (
   }
 };
 
-export function computeValidationGuess(
+export async function computeValidationGuess(
   pokemonGuessId: number
-): PokemonValidationGuess {
+): Promise<PokemonValidationGuess> {
   const database = getDatabase();
   // Find the pokemon guess in the database
   const pokemonGuess = database.find((p) => p.id === pokemonGuessId);
@@ -30,7 +30,9 @@ export function computeValidationGuess(
     throw new Error("Pokemon not found");
   }
 
-  const POKEMON_TO_GUESS = database.find((p) => p.id === getPokemonIdToGuess());
+  const HIDDEN_POKEMON_ID = await getPokemonIdToGuess();
+
+  const POKEMON_TO_GUESS = database.find((p) => p.id === HIDDEN_POKEMON_ID);
 
   if (!POKEMON_TO_GUESS) {
     throw new Error("Pokemon to guess not found");

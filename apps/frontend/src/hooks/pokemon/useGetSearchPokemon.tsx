@@ -5,7 +5,7 @@ export const useGetSearchPokemon = ({ name }: { name: string }) => {
   return useQuery({
     queryKey: ["pokemon", name],
     queryFn: () =>
-      fetch(`${import.meta.env.VITE_API_URL}/pokemon/search/${name}`, {
+      fetch(`${import.meta.env.VITE_BACKEND_URL}/pokemon/search/${name}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
