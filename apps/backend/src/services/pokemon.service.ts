@@ -1,7 +1,10 @@
 import { getDatabase } from "../config/database";
 
-export function searchPokemon(query: string) {
+export function searchPokemon(query?: string) {
   const database = getDatabase();
+  if (!query) {
+    return database.slice(0, 10);
+  }
   return (
     database
       .filter((pokemon) =>

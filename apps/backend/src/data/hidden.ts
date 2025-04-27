@@ -1,19 +1,19 @@
 import dayjs from "dayjs";
 import { getFirestoreDatabase } from "../config/firebase";
 
+let hiddenPokemonId = 0;
+const day = dayjs().format("YYYY-MM-DD");
+
 async function retrieveRemoteHiddenPokemonForDay(day: string) {
   const db = getFirestoreDatabase();
   const docRef = db.collection("guesses").doc(day);
-  if (!docRef) {
-    throw new Error("Document not found");
-  }
-  const doc = docRef.get();
-  if (!doc) {
-    throw new Error("Document not found");
-  }
-  const data = (await doc).data();
+  const data = (await docRef.get()).data();
   if (!data) {
-    throw new Error("Data not found");
+    const randomId = Math.floor(Math.random() * 151) + 1;
+    await db.collection("guesses").doc(day).set({
+      hiddenPokemonId: randomId,
+    });
+    return randomId;
   }
   const dailyHiddenPokemonId = data.hiddenPokemonId;
   if (!dailyHiddenPokemonId) {
@@ -36,9 +36,6 @@ async function retrieveRemoteHiddenPokemonForDay(day: string) {
   }
   return dailyHiddenPokemonId;
 }
-
-let hiddenPokemonId = 0;
-const day = dayjs().format("YYYY-MM-DD");
 
 export async function getPokemonIdToGuess() {
   if (!hiddenPokemonId) {
