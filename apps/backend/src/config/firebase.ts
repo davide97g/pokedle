@@ -11,3 +11,11 @@ export const initializeFirebaseApp = () =>
     databaseURL:
       "https://pokedle-online-default-rtdb.europe-west1.firebasedatabase.app",
   });
+
+export const getFirestoreDatabase = () => {
+  const app = admin.apps[0];
+  if (!app) {
+    throw new Error("Firebase app not initialized");
+  }
+  return app.firestore();
+};

@@ -1,15 +1,23 @@
+import { PokemonModel } from "@pokedle/types";
 import { useQuery } from "@tanstack/react-query";
-import { getDatabase } from "../../config/database";
 
 export const useGetSearchPokemon = ({ name }: { name: string }) => {
   return useQuery({
     queryKey: ["pokemon", name],
     queryFn: () =>
-      getDatabase().then((db) =>
-        db
-          .filter((p) => p.name.toLowerCase().includes(name.toLowerCase()))
-          .slice(0, 10)
-      ),
+      fetch(`${import.meta.env.VITE_API_URL}/pokemon/search/${name}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return res.json();
+        })
+        .then((res) => res as PokemonModel[]),
     enabled: false,
   });
 };

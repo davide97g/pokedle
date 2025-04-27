@@ -7,15 +7,16 @@ import { Reset } from "@carbon/icons-react";
 import { PokemonSummary } from "@pokedle/types";
 import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
 import { WinningModal } from "../components/WinningModal";
+import { useSendGuessPokemon } from "../hooks/pokemon/useSendGuessPokemon";
 import { useLayout } from "../hooks/useLayout";
 import { useStatus } from "../hooks/useStatus";
-import { sendGuessPokemonId } from "../services/guess";
 
 const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 
 export default function Player() {
   const { isMobile } = useLayout();
 
+  const sendGuessPokemon = useSendGuessPokemon();
   const [winningModalOpen, setWinningModalOpen] = useState(false);
 
   const {
@@ -52,10 +53,10 @@ export default function Player() {
 
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
-      sendGuessPokemonId(pokemonId, guessFeedbackHistory).then((response) => {
+      sendGuessPokemon.mutateAsync({ pokemonId }).then(({ validation }) => {
         const updatedHistory = [
           ...guessFeedbackHistory,
-          { ...response.validation, order: guessFeedbackHistory.length },
+          { ...validation, order: guessFeedbackHistory.length },
         ];
         setGuessFeedbackHistory(updatedHistory);
       });

@@ -1,7 +1,7 @@
 import { PokemonValidationGuess } from "@pokedle/types";
 import dayjs from "dayjs";
 import { getDatabase } from "../config/database";
-import { POKEMON_TO_GUESS_ID } from "./dailyGuess";
+import { getPokemonIdToGuess } from "../data/hidden";
 
 const computeComparison = (
   value?: number,
@@ -20,20 +20,17 @@ const computeComparison = (
   }
 };
 
-export const testGuess = async ({
-  pokemonGuessId,
-}: {
-  pokemonGuessId: number;
-}): Promise<{
-  validationGuess: PokemonValidationGuess;
-}> => {
-  const database = await getDatabase();
+export function computeValidationGuess(
+  pokemonGuessId: number
+): PokemonValidationGuess {
+  const database = getDatabase();
+  // Find the pokemon guess in the database
   const pokemonGuess = database.find((p) => p.id === pokemonGuessId);
   if (!pokemonGuess) {
     throw new Error("Pokemon not found");
   }
 
-  const POKEMON_TO_GUESS = database.find((p) => p.id === POKEMON_TO_GUESS_ID);
+  const POKEMON_TO_GUESS = database.find((p) => p.id === getPokemonIdToGuess());
 
   if (!POKEMON_TO_GUESS) {
     throw new Error("Pokemon to guess not found");
@@ -90,5 +87,5 @@ export const testGuess = async ({
     },
   };
 
-  return { validationGuess };
-};
+  return validationGuess;
+}

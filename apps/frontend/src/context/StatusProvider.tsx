@@ -9,7 +9,6 @@ import {
 } from "react";
 
 import { PokemonValidationGuess } from "@pokedle/types";
-import { updatePokemonToGuess } from "../services/dailyGuess";
 
 interface StatusContext {
   gameStatus?: "PLAYING" | "WON";
@@ -73,7 +72,6 @@ export function StatusProvider({
   const reset = useCallback(() => {
     localStorage.removeItem("guessFeedbackHistory");
     localStorage.removeItem("generation");
-    updatePokemonToGuess();
     setGuessFeedbackHistory([]);
     setGameStatus("PLAYING");
     setTimeout(() => {
