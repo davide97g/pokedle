@@ -1,0 +1,9 @@
+{
+  "name": "@pokedle/types",
+  "version": "0.1.0",
+  "main": "index.ts",
+  "author": "Davide Ghiotto",
+  "license": "MIT",
+  "private": true,
+  "description": "Type definitions for the Pokedle game."
+}
