@@ -30,11 +30,12 @@ Wordle-inspired game based on pokemon to guess
 ### Requirements
 
 - Node.js (>=20 recommended)
+- [PNPM](https://pnpm.io/)
 
 ### Local development
 
 In the root:
 
-- `yarn` to install dependecies
-- `yarn build` to build the projects (backend & frontend)
-- `yarn dev` to test it locally: will run both frontend and backend, relatively at [http://localhost:8080](http://localhost:8080) and [http://localhost:3000](http://localhost:3000)
+- `pnpm i` to install dependecies
+- `pnpm build` to build the projects (backend & frontend)
+- `pnpm dev` to test it locally: will run both frontend and backend, relatively at [http://localhost:8080](http://localhost:8080) and [http://localhost:3000](http://localhost:3000)
