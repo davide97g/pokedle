@@ -1,6 +1,5 @@
 import cors from "cors";
 import express from "express";
-import { version } from "../package.json";
 import { initializeFirebaseApp } from "./config/firebase";
 import { createPokemonController } from "./controller/pokemon.controller";
 
@@ -23,6 +22,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
+  const version = process.env.npm_package_version;
   res.send("Hello World from Pokedle Server! Version: " + version);
 });
 
