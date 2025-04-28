@@ -49,7 +49,9 @@ export function WinningModal({
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              <span className="text-lg">🎉 Congratulations!</span>
+              <span className="text-lg text-foreground-50">
+                🎉 Congratulations!
+              </span>
             </ModalHeader>
             <ModalBody>
               <div className="flex flex-row gap-2 items-center">
