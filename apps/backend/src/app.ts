@@ -13,6 +13,7 @@ const allowedOrigins = [
   "http://localhost:8080",
   "https://test.pokedle.online",
   "https://pokedle.online",
+  "https://www.pokedle.online",
 ];
 
 app.use(
