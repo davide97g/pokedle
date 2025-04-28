@@ -9,7 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
   Tooltip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { PokemonSummary } from "@pokedle/types";
 import confetti from "canvas-confetti";
 import { useEffect } from "react";

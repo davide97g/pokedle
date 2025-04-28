@@ -1,4 +1,4 @@
-import { Card, CardBody, Image, Tooltip } from "@nextui-org/react";
+import { Card, CardBody, Image, Tooltip } from "@heroui/react";
 
 import { PokemonValidationGuess } from "@pokedle/types";
 import { GuessFeatureCard } from "./GuessFeatureCard";

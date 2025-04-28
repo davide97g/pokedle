@@ -1,4 +1,4 @@
-import { Button, CircularProgress, ScrollShadow } from "@nextui-org/react";
+import { Button, CircularProgress, ScrollShadow } from "@heroui/react";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
 import { GuessFeedback } from "../components/Guess/GuessFeedback";
