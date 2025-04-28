@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import { version } from "../package.json";
 import { initializeFirebaseApp } from "./config/firebase";
 import { createPokemonController } from "./controller/pokemon.controller";
 
@@ -9,7 +10,11 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = ["http://localhost:8080", "https://pokedle.online"];
+const allowedOrigins = [
+  "http://localhost:8080",
+  "https://test.pokedle.online",
+  "https://pokedle.online",
+];
 
 app.use(
   cors({
@@ -18,7 +23,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.send("Hello World from Pokedle Server!");
+  res.send("Hello World from Pokedle Server! Version: " + version);
 });
 
 createPokemonController(app);
