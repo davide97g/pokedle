@@ -12,7 +12,7 @@ Wordle-inspired game based on pokemon to guess
   - Typescript
   - [Tailwind](https://tailwindcss.com/)
   - [Vite](https://vite.dev/)
-  - NextUI (now [HeroUI](https://www.heroui.com/))
+  - [HeroUI](https://www.heroui.com/)
 
 - Backend:
 
