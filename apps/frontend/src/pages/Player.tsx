@@ -1,4 +1,6 @@
-import { Button, CircularProgress, ScrollShadow } from "@heroui/react";
+import { Button } from "@heroui/button";
+import { CircularProgress } from "@heroui/progress";
+import { ScrollShadow } from "@heroui/scroll-shadow";
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
 import { GuessFeedback } from "../components/Guess/GuessFeedback";

@@ -1,5 +1,6 @@
-import { Card, CardBody, Image, Tooltip } from "@heroui/react";
-
+import { Card, CardBody } from "@heroui/card";
+import { Image } from "@heroui/image";
+import { Tooltip } from "@heroui/tooltip";
 import { PokemonValidationGuess } from "@pokedle/types";
 import { GuessFeatureCard } from "./GuessFeatureCard";
 

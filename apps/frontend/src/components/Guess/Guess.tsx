@@ -1,10 +1,6 @@
-import {
-  Button,
-  Image,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@heroui/react";
+import { Button } from "@heroui/button";
+import { Image } from "@heroui/image";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import { PokemonSummary } from "@pokedle/types";
 
 export default function Guess({

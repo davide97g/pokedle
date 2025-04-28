@@ -1,4 +1,5 @@
-import { Autocomplete, AutocompleteItem, Avatar } from "@heroui/react";
+import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
+import { Avatar } from "@heroui/avatar";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
 

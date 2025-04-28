@@ -1,5 +1,4 @@
-import { Card, CardBody } from "@heroui/react";
-
+import { Card, CardBody } from "@heroui/card";
 import { ValidationComparison } from "@pokedle/types";
 import { ComparisonIcon } from "../ComparisonIcon";
 import "./animate.css";

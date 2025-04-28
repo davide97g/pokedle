@@ -1,15 +1,14 @@
+import { Button } from "@heroui/button";
+import { Card, CardBody } from "@heroui/card";
+import { Image } from "@heroui/image";
 import {
-  Button,
-  Card,
-  CardBody,
-  Image,
   Modal,
   ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Tooltip,
-} from "@heroui/react";
+} from "@heroui/modal";
+import { Tooltip } from "@heroui/tooltip";
 import { PokemonSummary } from "@pokedle/types";
 import confetti from "canvas-confetti";
 import { useEffect } from "react";

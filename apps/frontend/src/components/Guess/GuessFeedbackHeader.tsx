@@ -1,4 +1,4 @@
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardBody } from "@heroui/card";
 import { useLayout } from "../../hooks/useLayout";
 
 export const GuessFeedbackHeader = () => {
