@@ -11,6 +11,5 @@ export const useSystemGetInfo = () => {
       }
       return response.ok;
     },
-    refetchInterval: 5000,
   });
 };
