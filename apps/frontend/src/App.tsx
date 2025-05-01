@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import AuthenticatedPage from "./components/AuthenticatedPage";
+import TopNavbar from "./components/Navbar";
 import ServerReady from "./components/ServerReady";
 import { AuthProvider } from "./context/AuthProvider";
 import { LayoutProvider } from "./context/LayoutProvider";
@@ -19,6 +20,7 @@ export default function App() {
         <AuthProvider>
           <LayoutProvider>
             <StatusProvider>
+              <TopNavbar />
               <Routes>
                 <Route element={<Player />} path="/" />
                 <Route element={<About />} path="/about" />

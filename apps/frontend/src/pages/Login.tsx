@@ -1,4 +1,5 @@
 import { Button } from "@heroui/button";
+import { Divider } from "@heroui/divider";
 import { Input } from "@heroui/input";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,8 +24,10 @@ export default function Login() {
         >
           Login with Google
         </Button>
-        <br />
-        <p>Or login with email and password</p>
+        <Divider className="my-4" />
+        <p className="text-sm text-slate-400">
+          Or login with email and password
+        </p>
         <div className="mt-4 flex flex-col gap-4">
           <Input
             type="email"
@@ -51,7 +54,8 @@ export default function Login() {
             Login
           </Button>
         </div>
-        <p className="mt-4 text-center text-sm text-slate-400">
+        <Divider className="my-4" />
+        <p className="text-center text-sm text-slate-400">
           Don't have an account?{" "}
           <a href="/register" className="text-blue-500 hover:underline">
             Register here
