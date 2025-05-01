@@ -8,9 +8,6 @@ export const createPokemonController = (app: Express) => {
   app.get("/pokemon/search", (req, res) => {
     try {
       const query = req.query.query as string | undefined;
-
-      console.info("Searching for pokemon with query", query);
-
       const searchResult = searchPokemon(query);
       res.send(searchResult);
     } catch (error) {
