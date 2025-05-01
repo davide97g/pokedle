@@ -38,4 +38,7 @@ In the root:
 
 - `pnpm i` to install dependecies
 - `pnpm build` to build the projects (backend & frontend)
+
+Before running locally, please follow the README of the `backend` project to setup Firebase config files and then:
+
 - `pnpm dev` to test it locally: will run both frontend and backend, relatively at [http://localhost:8080](http://localhost:8080) and [http://localhost:3000](http://localhost:3000)

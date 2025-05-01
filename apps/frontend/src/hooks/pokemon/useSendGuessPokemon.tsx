@@ -5,7 +5,7 @@ export const useSendGuessPokemon = () => {
   return useMutation({
     mutationFn: async ({ pokemonId }: { pokemonId: number }) => {
       const { validationGuess } = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/pokemon/guess/${pokemonId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/guess/${pokemonId}`,
         {
           method: "POST",
           headers: {
