@@ -18,6 +18,7 @@ export default function TopNavbar() {
   const links: NavbarItem[] = [
     { link: "/", label: "Guess" },
     { link: "/about", label: "About" },
+    { link: "/leaderboard", label: "Leaderboard" },
   ];
   return (
     <Navbar>

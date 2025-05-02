@@ -6,7 +6,7 @@ export const getUserInfoFromToken = async (
 ): Promise<{
   uid: string;
   displayName: string;
-  photoURL: string;
+  photoURL?: string;
 } | null> => {
   const bearerToken = req.header("Authorization");
   if (!bearerToken) return null;
@@ -16,8 +16,8 @@ export const getUserInfoFromToken = async (
     );
     return {
       uid: tokenInfo.uid,
-      displayName: tokenInfo.name,
-      photoURL: tokenInfo.picture!,
+      displayName: tokenInfo.name || tokenInfo.email || "",
+      photoURL: tokenInfo.picture,
     };
   } catch (err) {
     return null;

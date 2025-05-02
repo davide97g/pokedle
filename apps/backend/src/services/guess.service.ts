@@ -23,7 +23,14 @@ const computeComparison = (
 
 export async function computeValidationGuess(
   pokemonGuessId: number,
-  userId?: string
+  user:
+    | {
+        id: string;
+        name: string;
+        image?: string;
+      }
+    | undefined,
+  guessNumber: number
 ): Promise<PokemonValidationGuess> {
   const database = getDatabase();
   // Find the pokemon guess in the database
@@ -93,13 +100,16 @@ export async function computeValidationGuess(
   };
 
   // Check if the guess is correct
-  if (userId && pokemonGuessId === HIDDEN_POKEMON_ID)
-    await addWinningForUser({
-      userId,
-      date,
-      guesses: 1,
-      pokemonId: HIDDEN_POKEMON_ID,
-    });
+  if (user?.id && pokemonGuessId === HIDDEN_POKEMON_ID)
+    await addWinningForUser(
+      {
+        userId: user.id,
+        date,
+        guesses: guessNumber,
+        pokemonId: HIDDEN_POKEMON_ID,
+      },
+      user
+    );
 
   return validationGuess;
 }

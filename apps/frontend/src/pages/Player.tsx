@@ -55,13 +55,18 @@ export default function Player() {
 
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
-      sendGuessPokemon.mutateAsync({ pokemonId }).then(({ validation }) => {
-        const updatedHistory = [
-          ...guessFeedbackHistory,
-          { ...validation, order: guessFeedbackHistory.length },
-        ];
-        setGuessFeedbackHistory(updatedHistory);
-      });
+      sendGuessPokemon
+        .mutateAsync({
+          pokemonId,
+          guessNumber: guessFeedbackHistory.length + 1,
+        })
+        .then(({ validation }) => {
+          const updatedHistory = [
+            ...guessFeedbackHistory,
+            { ...validation, order: guessFeedbackHistory.length },
+          ];
+          setGuessFeedbackHistory(updatedHistory);
+        });
     }
   };
 

@@ -13,6 +13,7 @@ const About = lazy(() => import("./pages/About"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const PersonalArea = lazy(() => import("./pages/PersonalArea"));
+const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 
 export default function App() {
   return (
@@ -54,6 +55,14 @@ export default function App() {
                       </PageLayout>
                     }
                     path="/register"
+                  />
+                  <Route
+                    element={
+                      <PageLayout>
+                        <Leaderboard />
+                      </PageLayout>
+                    }
+                    path="/leaderboard"
                   />
                   <Route
                     element={

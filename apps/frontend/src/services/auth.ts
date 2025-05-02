@@ -74,6 +74,8 @@ export async function singinWithEmail(email: string, password: string) {
 export async function logout() {
   try {
     await signOut(auth);
+    localStorage.removeItem("guessFeedbackHistory");
+    localStorage.removeItem("generation");
   } catch (error) {
     console.error("Error signing out: ", error);
     addToast({

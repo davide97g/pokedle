@@ -21,11 +21,26 @@ export const createGuessController = (app: Express) => {
           res.status(400).send("Invalid Pokemon Id");
         }
 
+        const guessNumber = Number(req.body.guessNumber);
+        if (isNaN(guessNumber)) {
+          res.status(400).send("Invalid Guess");
+        }
+        if (guessNumber < 1) {
+          res.status(400).send("Guess must be positive");
+        }
+
         const user = await getUserInfoFromToken(req);
 
         const validationGuess = await computeValidationGuess(
           pokemonIdNumber,
           user?.uid
+            ? {
+                id: user.uid,
+                name: user.displayName,
+                image: user.photoURL,
+              }
+            : undefined,
+          guessNumber
         );
 
         if (!validationGuess) {

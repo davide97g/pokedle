@@ -4,7 +4,13 @@ import { getAuth } from "firebase/auth";
 
 export const useSendGuessPokemon = () => {
   return useMutation({
-    mutationFn: async ({ pokemonId }: { pokemonId: number }) => {
+    mutationFn: async ({
+      pokemonId,
+      guessNumber,
+    }: {
+      pokemonId: number;
+      guessNumber: number;
+    }) => {
       const token = await getAuth().currentUser?.getIdToken();
       const { validationGuess } = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/guess/${pokemonId}`,
@@ -14,6 +20,7 @@ export const useSendGuessPokemon = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify({ guessNumber }),
         }
       ).then(
         (res) =>

@@ -1,5 +1,4 @@
-import { Delete, Edit, Eyedropper } from "@carbon/icons-react";
-import { Chip } from "@heroui/chip";
+import { Pagination } from "@heroui/pagination";
 import {
   Table,
   TableBody,
@@ -8,138 +7,91 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import { Tooltip } from "@heroui/tooltip";
 import { User } from "@heroui/user";
-import { useCallback } from "react";
+import { PublicLeaderboardItem } from "@pokedle/types";
+import { useCallback, useState } from "react";
+import { useAuth } from "../../context/AuthProvider";
+import { useStatsGetPublicLeaderboard } from "../../hooks/stats/useStatsGetPublicLeaderboard";
 
 export const columns = [
-  { name: "NAME", uid: "name" },
-  { name: "ROLE", uid: "role" },
-  { name: "STATUS", uid: "status" },
-  { name: "ACTIONS", uid: "actions" },
+  { name: "USER", uid: "user" },
+  { name: "BEST STREAK", uid: "streak" },
+  { name: "AVERAGE GUESSES", uid: "guesses" },
+  { name: "TOTAL GAMES", uid: "games" },
 ];
 
-export const users = [
-  {
-    id: 1,
-    name: "Tony Reichert",
-    role: "CEO",
-    team: "Management",
-    status: "active",
-    age: "29",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
-    email: "tony.reichert@example.com",
-  },
-  {
-    id: 2,
-    name: "Zoey Lang",
-    role: "Technical Lead",
-    team: "Development",
-    status: "paused",
-    age: "25",
-    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
-    email: "zoey.lang@example.com",
-  },
-  {
-    id: 3,
-    name: "Jane Fisher",
-    role: "Senior Developer",
-    team: "Development",
-    status: "active",
-    age: "22",
-    avatar: "https://i.pravatar.cc/150?u=a04258114e29026702d",
-    email: "jane.fisher@example.com",
-  },
-  {
-    id: 4,
-    name: "William Howard",
-    role: "Community Manager",
-    team: "Marketing",
-    status: "vacation",
-    age: "28",
-    avatar: "https://i.pravatar.cc/150?u=a048581f4e29026701d",
-    email: "william.howard@example.com",
-  },
-  {
-    id: 5,
-    name: "Kristen Copper",
-    role: "Sales Manager",
-    team: "Sales",
-    status: "active",
-    age: "24",
-    avatar: "https://i.pravatar.cc/150?u=a092581d4ef9026700d",
-    email: "kristen.cooper@example.com",
-  },
-];
+type Column = "user" | "streak" | "guesses" | "games";
 
-const statusColorMap = {
-  active: "success",
-  paused: "danger",
-  vacation: "warning",
-};
-
-export function UserStatsHistory() {
-  const renderCell = useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
-
-    switch (columnKey) {
-      case "name":
-        return (
-          <User
-            avatarProps={{ radius: "lg", src: user.avatar }}
-            description={user.email}
-            name={cellValue}
-          >
-            {user.email}
-          </User>
-        );
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm capitalize">{cellValue}</p>
-            <p className="text-bold text-sm capitalize text-default-400">
-              {user.team}
-            </p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip content="Details">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Eyedropper />
-              </span>
-            </Tooltip>
-            <Tooltip content="Edit user">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <Edit />
-              </span>
-            </Tooltip>
-            <Tooltip color="danger" content="Delete user">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <Delete />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+export function PublicLeaderboard() {
+  const { user } = useAuth();
+  const [page, setPage] = useState(1);
+  const publicLeaderboard = useStatsGetPublicLeaderboard(page);
+  const renderCell = useCallback(
+    (statItem: PublicLeaderboardItem, columnKey: Column) => {
+      switch (columnKey) {
+        case "user":
+          return (
+            <User
+              avatarProps={{ radius: "lg", src: statItem.user.image }}
+              description={statItem.user.name}
+              name={statItem.user.name}
+              className={
+                statItem.user.id === user?.uid
+                  ? "border-fuchsia-400 border-2 rounded-lg p-2"
+                  : ""
+              }
+            >
+              {statItem.user.name}
+            </User>
+          );
+        case "streak":
+          return (
+            <div className="flex flex-row items-center gap-2">
+              <p className="text-bold text-sm capitalize">
+                {statItem.bestStreak}
+              </p>
+            </div>
+          );
+        case "guesses":
+          return (
+            <div className="flex flex-row items-center gap-2">
+              <p className="text-bold text-sm capitalize">
+                {statItem.totalGuesses / statItem.totalGames}
+              </p>
+            </div>
+          );
+        case "games":
+          return (
+            <div className="flex flex-row items-center gap-2">
+              <p className="text-bold text-sm capitalize">
+                {statItem.totalGames}
+              </p>
+            </div>
+          );
+      }
+    },
+    []
+  );
 
   return (
-    <Table aria-label="Example table with custom cells">
+    <Table
+      aria-label="Example table with custom cells"
+      bottomContent={
+        publicLeaderboard.data?.currentPage ? (
+          <div className="flex w-full justify-center">
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={publicLeaderboard.data?.items.length ?? 0}
+              onChange={(page) => setPage(page)}
+            />
+          </div>
+        ) : null
+      }
+    >
       <TableHeader columns={columns}>
         {(column) => (
           <TableColumn
@@ -150,11 +102,11 @@ export function UserStatsHistory() {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody items={users}>
+      <TableBody items={publicLeaderboard.data?.items ?? []}>
         {(item) => (
-          <TableRow key={item.id}>
+          <TableRow key={item.user.id}>
             {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
+              <TableCell>{renderCell(item, columnKey as Column)}</TableCell>
             )}
           </TableRow>
         )}
