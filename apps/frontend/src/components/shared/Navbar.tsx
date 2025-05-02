@@ -1,6 +1,9 @@
+import { Avatar } from "@heroui/avatar";
 import { Link } from "@heroui/link";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/navbar";
-import { useAuth } from "../context/AuthProvider";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthProvider";
+import { getAvatarInitials } from "../../services/utils";
 import { PokedleLogo } from "./PokedleLogo";
 
 type NavbarItem = {
@@ -9,16 +12,12 @@ type NavbarItem = {
 };
 
 export default function TopNavbar() {
-  // TODO: transform into SPA navigation
-
   const { user } = useAuth();
 
-  console.log("user", user);
-
+  const navigate = useNavigate();
   const links: NavbarItem[] = [
     { link: "/", label: "Guess" },
     { link: "/about", label: "About" },
-    { link: "/me", label: "Personal Area" },
   ];
   return (
     <Navbar>
@@ -27,19 +26,33 @@ export default function TopNavbar() {
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         {links.map(({ link, label }) => (
-          <a
+          <Link
             className="text-foreground hover:text-primary"
-            href={link}
+            onClick={() => navigate(link)}
             key={label}
           >
             {label}
-          </a>
+          </Link>
         ))}
       </NavbarContent>
+
       <NavbarContent justify="end">
         {!user && (
           <NavbarItem className="lg:flex">
             <Link href="/login">Login</Link>
+          </NavbarItem>
+        )}
+        {user && (
+          <NavbarItem className="lg:flex">
+            <Avatar
+              color="secondary"
+              isBordered
+              radius="sm"
+              src={user.photoURL ?? undefined}
+              name={user.email ?? undefined}
+              getInitials={getAvatarInitials}
+              onClick={() => navigate("/me")}
+            ></Avatar>
           </NavbarItem>
         )}
       </NavbarContent>

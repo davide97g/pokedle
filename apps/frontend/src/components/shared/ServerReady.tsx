@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { useSystemGetInfo } from "../hooks/system/useSystemGetInfo";
-import { Loader } from "./Loader";
+import { useSystemGetInfo } from "../../hooks/system/useSystemGetInfo";
+import { Loader } from "./loader/Loader";
 
 export default function ServerReady({ children }: { children: ReactNode }) {
   const systemInfo = useSystemGetInfo();
