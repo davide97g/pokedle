@@ -3,6 +3,7 @@ import express from "express";
 import { initializeFirebaseApp } from "./config/firebase";
 import { createGuessController } from "./controller/guess.controller";
 import { createPokemonController } from "./controller/pokemon.controller";
+import { createStatsController } from "./controller/stats.controller";
 
 initializeFirebaseApp();
 
@@ -30,6 +31,7 @@ app.get("/", (req, res) => {
 
 createPokemonController(app);
 createGuessController(app);
+createStatsController(app);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");

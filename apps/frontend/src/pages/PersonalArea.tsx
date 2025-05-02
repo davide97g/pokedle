@@ -1,9 +1,11 @@
 import { Button } from "@heroui/button";
+import { UserStatsHistory } from "../components/Stats/UserStatsHistory";
 import { useAuth } from "../context/AuthProvider";
 import { logout } from "../services/auth";
 
 export default function PersonalArea() {
   const { user } = useAuth();
+
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-2">
       <div className="text-2xl font-bold">Personal Area</div>
@@ -15,6 +17,7 @@ export default function PersonalArea() {
           Logout
         </Button>
       </div>
+      <UserStatsHistory />
     </div>
   );
 }
