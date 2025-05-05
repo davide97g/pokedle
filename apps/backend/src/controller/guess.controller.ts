@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, type Express } from "express";
 import { computeValidationGuess } from "../services/guess.service";
+import { getUserInfoFromToken } from "../utils/tokenInfo";
 
 export const createGuessController = (app: Express) => {
   // get guess feedback results
@@ -20,7 +21,27 @@ export const createGuessController = (app: Express) => {
           res.status(400).send("Invalid Pokemon Id");
         }
 
-        const validationGuess = await computeValidationGuess(pokemonIdNumber);
+        const guessNumber = Number(req.body.guessNumber);
+        if (isNaN(guessNumber)) {
+          res.status(400).send("Invalid Guess");
+        }
+        if (guessNumber < 1) {
+          res.status(400).send("Guess must be positive");
+        }
+
+        const user = await getUserInfoFromToken(req);
+
+        const validationGuess = await computeValidationGuess(
+          pokemonIdNumber,
+          user?.uid
+            ? {
+                id: user.uid,
+                name: user.displayName,
+                image: user.photoURL,
+              }
+            : undefined,
+          guessNumber
+        );
 
         if (!validationGuess) {
           res.status(400).send("Pokemon not found");

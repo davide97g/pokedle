@@ -55,13 +55,18 @@ export default function Player() {
 
   const guessPokemonById = (pokemonId: number) => {
     if (pokemonId) {
-      sendGuessPokemon.mutateAsync({ pokemonId }).then(({ validation }) => {
-        const updatedHistory = [
-          ...guessFeedbackHistory,
-          { ...validation, order: guessFeedbackHistory.length },
-        ];
-        setGuessFeedbackHistory(updatedHistory);
-      });
+      sendGuessPokemon
+        .mutateAsync({
+          pokemonId,
+          guessNumber: guessFeedbackHistory.length + 1,
+        })
+        .then(({ validation }) => {
+          const updatedHistory = [
+            ...guessFeedbackHistory,
+            { ...validation, order: guessFeedbackHistory.length },
+          ];
+          setGuessFeedbackHistory(updatedHistory);
+        });
     }
   };
 
@@ -75,8 +80,7 @@ export default function Player() {
     <>
       <div className="flex flex-col justify-center items-center gap-4">
         <div className="pt-8 md:pt-20 flex flex-row items-center gap-2">
-          <img src="./logo.png" alt="logo" height={45} width={45} />
-          <h1 className="text-2xl">Pokedle</h1>
+          <h2 className="text-2xl">Guess the pokemon</h2>
         </div>
         <Reset
           style={{

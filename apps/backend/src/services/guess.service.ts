@@ -2,6 +2,7 @@ import { PokemonValidationGuess } from "@pokedle/types";
 import dayjs from "dayjs";
 import { getDatabase } from "../config/database";
 import { getPokemonIdToGuess } from "../data/hidden";
+import { addWinningForUser } from "./stats.service";
 
 const computeComparison = (
   value?: number,
@@ -21,7 +22,15 @@ const computeComparison = (
 };
 
 export async function computeValidationGuess(
-  pokemonGuessId: number
+  pokemonGuessId: number,
+  user:
+    | {
+        id: string;
+        name: string;
+        image?: string;
+      }
+    | undefined,
+  guessNumber: number
 ): Promise<PokemonValidationGuess> {
   const database = getDatabase();
   // Find the pokemon guess in the database
@@ -38,9 +47,10 @@ export async function computeValidationGuess(
     throw new Error("Pokemon to guess not found");
   }
 
+  const date = dayjs().format("YYYY-MM-DD");
   const validationGuess: PokemonValidationGuess = {
     id: pokemonGuess.id,
-    date: dayjs().format("YYYY-MM-DD"),
+    date,
     name: pokemonGuess.name,
     image: pokemonGuess.image,
     type1: {
@@ -88,6 +98,18 @@ export async function computeValidationGuess(
       ),
     },
   };
+
+  // Check if the guess is correct
+  if (user?.id && pokemonGuessId === HIDDEN_POKEMON_ID)
+    await addWinningForUser(
+      {
+        userId: user.id,
+        date,
+        guesses: guessNumber,
+        pokemonId: HIDDEN_POKEMON_ID,
+      },
+      user
+    );
 
   return validationGuess;
 }
