@@ -61,6 +61,13 @@ export default function Login() {
             Register here
           </a>
         </p>
+        <Divider className="my-4" />
+        <p className="text-center text-sm text-slate-400">
+          Forgot your password?{" "}
+          <a href="/password-reset" className="text-blue-500 hover:underline">
+            Reset here
+          </a>
+        </p>
       </div>
     </div>
   );
