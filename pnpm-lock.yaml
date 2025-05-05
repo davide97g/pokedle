@@ -75,6 +75,9 @@ importers:
       '@heroui/code':
         specifier: 2.2.12
         version: 2.2.12(@heroui/theme@2.4.13(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.3)(typescript@5.8.3))))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@heroui/divider':
+        specifier: 2.2.11
+        version: 2.2.11(@heroui/theme@2.4.13(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.3)(typescript@5.8.3))))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@heroui/dropdown':
         specifier: 2.3.17
         version: 2.3.17(@heroui/system@2.4.13(@heroui/theme@2.4.13(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.3)(typescript@5.8.3))))(framer-motion@12.9.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.13(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@22.15.3)(typescript@5.8.3))))(framer-motion@12.9.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
