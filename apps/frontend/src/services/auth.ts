@@ -2,6 +2,7 @@ import { addToast } from "@heroui/toast";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -62,6 +63,31 @@ export async function singinWithEmail(email: string, password: string) {
     addToast({
       title: "Error signing in",
       description: "Please check your email and password",
+      timeout: 3000,
+      shouldShowTimeoutProgress: true,
+      variant: "flat",
+      color: "danger",
+    });
+    throw error;
+  }
+}
+
+export async function resetPassword(email: string) {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    addToast({
+      title: "Password reset email sent",
+      description: "Please check your email to reset your password",
+      timeout: 3000,
+      shouldShowTimeoutProgress: true,
+      variant: "flat",
+      color: "success",
+    });
+  } catch (error) {
+    console.error("Error sending password reset email: ", error);
+    addToast({
+      title: "Error sending password reset email",
+      description: "Please check your email and try again",
       timeout: 3000,
       shouldShowTimeoutProgress: true,
       variant: "flat",

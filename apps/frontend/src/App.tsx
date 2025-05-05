@@ -14,6 +14,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const PersonalArea = lazy(() => import("./pages/PersonalArea"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
+const PasswordReset = lazy(() => import("./pages/PasswordReset"));
 
 export default function App() {
   return (
@@ -55,6 +56,14 @@ export default function App() {
                       </PageLayout>
                     }
                     path="/register"
+                  />
+                  <Route
+                    element={
+                      <PageLayout>
+                        <PasswordReset />
+                      </PageLayout>
+                    }
+                    path="/password-reset"
                   />
                   <Route
                     element={
