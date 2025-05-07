@@ -8,7 +8,10 @@ import { GuessFeedback } from "../components/Guess/GuessFeedback";
 import { Reset } from "@carbon/icons-react";
 import { PokemonSummary } from "@pokedle/types";
 import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
+import { Loader } from "../components/shared/loader/Loader";
 import { WinningModal } from "../components/WinningModal";
+import { useAuth } from "../context/AuthProvider";
+import { useGetBestGuessPokemon } from "../hooks/pokemon/useGetBestGuessPokemon";
 import { useSendGuessPokemon } from "../hooks/pokemon/useSendGuessPokemon";
 import { useLayout } from "../hooks/useLayout";
 import { useStatus } from "../hooks/useStatus";
@@ -18,7 +21,10 @@ const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 export default function Player() {
   const { isMobile } = useLayout();
 
+  const { user } = useAuth();
+
   const sendGuessPokemon = useSendGuessPokemon();
+
   const [winningModalOpen, setWinningModalOpen] = useState(false);
 
   const {
@@ -28,6 +34,12 @@ export default function Player() {
     setGuessFeedbackHistory,
     reset,
   } = useStatus();
+
+  const getBestGuessPokemon = useGetBestGuessPokemon({
+    previouslyGuessedPokemonIdList: guessFeedbackHistory
+      .map((guess) => guess.id)
+      .filter(Boolean) as number[],
+  });
 
   useEffect(() => {
     if (gameStatus === "WON") setWinningModalOpen(true);
@@ -68,6 +80,17 @@ export default function Player() {
           setGuessFeedbackHistory(updatedHistory);
         });
     }
+  };
+
+  const handleBestGuessPokemon = () => {
+    if (!user) return;
+
+    getBestGuessPokemon.refetch().then((response) => {
+      if (response.data) {
+        const bestGuess = response.data;
+        guessPokemonById(bestGuess.id);
+      }
+    });
   };
 
   const startNewGame = () => {
@@ -120,6 +143,16 @@ export default function Player() {
           gameStatus={gameStatus}
           guessPokemonById={guessPokemonById}
         />
+        {!!user && (
+          <Button
+            className="flex-shrink-0 mt-2"
+            color="primary"
+            onPress={handleBestGuessPokemon}
+            isDisabled={gameStatus === "WON"}
+          >
+            Best Guess
+          </Button>
+        )}
       </Suspense>
 
       {/* VALIDATION LINES */}
@@ -164,6 +197,10 @@ export default function Player() {
             setWinningModalOpen(false);
           }}
         />
+      )}
+
+      {sendGuessPokemon.isPending && getBestGuessPokemon.isFetching && (
+        <Loader />
       )}
     </>
   );
