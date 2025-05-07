@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response, type Express } from "express";
-import { guessPokemon } from "../services/guess.service";
+import { isLogged } from "../middlewares/authentication";
+import { getBestPokemonToGuess, guessPokemon } from "../services/guess.service";
 import { getUserInfoFromToken } from "../utils/tokenInfo";
 
 export const createGuessController = (app: Express) => {
@@ -55,4 +56,18 @@ export const createGuessController = (app: Express) => {
       }
     }
   );
+
+  // ? get best pokemon to guess next given a list of previously guessed pokemons
+  // ? if no pokemon is passed, return the "best initial guess"
+  app.get("/guess/best", isLogged, (req, res) => {
+    try {
+      const { id } = req.query;
+      const pokemonIds = (!id ? [] : Array.isArray(id) ? id : [id]).map(Number);
+      const bestGuess = getBestPokemonToGuess(pokemonIds);
+      res.status(200).send(bestGuess);
+    } catch (error) {
+      console.error("Error gettings stats", error);
+      res.status(500).send("Internal Server Error");
+    }
+  });
 };

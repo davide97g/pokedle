@@ -126,3 +126,13 @@ export function computeValidationFeedback(
     correct: pokemonGuessed.id === pokemonHidden.id,
   };
 }
+
+export function getBestPokemonToGuess(
+  guessHistoryIdList: number[]
+): PokemonModel | null {
+  const database = getDatabase();
+  const pokemonToGuess = database.filter(
+    (p) => !guessHistoryIdList.includes(p.id)
+  );
+  return pokemonToGuess?.[0] ?? null;
+}
