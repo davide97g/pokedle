@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response, type Express } from "express";
+import { isLogged } from "../middlewares/authentication";
 import {
   computeFeedbackHistory,
   getBestPokemonToGuess,
@@ -62,7 +63,7 @@ export const createGuessController = (app: Express) => {
 
   // ? get best pokemon to guess next given a list of previously guessed pokemons
   // ? if no pokemon is passed, return the "best initial guess"
-  app.get("/guess/best", async (req, res) => {
+  app.get("/guess/best", isLogged, async (req, res) => {
     try {
       // ? take the pokemon ids from the query params
       // ? if no pokemon is passed, it will return the "best initial guess"
