@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, type Express } from "express";
-import { computeValidationGuess } from "../services/guess.service";
+import { guessPokemon } from "../services/guess.service";
 import { getUserInfoFromToken } from "../utils/tokenInfo";
 
 export const createGuessController = (app: Express) => {
@@ -31,7 +31,7 @@ export const createGuessController = (app: Express) => {
 
         const user = await getUserInfoFromToken(req);
 
-        const validationGuess = await computeValidationGuess(
+        const validationGuess = await guessPokemon(
           pokemonIdNumber,
           user?.uid
             ? {
