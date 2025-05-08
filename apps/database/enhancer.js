@@ -2,13 +2,19 @@
 
 import axios from "axios";
 import cliProgress from "cli-progress";
-import { readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
 // create a new progress bar instance and use shades_classic theme
 const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 
-const NUMBER_OF_POKEMON = 151;
+const NUMBER_OF_POKEMON = 1025;
+
+// create a directory for the data
+const dir = "./data/enhanced/";
+if (!existsSync(dir)) {
+  mkdirSync(dir);
+}
 
 const enhancer = async () => {
   const evolutionData = JSON.parse(
