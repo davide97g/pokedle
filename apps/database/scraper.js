@@ -1,9 +1,8 @@
-//  DOWNLOAD THE FIRST 151 POKEMON FROM THE POKEAPI
+//  DOWNLOAD THE FIRST 1025 POKEMON FROM THE POKEAPI
 import axios from "axios";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
-// const NUMBER_OF_POKEMON = 151;
 const NUMBER_OF_POKEMON = 1025;
 
 const scraper = async () => {

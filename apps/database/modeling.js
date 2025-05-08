@@ -18,7 +18,7 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const NUMBER_OF_POKEMON = 151;
+const NUMBER_OF_POKEMON = 1025;
 
 const modeling = () => {
   const pokemonData = [];
