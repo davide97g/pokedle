@@ -3,7 +3,7 @@ import { Slider } from "@heroui/slider";
 import { Tooltip } from "@heroui/tooltip";
 import { useAuth } from "../context/AuthProvider";
 
-const firstPokemonIdForGeneration = [1, 152, 252, 387, 494, 650, 722, 810, 906];
+const firstPokemonIdForGeneration = [1, 152, 252, 387, 495, 650, 722, 810, 906];
 const regionForGeneration = [
   "Kanto",
   "Johto",
