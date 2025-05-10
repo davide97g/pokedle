@@ -120,7 +120,7 @@ const computeAvgScore = (
 export const findOptimalPokemon = (
   pokemonList: PokemonModel[],
   remainingFeatures: FEATURE[]
-) => {
+): { pokemon: PokemonModel; score: number } | null => {
   const pokemonScores: { pokemonId: number; avg: number; name: string }[] = [];
 
   pokemonList.forEach((pokemon) => {
@@ -133,10 +133,20 @@ export const findOptimalPokemon = (
   const minScore = Math.min(...pokemonScores.map((p) => p.avg));
   const pokemonWithMinScore = pokemonScores.filter((p) => p.avg === minScore);
 
+  console.info(
+    `Best guess pokemon: ${pokemonWithMinScore[0].name} with score ${minScore}`
+  );
+
   const randomIndex = Math.floor(Math.random() * pokemonWithMinScore.length);
   const bestPokemonId = pokemonWithMinScore[randomIndex].pokemonId;
 
-  return pokemonList.find((p) => p.id === bestPokemonId) ?? null;
+  const pokemon = pokemonList.find((p) => p.id === bestPokemonId) ?? null;
+  if (!pokemon) return null;
+
+  return {
+    pokemon: pokemon,
+    score: minScore,
+  };
 };
 
 export const generateInfo = (

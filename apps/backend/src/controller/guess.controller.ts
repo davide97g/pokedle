@@ -48,7 +48,7 @@ export const createGuessController = (app: Express) => {
               }
             : undefined,
           guessNumber,
-          gen && !isNaN(Number(gen)) ? Number(gen) : undefined
+          gen && !isNaN(Number(gen)) ? Number(gen) : 1
         );
 
         if (!validationGuess) {
@@ -76,7 +76,7 @@ export const createGuessController = (app: Express) => {
       // ? compute the feedback history for the given pokemon ids
       const feedbackHistory = await computeFeedbackHistory(
         pokemonIds,
-        gen && !isNaN(Number(gen)) ? Number(gen) : undefined
+        gen && !isNaN(Number(gen)) ? Number(gen) : 1
       );
       if (feedbackHistory.correctPokemon) {
         res.status(200).send(feedbackHistory.correctPokemon);
@@ -84,7 +84,8 @@ export const createGuessController = (app: Express) => {
 
       // ? compute the best guess pokemon based on the feedback history
       const bestGuess = await getBestPokemonToGuess(
-        feedbackHistory.feedbackHistory.map((f) => f.validationGuess) ?? []
+        feedbackHistory.feedbackHistory.map((f) => f.validationGuess) ?? [],
+        gen && !isNaN(Number(gen)) ? Number(gen) : 1
       );
 
       if (!bestGuess)

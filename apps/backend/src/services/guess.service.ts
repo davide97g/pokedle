@@ -1,6 +1,7 @@
 import { FEATURE, PokemonModel, PokemonValidationGuess } from "@pokedle/types";
 import dayjs from "dayjs";
 import { getDatabase } from "../config/database";
+import { optimalGuessForGenerations } from "../data/best";
 import { getPokemonIdToGuess } from "../data/hidden";
 import {
   filterOutPokemonByNegativeFeatures,
@@ -36,9 +37,9 @@ export async function guessPokemon(
       }
     | undefined,
   guessNumber: number,
-  gen?: number
+  gen: number
 ): Promise<PokemonValidationGuess> {
-  const database = getDatabase();
+  const database = getDatabase(gen);
   // Find the pokemon guess in the database
   const pokemonGuess = database.find((p) => p.id === pokemonGuessId);
   if (!pokemonGuess) {
@@ -143,9 +144,9 @@ export function computeValidationFeedback(
 // ?
 export async function computeFeedbackHistory(
   guessHistoryIdList: number[],
-  gen?: number
+  gen: number
 ) {
-  const database = getDatabase();
+  const database = getDatabase(gen);
   // ? here we are retrieving the pokemon to guess from the database, but it is not required
   const HIDDEN_POKEMON_ID = await getPokemonIdToGuess(gen ?? 1);
   const POKEMON_TO_GUESS = database.find((p) => p.id === HIDDEN_POKEMON_ID);
@@ -172,14 +173,31 @@ export async function computeFeedbackHistory(
  * @returns
  */
 export async function getBestPokemonToGuess(
-  validationGuessHistory: PokemonValidationGuess[]
-): Promise<PokemonModel | null> {
-  const database = getDatabase();
+  validationGuessHistory: PokemonValidationGuess[],
+  gen: number
+): Promise<{ pokemon: PokemonModel; score: number } | null> {
+  const database = getDatabase(gen);
+
+  // ? if this is the first guess, we can return the best pokemon to guess
+  // ? for the generation: optimization for the first guess that is a bit heavy to compute
+  if (!validationGuessHistory.length) {
+    const bestGuessForGeneration = optimalGuessForGenerations.find(
+      (g) => g.gen === gen
+    );
+    const bestPokemon = database.find(
+      (p) => p.id === bestGuessForGeneration?.optimalGuess
+    );
+    if (bestPokemon)
+      return {
+        pokemon: bestPokemon,
+        score: bestGuessForGeneration?.score ?? 0,
+      };
+  }
 
   // Filter out the pokemons that have been guessed
   const guessedPokemonIds = validationGuessHistory.map((v) => v.id);
   const pokemonStillToGuess = database.filter(
-    (p) => !guessedPokemonIds.includes(p.id)
+    (p) => p.generation <= gen && !guessedPokemonIds.includes(p.id)
   );
 
   // Given a list of feedbacks, generate the guessed features and negative features
@@ -210,10 +228,5 @@ export async function getBestPokemonToGuess(
   // This will give us the most information about the remaining features
   // and will help us to narrow down the list of pokemons
   // to guess next
-  const bestPokemonToGuess = findOptimalPokemon(
-    pokemonFiltered,
-    remainingFeatures
-  );
-
-  return bestPokemonToGuess;
+  return findOptimalPokemon(pokemonFiltered, remainingFeatures);
 }

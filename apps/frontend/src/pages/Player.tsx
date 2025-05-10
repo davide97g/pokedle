@@ -7,6 +7,7 @@ import { GuessFeedback } from "../components/Guess/GuessFeedback";
 
 import { Reset } from "@carbon/icons-react";
 import { PokemonSummary } from "@pokedle/types";
+import { GenerationSelection } from "../components/GenerationSelection";
 import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
 import { Loader } from "../components/shared/loader/Loader";
 import { WinningModal } from "../components/WinningModal";
@@ -26,7 +27,6 @@ export default function Player() {
   const sendGuessPokemon = useSendGuessPokemon();
 
   const [winningModalOpen, setWinningModalOpen] = useState(false);
-  const [gen, setGen] = useState(1);
 
   const {
     savedGuessNumber,
@@ -34,13 +34,15 @@ export default function Player() {
     gameStatus,
     setGuessFeedbackHistory,
     reset,
+    generation,
+    setGeneration,
   } = useStatus();
 
   const getBestGuessPokemon = useGetBestGuessPokemon({
     previouslyGuessedPokemonIdList: guessFeedbackHistory
       .map((guess) => guess.id)
       .filter(Boolean) as number[],
-    gen,
+    gen: generation,
   });
 
   useEffect(() => {
@@ -73,7 +75,7 @@ export default function Player() {
         .mutateAsync({
           pokemonId,
           guessNumber: guessFeedbackHistory.length + 1,
-          gen,
+          gen: generation,
         })
         .then(({ validation }) => {
           const updatedHistory = [
@@ -90,8 +92,9 @@ export default function Player() {
 
     getBestGuessPokemon.refetch().then((response) => {
       if (response.data) {
-        const bestGuess = response.data;
-        guessPokemonById(bestGuess.id);
+        const { pokemon, score } = response.data;
+        console.log("Best guess pokemon:", pokemon, score);
+        guessPokemonById(pokemon.id);
       }
     });
   };
@@ -105,23 +108,27 @@ export default function Player() {
   return (
     <>
       <div className="flex flex-col justify-center items-center gap-4">
-        <div className="pt-8 md:pt-20 flex flex-row items-center gap-2">
+        <div className="pt-8 md:pt-20 flex flex-col items-center gap-4">
           <h2 className="text-2xl">Guess the pokemon</h2>
+          {Boolean(guessFeedbackHistory.length) && (
+            <Button
+              className="flex-shrink-0"
+              color="danger"
+              size="sm"
+              isDisabled={gameStatus === "WON"}
+              onPress={reset}
+            >
+              Restart
+              <Reset />
+            </Button>
+          )}
         </div>
-        <Reset
-          style={{
-            position: "absolute",
-            top: "1rem",
-            right: "1rem",
-          }}
-          color="danger"
-          className="w-5 h-5"
-          onClick={reset}
+
+        <GenerationSelection
+          value={generation}
+          onChange={setGeneration}
+          disabled={!!guessFeedbackHistory.length}
         />
-        <p className="md:text-md text-xs text-white/50 flex justify-end mr-2 mt-2">
-          Guess the hidden pokemon between the "First Generation"
-        </p>
-        {/* TODO add generation dropdown if user is logged */}
       </div>
 
       {/* START NEW GAME */}
@@ -146,7 +153,7 @@ export default function Player() {
         <PokemonSearchBar
           gameStatus={gameStatus}
           guessPokemonById={guessPokemonById}
-          gen={gen}
+          gen={generation}
         />
         {!!user && (
           <Button
@@ -204,7 +211,7 @@ export default function Player() {
         />
       )}
 
-      {sendGuessPokemon.isPending && getBestGuessPokemon.isFetching && (
+      {sendGuessPokemon.isPending && getBestGuessPokemon.isLoading && (
         <Loader />
       )}
     </>

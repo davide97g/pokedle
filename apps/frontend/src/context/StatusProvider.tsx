@@ -11,6 +11,8 @@ import {
 import { PokemonValidationGuess } from "@pokedle/types";
 
 interface StatusContext {
+  generation: number;
+  setGeneration: (generation: number) => void;
   gameStatus?: "PLAYING" | "WON";
   guessFeedbackHistory: PokemonValidationGuess[];
   setGuessFeedbackHistory: (
@@ -21,6 +23,8 @@ interface StatusContext {
 }
 
 export const StatusContext = createContext({
+  generation: 1,
+  setGeneration: () => {},
   gameStatus: "PLAYING",
   guessFeedbackHistory: [],
   setGuessFeedbackHistory: () => {},
@@ -31,6 +35,9 @@ export const StatusContext = createContext({
 export function StatusProvider({
   children,
 }: Readonly<{ children: ReactNode }>) {
+  const [generation, setGeneration] = useState<number>(
+    Number(localStorage.getItem("generation")) || 1
+  );
   const [guessFeedbackHistory, setGuessFeedbackHistory] = useState<
     PokemonValidationGuess[]
   >(
@@ -88,6 +95,10 @@ export function StatusProvider({
     );
   }, [guessFeedbackHistory]);
 
+  useEffect(() => {
+    localStorage.setItem("generation", String(generation));
+  }, [generation]);
+
   // ****
 
   // ? reset everything when day changes
@@ -107,8 +118,10 @@ export function StatusProvider({
       setGuessFeedbackHistory,
       reset,
       savedGuessNumber,
+      generation,
+      setGeneration,
     }),
-    [gameStatus, guessFeedbackHistory, reset, savedGuessNumber]
+    [gameStatus, generation, guessFeedbackHistory, reset, savedGuessNumber]
   );
 
   return (

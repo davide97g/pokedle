@@ -3,7 +3,7 @@ import { generationLimits } from "../constants";
 
 export function searchPokemon(query?: string, gen?: number) {
   const limit = generationLimits[gen ? gen - 1 : 0];
-  const database = getDatabase();
+  const database = getDatabase(gen ?? 1);
   if (!query) {
     return database.slice(0, 10);
   }

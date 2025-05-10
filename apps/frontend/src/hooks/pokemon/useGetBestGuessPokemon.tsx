@@ -28,12 +28,17 @@ export const useGetBestGuessPokemon = ({
         }
       )
         .then((res) => {
+          console.log("Response status:", res);
           if (!res.ok) {
             throw new Error("Network response was not ok");
           }
           return res.json();
         })
-        .then((res) => res as PokemonModel);
+        .then((res) => res as { pokemon: PokemonModel; score: number })
+        .catch((err) => {
+          console.error("Error fetching best guess pokemon:", err);
+          throw new Error("Failed to fetch best guess pokemon");
+        });
     },
     enabled: false,
   });
