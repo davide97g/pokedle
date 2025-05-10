@@ -46,7 +46,7 @@ export default function PokemonSearchBar({
         onInputChange={(value) => setPokemonNameFilter(value)}
         onSelectionChange={(pokemonId) => {
           if (pokemonId) {
-            setPokemonNameFilter("");
+            // setPokemonNameFilter("");
             guessPokemonById(Number(pokemonId));
           }
         }}
