@@ -87,7 +87,7 @@ export async function addWinningForUser(
 }
 
 export async function getUserStats(userId: string) {
-  const pokemonList = getDatabase();
+  const pokemonList = getDatabase(9);
   const firestore = getFirestoreDatabase();
   const userStatsRef = firestore
     .collection("usersStats")

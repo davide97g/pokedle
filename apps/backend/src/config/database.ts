@@ -3,7 +3,7 @@ import { PokemonModel } from "@pokedle/types";
 const databasePath = process.env.DATABASE_PATH || "../data/pokemon.json";
 let database: PokemonModel[] = [];
 
-export function getDatabase(): PokemonModel[] {
+export function getDatabase(gen: number): PokemonModel[] {
   if (database.length === 0) {
     const data = require(databasePath);
     if (!data) {
@@ -14,5 +14,5 @@ export function getDatabase(): PokemonModel[] {
       throw new Error("Database is not an array");
     }
   }
-  return database;
+  return database.filter((p) => p.generation <= gen);
 }

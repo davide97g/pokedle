@@ -1,12 +1,20 @@
 import { PokemonModel } from "@pokedle/types";
 import { useQuery } from "@tanstack/react-query";
 
-export const useGetSearchPokemon = ({ name }: { name: string }) => {
+export const useGetSearchPokemon = ({
+  name,
+  gen,
+}: {
+  name: string;
+  gen: number;
+}) => {
   return useQuery({
-    queryKey: ["pokemon", name],
+    queryKey: ["pokemon", name, gen],
     queryFn: () =>
       fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/pokemon/search?query=${name}`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/pokemon/search?query=${name}&gen=${gen}`,
         {
           method: "GET",
           headers: {

@@ -7,8 +7,12 @@ import { GuessFeedback } from "../components/Guess/GuessFeedback";
 
 import { Reset } from "@carbon/icons-react";
 import { PokemonSummary } from "@pokedle/types";
+import { GenerationSelection } from "../components/GenerationSelection";
 import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
+import { Loader } from "../components/shared/loader/Loader";
 import { WinningModal } from "../components/WinningModal";
+import { useAuth } from "../context/AuthProvider";
+import { useGetBestGuessPokemon } from "../hooks/pokemon/useGetBestGuessPokemon";
 import { useSendGuessPokemon } from "../hooks/pokemon/useSendGuessPokemon";
 import { useLayout } from "../hooks/useLayout";
 import { useStatus } from "../hooks/useStatus";
@@ -18,7 +22,10 @@ const PokemonSearchBar = lazy(() => import("../components/PokemonSearchBar"));
 export default function Player() {
   const { isMobile } = useLayout();
 
+  const { user } = useAuth();
+
   const sendGuessPokemon = useSendGuessPokemon();
+
   const [winningModalOpen, setWinningModalOpen] = useState(false);
 
   const {
@@ -27,7 +34,16 @@ export default function Player() {
     gameStatus,
     setGuessFeedbackHistory,
     reset,
+    generation,
+    setGeneration,
   } = useStatus();
+
+  const getBestGuessPokemon = useGetBestGuessPokemon({
+    previouslyGuessedPokemonIdList: guessFeedbackHistory
+      .map((guess) => guess.id)
+      .filter(Boolean) as number[],
+    gen: generation,
+  });
 
   useEffect(() => {
     if (gameStatus === "WON") setWinningModalOpen(true);
@@ -59,6 +75,7 @@ export default function Player() {
         .mutateAsync({
           pokemonId,
           guessNumber: guessFeedbackHistory.length + 1,
+          gen: generation,
         })
         .then(({ validation }) => {
           const updatedHistory = [
@@ -70,6 +87,18 @@ export default function Player() {
     }
   };
 
+  const handleBestGuessPokemon = () => {
+    if (!user) return;
+
+    getBestGuessPokemon.refetch().then((response) => {
+      if (response.data) {
+        const { pokemon, score } = response.data;
+        console.log("Best guess pokemon:", pokemon, score);
+        guessPokemonById(pokemon.id);
+      }
+    });
+  };
+
   const startNewGame = () => {
     reset();
     setGuessFeedbackHistory([]);
@@ -79,22 +108,27 @@ export default function Player() {
   return (
     <>
       <div className="flex flex-col justify-center items-center gap-4">
-        <div className="pt-8 md:pt-20 flex flex-row items-center gap-2">
+        <div className="pt-8 md:pt-20 flex flex-col items-center gap-4">
           <h2 className="text-2xl">Guess the pokemon</h2>
+          {Boolean(guessFeedbackHistory.length) && (
+            <Button
+              className="flex-shrink-0"
+              color="danger"
+              size="sm"
+              isDisabled={gameStatus === "WON"}
+              onPress={reset}
+            >
+              Restart
+              <Reset />
+            </Button>
+          )}
         </div>
-        <Reset
-          style={{
-            position: "absolute",
-            top: "1rem",
-            right: "1rem",
-          }}
-          color="danger"
-          className="w-5 h-5"
-          onClick={reset}
+
+        <GenerationSelection
+          value={generation}
+          onChange={setGeneration}
+          disabled={!!guessFeedbackHistory.length}
         />
-        <p className="md:text-md text-xs text-white/50 flex justify-end mr-2 mt-2">
-          Guess the hidden pokemon between the "First Generation"
-        </p>
       </div>
 
       {/* START NEW GAME */}
@@ -119,7 +153,18 @@ export default function Player() {
         <PokemonSearchBar
           gameStatus={gameStatus}
           guessPokemonById={guessPokemonById}
+          gen={generation}
         />
+        {!!user && (
+          <Button
+            className="flex-shrink-0 mt-2"
+            color="primary"
+            onPress={handleBestGuessPokemon}
+            isDisabled={gameStatus === "WON"}
+          >
+            Best Guess
+          </Button>
+        )}
       </Suspense>
 
       {/* VALIDATION LINES */}
@@ -164,6 +209,10 @@ export default function Player() {
             setWinningModalOpen(false);
           }}
         />
+      )}
+
+      {sendGuessPokemon.isPending && getBestGuessPokemon.isLoading && (
+        <Loader />
       )}
     </>
   );

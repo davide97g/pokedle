@@ -1,5 +1,10 @@
 import { NextFunction, Request, Response, type Express } from "express";
-import { computeValidationGuess } from "../services/guess.service";
+import { isLogged } from "../middlewares/authentication";
+import {
+  computeFeedbackHistory,
+  getBestPokemonToGuess,
+  guessPokemon,
+} from "../services/guess.service";
 import { getUserInfoFromToken } from "../utils/tokenInfo";
 
 export const createGuessController = (app: Express) => {
@@ -31,7 +36,9 @@ export const createGuessController = (app: Express) => {
 
         const user = await getUserInfoFromToken(req);
 
-        const validationGuess = await computeValidationGuess(
+        const { gen } = req.query;
+
+        const validationGuess = await guessPokemon(
           pokemonIdNumber,
           user?.uid
             ? {
@@ -40,7 +47,8 @@ export const createGuessController = (app: Express) => {
                 image: user.photoURL,
               }
             : undefined,
-          guessNumber
+          guessNumber,
+          user && gen && !isNaN(Number(gen)) ? Number(gen) : 1
         );
 
         if (!validationGuess) {
@@ -55,4 +63,40 @@ export const createGuessController = (app: Express) => {
       }
     }
   );
+
+  // ? get best pokemon to guess next given a list of previously guessed pokemons
+  // ? if no pokemon is passed, return the "best initial guess"
+  app.get("/guess/best", isLogged, async (req, res) => {
+    try {
+      // ? take the pokemon ids from the query params
+      // ? if no pokemon is passed, it will return the "best initial guess"
+      const { id, gen } = req.query;
+      const pokemonIds = (!id ? [] : Array.isArray(id) ? id : [id]).map(Number);
+
+      // ? compute the feedback history for the given pokemon ids
+      const feedbackHistory = await computeFeedbackHistory(
+        pokemonIds,
+        gen && !isNaN(Number(gen)) ? Number(gen) : 1
+      );
+      if (feedbackHistory.correctPokemon) {
+        res.status(200).send(feedbackHistory.correctPokemon);
+      }
+
+      // ? compute the best guess pokemon based on the feedback history
+      const bestGuess = await getBestPokemonToGuess(
+        feedbackHistory.feedbackHistory.map((f) => f.validationGuess) ?? [],
+        gen && !isNaN(Number(gen)) ? Number(gen) : 1
+      );
+
+      if (!bestGuess)
+        res.status(400).send({
+          message: "No best guess pokemon found",
+        });
+
+      res.status(200).send(bestGuess);
+    } catch (error) {
+      console.error("Error gettings stats", error);
+      res.status(500).send("Internal Server Error");
+    }
+  });
 };

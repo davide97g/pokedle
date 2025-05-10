@@ -9,9 +9,11 @@ import { useLayout } from "../hooks/useLayout";
 export default function PokemonSearchBar({
   gameStatus,
   guessPokemonById,
+  gen,
 }: Readonly<{
   gameStatus?: "PLAYING" | "WON";
   guessPokemonById: (pokemonId: number) => void;
+  gen: number;
 }>) {
   const { isMobile } = useLayout();
   const [pokemonNameFilter, setPokemonNameFilter] = useState("");
@@ -23,6 +25,7 @@ export default function PokemonSearchBar({
     refetch: refetchPokemonList,
   } = useGetSearchPokemon({
     name: deferredPokemonNameFilter,
+    gen,
   });
 
   useEffect(() => {
