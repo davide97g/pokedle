@@ -7,13 +7,15 @@ export const useSendGuessPokemon = () => {
     mutationFn: async ({
       pokemonId,
       guessNumber,
+      gen,
     }: {
       pokemonId: number;
       guessNumber: number;
+      gen: number;
     }) => {
       const token = await getAuth().currentUser?.getIdToken();
       const { validationGuess } = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/guess/${pokemonId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/guess/${pokemonId}?gen=${gen}`,
         {
           method: "POST",
           headers: {

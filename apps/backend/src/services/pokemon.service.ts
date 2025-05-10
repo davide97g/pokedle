@@ -1,14 +1,18 @@
 import { getDatabase } from "../config/database";
+import { generationLimits } from "../constants";
 
-export function searchPokemon(query?: string) {
+export function searchPokemon(query?: string, gen?: number) {
+  const limit = generationLimits[gen ? gen - 1 : 0];
   const database = getDatabase();
   if (!query) {
     return database.slice(0, 10);
   }
   return (
     database
-      .filter((pokemon) =>
-        pokemon.name.toLowerCase().includes(query.toLowerCase())
+      .filter(
+        (pokemon) =>
+          pokemon.id <= limit &&
+          pokemon.name.toLowerCase().includes(query.toLowerCase())
       )
       // limit to 10 results
       .slice(0, 10)

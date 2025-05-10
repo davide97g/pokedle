@@ -4,18 +4,21 @@ import { getAuth } from "firebase/auth";
 
 export const useGetBestGuessPokemon = ({
   previouslyGuessedPokemonIdList,
+  gen,
 }: {
   previouslyGuessedPokemonIdList: number[];
+  gen: number;
 }) => {
-  const queryParams = previouslyGuessedPokemonIdList.join("&id=");
+  const queryParamsIds = previouslyGuessedPokemonIdList.join("&id=");
+  const queryParams = `?gen=${gen}${
+    queryParamsIds ? `&id=${queryParamsIds}` : ""
+  }`;
   return useQuery({
-    queryKey: ["guess", "best", previouslyGuessedPokemonIdList.join(",")],
+    queryKey: ["guess", "best", gen, previouslyGuessedPokemonIdList.join(",")],
     queryFn: async () => {
       const token = await getAuth().currentUser?.getIdToken();
       return fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/guess/best${
-          queryParams ? `?id=${queryParams}` : ""
-        }`,
+        `${import.meta.env.VITE_BACKEND_URL}/guess/best${queryParams}`,
         {
           method: "GET",
           headers: {

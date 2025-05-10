@@ -35,7 +35,8 @@ export async function guessPokemon(
         image?: string;
       }
     | undefined,
-  guessNumber: number
+  guessNumber: number,
+  gen?: number
 ): Promise<PokemonValidationGuess> {
   const database = getDatabase();
   // Find the pokemon guess in the database
@@ -44,7 +45,7 @@ export async function guessPokemon(
     throw new Error("Pokemon not found");
   }
 
-  const HIDDEN_POKEMON_ID = await getPokemonIdToGuess();
+  const HIDDEN_POKEMON_ID = await getPokemonIdToGuess(gen ?? 1);
 
   const POKEMON_TO_GUESS = database.find((p) => p.id === HIDDEN_POKEMON_ID);
 
@@ -140,10 +141,13 @@ export function computeValidationFeedback(
  * @returns
  */
 // ?
-export async function computeFeedbackHistory(guessHistoryIdList: number[]) {
+export async function computeFeedbackHistory(
+  guessHistoryIdList: number[],
+  gen?: number
+) {
   const database = getDatabase();
   // ? here we are retrieving the pokemon to guess from the database, but it is not required
-  const HIDDEN_POKEMON_ID = await getPokemonIdToGuess();
+  const HIDDEN_POKEMON_ID = await getPokemonIdToGuess(gen ?? 1);
   const POKEMON_TO_GUESS = database.find((p) => p.id === HIDDEN_POKEMON_ID);
   if (!POKEMON_TO_GUESS) {
     throw new Error("Pokemon to guess not found");

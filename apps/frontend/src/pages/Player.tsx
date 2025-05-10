@@ -26,6 +26,7 @@ export default function Player() {
   const sendGuessPokemon = useSendGuessPokemon();
 
   const [winningModalOpen, setWinningModalOpen] = useState(false);
+  const [gen, setGen] = useState(1);
 
   const {
     savedGuessNumber,
@@ -39,6 +40,7 @@ export default function Player() {
     previouslyGuessedPokemonIdList: guessFeedbackHistory
       .map((guess) => guess.id)
       .filter(Boolean) as number[],
+    gen,
   });
 
   useEffect(() => {
@@ -71,6 +73,7 @@ export default function Player() {
         .mutateAsync({
           pokemonId,
           guessNumber: guessFeedbackHistory.length + 1,
+          gen,
         })
         .then(({ validation }) => {
           const updatedHistory = [
@@ -118,6 +121,7 @@ export default function Player() {
         <p className="md:text-md text-xs text-white/50 flex justify-end mr-2 mt-2">
           Guess the hidden pokemon between the "First Generation"
         </p>
+        {/* TODO add generation dropdown if user is logged */}
       </div>
 
       {/* START NEW GAME */}
@@ -142,6 +146,7 @@ export default function Player() {
         <PokemonSearchBar
           gameStatus={gameStatus}
           guessPokemonById={guessPokemonById}
+          gen={gen}
         />
         {!!user && (
           <Button

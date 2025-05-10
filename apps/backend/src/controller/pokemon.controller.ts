@@ -7,8 +7,11 @@ export const createPokemonController = (app: Express) => {
   // if query is not provided, return first 10 pokemons
   app.get("/pokemon/search", (req, res) => {
     try {
-      const query = req.query.query as string | undefined;
-      const searchResult = searchPokemon(query);
+      const { query, gen } = req.query;
+      const searchResult = searchPokemon(
+        query as string,
+        gen && !isNaN(Number(gen)) ? Number(gen) : undefined
+      );
       res.send(searchResult);
     } catch (error) {
       console.error("Error searching for pokemon", error);

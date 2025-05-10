@@ -36,6 +36,8 @@ export const createGuessController = (app: Express) => {
 
         const user = await getUserInfoFromToken(req);
 
+        const { gen } = req.query;
+
         const validationGuess = await guessPokemon(
           pokemonIdNumber,
           user?.uid
@@ -45,7 +47,8 @@ export const createGuessController = (app: Express) => {
                 image: user.photoURL,
               }
             : undefined,
-          guessNumber
+          guessNumber,
+          gen && !isNaN(Number(gen)) ? Number(gen) : undefined
         );
 
         if (!validationGuess) {
@@ -67,11 +70,14 @@ export const createGuessController = (app: Express) => {
     try {
       // ? take the pokemon ids from the query params
       // ? if no pokemon is passed, it will return the "best initial guess"
-      const { id } = req.query;
+      const { id, gen } = req.query;
       const pokemonIds = (!id ? [] : Array.isArray(id) ? id : [id]).map(Number);
 
       // ? compute the feedback history for the given pokemon ids
-      const feedbackHistory = await computeFeedbackHistory(pokemonIds);
+      const feedbackHistory = await computeFeedbackHistory(
+        pokemonIds,
+        gen && !isNaN(Number(gen)) ? Number(gen) : undefined
+      );
       if (feedbackHistory.correctPokemon) {
         res.status(200).send(feedbackHistory.correctPokemon);
       }
