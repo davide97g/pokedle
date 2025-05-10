@@ -1,5 +1,6 @@
 import { type Express } from "express";
 import { searchPokemon } from "../services/pokemon.service";
+import { getUserInfoFromToken } from "../utils/tokenInfo";
 
 export const createPokemonController = (app: Express) => {
   // search a pokemon by query
@@ -8,9 +9,10 @@ export const createPokemonController = (app: Express) => {
   app.get("/pokemon/search", (req, res) => {
     try {
       const { query, gen } = req.query;
+      const user = getUserInfoFromToken(req);
       const searchResult = searchPokemon(
         query as string,
-        gen && !isNaN(Number(gen)) ? Number(gen) : undefined
+        !user && gen && !isNaN(Number(gen)) ? Number(gen) : undefined
       );
       res.send(searchResult);
     } catch (error) {

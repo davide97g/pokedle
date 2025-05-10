@@ -48,7 +48,7 @@ export const createGuessController = (app: Express) => {
               }
             : undefined,
           guessNumber,
-          gen && !isNaN(Number(gen)) ? Number(gen) : 1
+          user && gen && !isNaN(Number(gen)) ? Number(gen) : 1
         );
 
         if (!validationGuess) {
