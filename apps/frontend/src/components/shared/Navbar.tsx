@@ -26,7 +26,11 @@ export default function TopNavbar() {
   ];
 
   return (
-    <Navbar>
+    <Navbar
+      classNames={{
+        wrapper: "pl-2 pr-4",
+      }}
+    >
       <NavbarBrand>
         <PokedleLogo />
       </NavbarBrand>
