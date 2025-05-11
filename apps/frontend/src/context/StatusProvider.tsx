@@ -20,6 +20,8 @@ interface StatusContext {
   ) => void;
   savedGuessNumber: number;
   reset: () => void;
+  mute: boolean;
+  toggleMute: () => void;
 }
 
 export const StatusContext = createContext({
@@ -30,6 +32,8 @@ export const StatusContext = createContext({
   setGuessFeedbackHistory: () => {},
   reset: () => {},
   savedGuessNumber: 0,
+  mute: false,
+  toggleMute: () => {},
 } as StatusContext);
 
 export function StatusProvider({
@@ -38,6 +42,12 @@ export function StatusProvider({
   const [generation, setGeneration] = useState<number>(
     Number(localStorage.getItem("generation")) || 1
   );
+  const [mute, setMute] = useState(localStorage.getItem("mute") === "true");
+  const toggleMute = useCallback(() => {
+    setMute(!mute);
+    localStorage.setItem("mute", (!mute).toString());
+  }, [mute]);
+
   const [guessFeedbackHistory, setGuessFeedbackHistory] = useState<
     PokemonValidationGuess[]
   >(
@@ -120,8 +130,18 @@ export function StatusProvider({
       savedGuessNumber,
       generation,
       setGeneration,
+      mute,
+      toggleMute,
     }),
-    [gameStatus, generation, guessFeedbackHistory, reset, savedGuessNumber]
+    [
+      gameStatus,
+      generation,
+      guessFeedbackHistory,
+      mute,
+      reset,
+      savedGuessNumber,
+      toggleMute,
+    ]
   );
 
   return (

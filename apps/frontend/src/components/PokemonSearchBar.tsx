@@ -38,10 +38,11 @@ export default function PokemonSearchBar({
         size="sm"
         isDisabled={gameStatus === "WON"}
         defaultItems={pokemonList ?? []}
-        variant={isMobile ? "flat" : "underlined"}
+        variant={isMobile ? "flat" : "flat"}
+        color="primary"
         label="Search a pokemon"
         labelPlacement="inside"
-        className="md:max-w-[300px] autocomplete p-4"
+        className="autocomplete"
         inputValue={pokemonNameFilter}
         onInputChange={(value) => setPokemonNameFilter(value)}
         onSelectionChange={(pokemonId) => {

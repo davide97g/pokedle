@@ -84,7 +84,7 @@ export const createGuessController = (app: Express) => {
 
       // ? compute the best guess pokemon based on the feedback history
       const bestGuess = await getBestPokemonToGuess(
-        feedbackHistory.feedbackHistory.map((f) => f.validationGuess) ?? [],
+        feedbackHistory.feedbackHistory ?? [],
         gen && !isNaN(Number(gen)) ? Number(gen) : 1
       );
 

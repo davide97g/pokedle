@@ -6,10 +6,10 @@ export const createPokemonController = (app: Express) => {
   // search a pokemon by query
   // optional query param
   // if query is not provided, return first 10 pokemons
-  app.get("/pokemon/search", (req, res) => {
+  app.get("/pokemon/search", async (req, res) => {
     try {
       const { query, gen } = req.query;
-      const user = getUserInfoFromToken(req);
+      const user = await getUserInfoFromToken(req);
       const searchResult = searchPokemon(
         query as string,
         !user && gen && !isNaN(Number(gen)) ? Number(gen) : undefined

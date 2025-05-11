@@ -1,8 +1,11 @@
+import { VolumeMute, VolumeUp } from "@carbon/icons-react";
 import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
 import { Link } from "@heroui/link";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/navbar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
+import { useStatus } from "../../hooks/useStatus";
 import { getAvatarInitials } from "../../services/utils";
 import { PokedleLogo } from "./PokedleLogo";
 
@@ -13,6 +16,7 @@ type NavbarItem = {
 
 export default function TopNavbar() {
   const { user } = useAuth();
+  const { mute, toggleMute } = useStatus();
 
   const navigate = useNavigate();
   const links: NavbarItem[] = [
@@ -20,8 +24,13 @@ export default function TopNavbar() {
     { link: "/about", label: "About" },
     { link: "/leaderboard", label: "Leaderboard" },
   ];
+
   return (
-    <Navbar>
+    <Navbar
+      classNames={{
+        wrapper: "pl-2 pr-4",
+      }}
+    >
       <NavbarBrand>
         <PokedleLogo />
       </NavbarBrand>
@@ -44,7 +53,16 @@ export default function TopNavbar() {
           </NavbarItem>
         )}
         {user && (
-          <NavbarItem className="lg:flex">
+          <NavbarItem className="flex gap-2 items-center">
+            <Button
+              isIconOnly
+              color={mute ? "default" : "primary"}
+              variant="light"
+              size="sm"
+              onPress={toggleMute}
+            >
+              {mute ? <VolumeMute /> : <VolumeUp />}
+            </Button>
             <Avatar
               color="secondary"
               isBordered
@@ -53,7 +71,7 @@ export default function TopNavbar() {
               name={user.email ?? undefined}
               getInitials={getAvatarInitials}
               onClick={() => navigate("/me")}
-            ></Avatar>
+            />
           </NavbarItem>
         )}
       </NavbarContent>

@@ -54,13 +54,13 @@ export async function guessPokemon(
     throw new Error("Pokemon to guess not found");
   }
 
-  const { validationGuess, correct } = computeValidationFeedback(
+  const validationGuess = computeValidationFeedback(
     pokemonGuess,
     POKEMON_TO_GUESS
   );
 
   // Check if the guess is correct
-  if (user?.id && correct)
+  if (user?.id && validationGuess.correct)
     await addWinningForUser(
       {
         userId: user.id,
@@ -77,7 +77,7 @@ export async function guessPokemon(
 export function computeValidationFeedback(
   pokemonGuessed: PokemonModel,
   pokemonHidden: PokemonModel
-): { validationGuess: PokemonValidationGuess; correct: boolean } {
+): PokemonValidationGuess {
   const validationGuess: PokemonValidationGuess = {
     id: pokemonGuessed.id,
     date: dayjs().format("YYYY-MM-DD"),
@@ -127,11 +127,9 @@ export function computeValidationFeedback(
         pokemonGuessed?.evolutionStage
       ),
     },
-  };
-  return {
-    validationGuess,
     correct: pokemonGuessed.id === pokemonHidden.id,
   };
+  return validationGuess;
 }
 
 /**
@@ -159,9 +157,7 @@ export async function computeFeedbackHistory(
   // If the user has already guessed the pokemon, return that pokemon
   const correctPokemon = feedbackHistory.find((v) => v.correct);
   return {
-    correctPokemon: database.find(
-      (p) => p.id === correctPokemon?.validationGuess.id
-    )!,
+    correctPokemon: database.find((p) => p.id === correctPokemon?.id)!,
     feedbackHistory,
   };
 }

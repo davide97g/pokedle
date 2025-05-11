@@ -68,6 +68,7 @@ export interface PokemonValidationGuess {
     value: number;
     comparison: ValidationComparison | undefined;
   };
+  correct: boolean;
 }
 
 export interface PokemonFeatures {
