@@ -5,7 +5,8 @@ import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 
 import { GuessFeedback } from "../components/Guess/GuessFeedback";
 
-import { Reset } from "@carbon/icons-react";
+import { Reset, StarFilled } from "@carbon/icons-react";
+import { Tooltip } from "@heroui/tooltip";
 import { PokemonSummary } from "@pokedle/types";
 import { GenerationSelection } from "../components/GenerationSelection";
 import { GuessFeedbackHeader } from "../components/Guess/GuessFeedbackHeader";
@@ -36,7 +37,28 @@ export default function Player() {
     reset,
     generation,
     setGeneration,
+    mute,
   } = useStatus();
+
+  const playPokemonBattelcry = (pokemonId: number) => {
+    if (mute) return;
+    const audio = new Audio(
+      `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${pokemonId}.ogg`
+    );
+    audio.volume = 0.35;
+    audio.play().catch((e) => {
+      console.error("Error playing sound:", e);
+    });
+  };
+
+  const playWinningSound = () => {
+    if (mute) return;
+    const audio = new Audio("/audio/victory.mp3");
+    audio.volume = 0.35;
+    audio.play().catch((e) => {
+      console.error("Error playing sound:", e);
+    });
+  };
 
   const getBestGuessPokemon = useGetBestGuessPokemon({
     previouslyGuessedPokemonIdList: guessFeedbackHistory
@@ -82,6 +104,8 @@ export default function Player() {
             ...guessFeedbackHistory,
             { ...validation, order: guessFeedbackHistory.length },
           ];
+          if (validation.correct) setTimeout(() => playWinningSound(), 7000);
+          playPokemonBattelcry(pokemonId);
           setGuessFeedbackHistory(updatedHistory);
         });
     }
@@ -108,20 +132,10 @@ export default function Player() {
   return (
     <>
       <div className="flex flex-col justify-center items-center gap-4">
-        <div className="pt-8 md:pt-20 flex flex-col items-center gap-4">
-          <h2 className="text-2xl">Guess the pokemon</h2>
-          {Boolean(guessFeedbackHistory.length) && (
-            <Button
-              className="flex-shrink-0"
-              color="danger"
-              size="sm"
-              isDisabled={gameStatus === "WON"}
-              onPress={reset}
-            >
-              Restart
-              <Reset />
-            </Button>
-          )}
+        <div className="md:pt-20 flex flex-col items-center gap-4">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary-400 bg-clip-text text-transparent">
+            Guess the Pokémon!
+          </h2>
         </div>
 
         <GenerationSelection
@@ -131,18 +145,6 @@ export default function Player() {
         />
       </div>
 
-      {/* START NEW GAME */}
-      {gameStatus === "WON" && (
-        <Button
-          className="flex-shrink-0"
-          color="primary"
-          onPress={startNewGame}
-        >
-          Start New Game
-        </Button>
-      )}
-
-      {/* SEARCH BAR */}
       <Suspense
         fallback={
           <div className="flex justify-center items-center">
@@ -150,21 +152,46 @@ export default function Player() {
           </div>
         }
       >
-        <PokemonSearchBar
-          gameStatus={gameStatus}
-          guessPokemonById={guessPokemonById}
-          gen={generation}
-        />
-        {!!user && (
-          <Button
-            className="flex-shrink-0 mt-2"
-            color="primary"
-            onPress={handleBestGuessPokemon}
-            isDisabled={gameStatus === "WON"}
-          >
-            Best Guess
-          </Button>
-        )}
+        <div className="flex flex-row items-center gap-4 w-full px-4 max-w-[60rem]">
+          {/* SEARCH BAR */}
+          <PokemonSearchBar
+            gameStatus={gameStatus}
+            guessPokemonById={guessPokemonById}
+            gen={generation}
+          />
+
+          {!!user && (
+            <Button
+              className="flex-shrink-0"
+              color="primary"
+              onPress={handleBestGuessPokemon}
+              isDisabled={gameStatus === "WON"}
+              variant="shadow"
+              isIconOnly={isMobile}
+            >
+              {isMobile ? "" : "Best Guess"}
+              <StarFilled />
+            </Button>
+          )}
+          {/* START NEW GAME */}
+          {gameStatus === "WON" && (
+            <Tooltip
+              content={"Start a new game"}
+              className="px-1.5 text-tiny text-default-600 rounded-small"
+              placement="top"
+            >
+              <Button
+                className="flex-shrink-0"
+                color="success"
+                onPress={startNewGame}
+                isIconOnly={isMobile}
+              >
+                {isMobile ? "" : "New Game"}
+                <Reset />
+              </Button>
+            </Tooltip>
+          )}
+        </div>
       </Suspense>
 
       {/* VALIDATION LINES */}
@@ -202,9 +229,10 @@ export default function Player() {
       {/* GAME OVER */}
       {winningModalOpen && (
         <WinningModal
+          isOpen
           pokemon={guessedPokemon as PokemonSummary}
-          numberOfGuesses={guessFeedbackHistory.length}
-          onRestart={startNewGame}
+          guessCount={guessFeedbackHistory.length}
+          onNewGame={startNewGame}
           onClose={() => {
             setWinningModalOpen(false);
           }}

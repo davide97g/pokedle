@@ -2,6 +2,7 @@ import { Information } from "@carbon/icons-react";
 import { Slider } from "@heroui/slider";
 import { Tooltip } from "@heroui/tooltip";
 import { useAuth } from "../context/AuthProvider";
+import { useLayout } from "../hooks/useLayout";
 
 const firstPokemonIdForGeneration = [1, 152, 252, 387, 495, 650, 722, 810, 906];
 const regionForGeneration = [
@@ -43,7 +44,7 @@ function Message({
         content={messageTooltip}
         placement="right"
       >
-        <Information className="transition-opacity opacity-80 hover:opacity-100" />
+        <Information className="transition-opacity opacity-80 hover:opacity-100 cursor-help" />
       </Tooltip>
     </label>
   );
@@ -59,17 +60,13 @@ export function GenerationSelection({
   disabled?: boolean;
 }) {
   const { user } = useAuth();
+  const { isMobile } = useLayout();
 
   const userNeedsToLogin = !user;
   const alreadyGuessed = disabled;
 
   return (
-    <div className="flex flex-col items-center gap-2 min-w-[400px]">
-      <Message userNeedsToLogin={!user} alreadyGuessed={disabled}>
-        <p className="md:text-md text-xs text-white/50 flex justify-end transition-opacity opacity-80 hover:opacity-100">
-          Currently playing with generation {value}
-        </p>
-      </Message>
+    <div className="flex flex-col items-center gap-2 min-w-[400px] px-[2rem]">
       <Slider
         color="foreground"
         label="Generation"
@@ -101,16 +98,9 @@ export function GenerationSelection({
         step={1}
         renderLabel={({ children, ...props }) => (
           <label {...props} className="text-medium flex gap-2 items-center">
-            {children}
-            <Tooltip
-              className="w-[200px] px-1.5 text-tiny text-default-600 rounded-small"
-              content="Select how many generations you want to play against."
-              placement="right"
-            >
-              <span className="transition-opacity opacity-80 hover:opacity-100">
-                <Information />
-              </span>
-            </Tooltip>
+            <Message userNeedsToLogin={!user} alreadyGuessed={disabled}>
+              {children}
+            </Message>
           </label>
         )}
         renderValue={({ children, ...props }) => (
@@ -130,7 +120,7 @@ export function GenerationSelection({
             </Tooltip>
           </span>
         )}
-        size="lg"
+        size={isMobile ? "md" : "lg"}
         value={value}
         onChange={(v) => {
           console.log("GEN", v);
