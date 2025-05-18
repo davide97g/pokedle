@@ -1,7 +1,8 @@
 import { Button } from "@heroui/button";
 import { PokemonSummary } from "@pokedle/types";
+import confetti from "canvas-confetti";
 import { PartyPopper, X } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface VictoryModalProps {
   isOpen: boolean;
@@ -18,6 +19,16 @@ export const WinningModal: React.FC<VictoryModalProps> = ({
   pokemon,
   guessCount,
 }) => {
+  useEffect(() => {
+    confetti({
+      particleCount: Math.max(200 - 20 * guessCount, 50),
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ["#ffcc00", "#ff6699", "#66ccff"],
+      disableForReducedMotion: true,
+    });
+  }, [guessCount]);
+
   if (!isOpen) return null;
 
   return (
